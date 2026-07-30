@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { DollarSign, ShoppingBag, Users, Package, TrendingUp, Eye } from 'lucide-react'
+import { DollarSign, ShoppingBag, Users, Package, TrendingUp, Eye, Ticket } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AdminDashboardPage() {
