@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
 import { v4 as uuidv4 } from 'uuid'
+import { sendBulkOrderNotification } from '@/lib/notifications'
 
 // POST - Create bulk order inquiry
 export async function POST(request) {
@@ -30,8 +31,8 @@ export async function POST(request) {
     
     await db.collection('bulk_orders').insertOne(bulkOrder)
     
-    // TODO: Send notification to admin
-    // await sendNotification('admin@mrcoco.com', 'New Bulk Order Inquiry', bulkOrder)
+    // Send notification to admin
+    await sendBulkOrderNotification(bulkOrder)
     
     return NextResponse.json({ success: true, orderId: bulkOrder._id })
   } catch (error) {
