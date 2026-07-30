@@ -44,26 +44,20 @@ export default function UploadDemoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-800 py-12">
+      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-12">
         <div className="container mx-auto px-4">
           <Link href="/">
             <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
@@ -71,7 +65,7 @@ export default function UploadDemoPage() {
             </Button>
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">File Upload Demo</h1>
-          <p className="text-amber-100 text-lg">Test the file upload system with product images, customer photos, and documents</p>
+          <p className="text-pink-100 text-lg">Test the file upload system with product images, customer photos, and documents</p>
         </div>
       </div>
 
@@ -94,9 +88,9 @@ export default function UploadDemoPage() {
 
           {/* Product Images Tab */}
           <TabsContent value="products">
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-2xl font-serif text-amber-900 flex items-center gap-2">
+                <CardTitle className="text-2xl font-serif text-pink-900 flex items-center gap-2">
                   <ImageIcon className="w-6 h-6" />
                   Upload Product Images
                 </CardTitle>
@@ -127,9 +121,9 @@ export default function UploadDemoPage() {
 
           {/* Customer Photos Tab */}
           <TabsContent value="photos">
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-2xl font-serif text-amber-900 flex items-center gap-2">
+                <CardTitle className="text-2xl font-serif text-pink-900 flex items-center gap-2">
                   <Camera className="w-6 h-6" />
                   Upload Customer Photos
                 </CardTitle>
@@ -160,9 +154,9 @@ export default function UploadDemoPage() {
 
           {/* Documents Tab */}
           <TabsContent value="documents">
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-2xl font-serif text-amber-900 flex items-center gap-2">
+                <CardTitle className="text-2xl font-serif text-pink-900 flex items-center gap-2">
                   <FileText className="w-6 h-6" />
                   Upload Documents
                 </CardTitle>
@@ -233,7 +227,7 @@ export default function UploadDemoPage() {
 
         {/* Features Info */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-2 border-amber-200">
+          <Card className="border-2 border-pink-200">
             <CardHeader>
               <CardTitle className="text-lg">✅ Features Implemented</CardTitle>
             </CardHeader>

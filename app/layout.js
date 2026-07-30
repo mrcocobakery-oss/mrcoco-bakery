@@ -16,8 +16,8 @@ const inter = Inter({
 })
 
 export const metadata = {
-  title: 'Mr. COCO Bakery - Keep It Simple, Keep It Tasty',
-  description: 'Premium luxury bakery offering cakes, cookies, pastries, and more. Fresh, delicious, and delivered with love.',
+  title: 'Mr. COCO Bakery - Keep It Simple, Keep It Tasty | Haldwani',
+  description: 'Premium bakery in Haldwani offering fresh cakes, cookies, pastries, and more. Located opposite Hotel Blue Saphire, Rampur Road. Call +918447655399',
 }
 
 export default function RootLayout({ children }) {

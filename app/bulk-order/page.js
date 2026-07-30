@@ -50,14 +50,14 @@ export default function BulkOrderPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50 flex items-center justify-center">
         <Card className="max-w-md mx-4 border-2 border-green-200">
           <CardContent className="text-center p-8">
             <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold font-serif text-amber-900 mb-2">Thank You!</h2>
+            <h2 className="text-2xl font-bold font-serif text-pink-900 mb-2">Thank You!</h2>
             <p className="text-gray-600 mb-6">Your bulk order inquiry has been submitted successfully. Our team will contact you within 24 hours.</p>
             <Link href="/">
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+              <Button className="bg-pink-600 hover:bg-pink-700 text-white">
                 Back to Home
               </Button>
             </Link>
@@ -68,26 +68,20 @@ export default function BulkOrderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-800 py-16">
+      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-16">
         <div className="container mx-auto px-4">
           <Link href="/">
             <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
@@ -95,7 +89,7 @@ export default function BulkOrderPage() {
             </Button>
           </Link>
           <h1 className="text-4xl md:text-6xl font-bold font-serif text-white mb-4">Bulk Orders</h1>
-          <p className="text-amber-100 text-lg max-w-3xl">Perfect for corporate events, weddings, parties, hotels, cafes, and retail shops. Get special pricing for large orders.</p>
+          <p className="text-pink-100 text-lg max-w-3xl">Perfect for corporate events, weddings, parties, hotels, cafes, and retail shops. Get special pricing for large orders.</p>
         </div>
       </div>
 
@@ -103,16 +97,16 @@ export default function BulkOrderPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-2xl font-serif text-amber-900">Submit Your Bulk Order Inquiry</CardTitle>
+                <CardTitle className="text-2xl font-serif text-pink-900">Submit Your Bulk Order Inquiry</CardTitle>
                 <p className="text-gray-600">Fill out the form below and our team will get back to you with a customized quote.</p>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Company Details */}
                   <div>
-                    <h3 className="text-lg font-semibold text-amber-900 mb-4">Company Details</h3>
+                    <h3 className="text-lg font-semibold text-pink-900 mb-4">Company Details</h3>
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="companyName">Company/Organization Name *</Label>
@@ -142,7 +136,7 @@ export default function BulkOrderPage() {
 
                   {/* Contact Details */}
                   <div>
-                    <h3 className="text-lg font-semibold text-amber-900 mb-4">Contact Information</h3>
+                    <h3 className="text-lg font-semibold text-pink-900 mb-4">Contact Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="contactPerson">Contact Person *</Label>
@@ -150,11 +144,11 @@ export default function BulkOrderPage() {
                       </div>
                       <div>
                         <Label htmlFor="phone">Phone Number *</Label>
-                        <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+91 98765 43210" required />
+                        <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+918447655399" required />
                       </div>
                       <div>
                         <Label htmlFor="whatsapp">WhatsApp Number</Label>
-                        <Input id="whatsapp" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} placeholder="+91 98765 43210" />
+                        <Input id="whatsapp" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} placeholder="+918447655399" />
                       </div>
                       <div>
                         <Label htmlFor="email">Email Address *</Label>
@@ -173,7 +167,7 @@ export default function BulkOrderPage() {
 
                   {/* Order Details */}
                   <div>
-                    <h3 className="text-lg font-semibold text-amber-900 mb-4">Order Requirements</h3>
+                    <h3 className="text-lg font-semibold text-pink-900 mb-4">Order Requirements</h3>
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="products">Required Products *</Label>
@@ -204,9 +198,9 @@ export default function BulkOrderPage() {
                   <div>
                     <Label htmlFor="file">Attach Documents (Optional)</Label>
                     <div className="mt-2 flex items-center justify-center w-full">
-                      <label htmlFor="file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-amber-300 border-dashed rounded-lg cursor-pointer bg-amber-50 hover:bg-amber-100 transition">
+                      <label htmlFor="file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-pink-300 border-dashed rounded-lg cursor-pointer bg-pink-50 hover:bg-pink-100 transition">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Upload className="w-10 h-10 text-amber-600 mb-2" />
+                          <Upload className="w-10 h-10 text-pink-600 mb-2" />
                           <p className="text-sm text-gray-600"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                           <p className="text-xs text-gray-500">PDF, DOC, DOCX, XLS, XLSX (MAX. 10MB)</p>
                         </div>
@@ -215,7 +209,7 @@ export default function BulkOrderPage() {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white text-lg py-6">
+                  <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700 text-white text-lg py-6">
                     Submit Inquiry
                   </Button>
                 </form>
@@ -225,9 +219,9 @@ export default function BulkOrderPage() {
 
           {/* Info Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-xl font-serif text-amber-900">Why Choose Us?</CardTitle>
+                <CardTitle className="text-xl font-serif text-pink-900">Why Choose Us?</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 text-sm">
@@ -259,12 +253,12 @@ export default function BulkOrderPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white">
+            <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white">
               <CardContent className="p-6">
-                <h3 className="font-bold text-amber-900 mb-2">Need Immediate Assistance?</h3>
+                <h3 className="font-bold text-pink-900 mb-2">Need Immediate Assistance?</h3>
                 <p className="text-sm text-gray-600 mb-4">Call our bulk order specialist</p>
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                  📞 Call: +91 98765 43210
+                  📞 Call: +918447655399
                 </Button>
                 <Button className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white">
                   💬 WhatsApp Us
@@ -272,9 +266,9 @@ export default function BulkOrderPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-amber-200">
+            <Card className="border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-lg font-serif text-amber-900">Our Clients</CardTitle>
+                <CardTitle className="text-lg font-serif text-pink-900">Our Clients</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600">Trusted by 500+ businesses including:</p>

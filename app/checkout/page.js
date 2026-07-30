@@ -105,11 +105,11 @@ export default function CheckoutPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-700 mb-4">Your cart is empty</h2>
           <Link href="/products">
-            <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+            <Button className="bg-pink-600 hover:bg-pink-700 text-white">
               Start Shopping
             </Button>
           </Link>
@@ -119,26 +119,20 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-800 py-12">
+      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-12">
         <div className="container mx-auto px-4">
           <Link href="/cart">
             <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
@@ -148,17 +142,17 @@ export default function CheckoutPage() {
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">Checkout</h1>
           <div className="flex items-center gap-4 text-white">
             <div className={`flex items-center ${step >= 1 ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-white text-amber-900' : 'bg-amber-700'} font-bold`}>1</div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-white text-pink-900' : 'bg-pink-700'} font-bold`}>1</div>
               <span className="ml-2 hidden sm:inline">Personal Info</span>
             </div>
             <div className="h-0.5 w-8 bg-white/30" />
             <div className={`flex items-center ${step >= 2 ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-white text-amber-900' : 'bg-amber-700'} font-bold`}>2</div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-white text-pink-900' : 'bg-pink-700'} font-bold`}>2</div>
               <span className="ml-2 hidden sm:inline">Delivery</span>
             </div>
             <div className="h-0.5 w-8 bg-white/30" />
             <div className={`flex items-center ${step >= 3 ? 'opacity-100' : 'opacity-50'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-white text-amber-900' : 'bg-amber-700'} font-bold`}>3</div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-white text-pink-900' : 'bg-pink-700'} font-bold`}>3</div>
               <span className="ml-2 hidden sm:inline">Payment</span>
             </div>
           </div>
@@ -171,9 +165,9 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             {/* Step 1: Personal Info */}
             {step === 1 && (
-              <Card className="border-2 border-amber-200">
+              <Card className="border-2 border-pink-200">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-amber-900">Personal Information</CardTitle>
+                  <CardTitle className="text-2xl font-serif text-pink-900">Personal Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -188,7 +182,7 @@ export default function CheckoutPage() {
                     <Label htmlFor="phone">Phone Number *</Label>
                     <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+91 98765 43210" />
                   </div>
-                  <Button onClick={nextStep} className="w-full bg-amber-600 hover:bg-amber-700 text-white mt-6">
+                  <Button onClick={nextStep} className="w-full bg-pink-600 hover:bg-pink-700 text-white mt-6">
                     Continue to Delivery Details
                   </Button>
                 </CardContent>
@@ -197,9 +191,9 @@ export default function CheckoutPage() {
 
             {/* Step 2: Delivery Details */}
             {step === 2 && (
-              <Card className="border-2 border-amber-200">
+              <Card className="border-2 border-pink-200">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-amber-900">Delivery Details</CardTitle>
+                  <CardTitle className="text-2xl font-serif text-pink-900">Delivery Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -263,7 +257,7 @@ export default function CheckoutPage() {
                     <Button onClick={() => setStep(1)} variant="outline" className="flex-1">
                       Back
                     </Button>
-                    <Button onClick={nextStep} className="flex-1 bg-amber-600 hover:bg-amber-700 text-white">
+                    <Button onClick={nextStep} className="flex-1 bg-pink-600 hover:bg-pink-700 text-white">
                       Continue to Payment
                     </Button>
                   </div>
@@ -273,13 +267,13 @@ export default function CheckoutPage() {
 
             {/* Step 3: Payment */}
             {step === 3 && (
-              <Card className="border-2 border-amber-200">
+              <Card className="border-2 border-pink-200">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-amber-900">Payment Method</CardTitle>
+                  <CardTitle className="text-2xl font-serif text-pink-900">Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({...formData, paymentMethod: value})}>
-                    <Card className="border-2 hover:border-amber-400 transition cursor-pointer">
+                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value="online" id="online" />
@@ -289,14 +283,14 @@ export default function CheckoutPage() {
                                 <p className="font-semibold">Online Payment</p>
                                 <p className="text-sm text-gray-600">Razorpay, UPI, Cards, Net Banking</p>
                               </div>
-                              <CreditCard className="w-6 h-6 text-amber-600" />
+                              <CreditCard className="w-6 h-6 text-pink-600" />
                             </div>
                           </Label>
                         </div>
                       </CardContent>
                     </Card>
                     
-                    <Card className="border-2 hover:border-amber-400 transition cursor-pointer">
+                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value="cod" id="cod" />
@@ -306,7 +300,7 @@ export default function CheckoutPage() {
                                 <p className="font-semibold">Cash on Delivery</p>
                                 <p className="text-sm text-gray-600">Pay when you receive</p>
                               </div>
-                              <Truck className="w-6 h-6 text-amber-600" />
+                              <Truck className="w-6 h-6 text-pink-600" />
                             </div>
                           </Label>
                         </div>
@@ -314,8 +308,8 @@ export default function CheckoutPage() {
                     </Card>
                   </RadioGroup>
                   
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6">
-                    <p className="text-sm text-amber-900">
+                  <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 mt-6">
+                    <p className="text-sm text-pink-900">
                       <strong>Note:</strong> This is a demo checkout. No actual payment will be processed.
                     </p>
                   </div>
@@ -335,9 +329,9 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24 border-2 border-amber-200">
+            <Card className="sticky top-24 border-2 border-pink-200">
               <CardHeader>
-                <CardTitle className="text-xl font-serif text-amber-900">Order Summary</CardTitle>
+                <CardTitle className="text-xl font-serif text-pink-900">Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 mb-4">
@@ -349,7 +343,7 @@ export default function CheckoutPage() {
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.name}</p>
                         <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
-                        <p className="text-sm font-bold text-amber-900">₹{item.price * item.quantity}</p>
+                        <p className="text-sm font-bold text-pink-900">₹{item.price * item.quantity}</p>
                       </div>
                     </div>
                   ))}
@@ -367,7 +361,7 @@ export default function CheckoutPage() {
                     <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
                   </div>
                   <Separator className="my-2" />
-                  <div className="flex justify-between text-xl font-bold text-amber-900">
+                  <div className="flex justify-between text-xl font-bold text-pink-900">
                     <span>Total</span>
                     <span>₹{total}</span>
                   </div>

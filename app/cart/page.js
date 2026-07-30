@@ -77,26 +77,20 @@ export default function CartPage() {
   const total = subtotal - discountAmount + deliveryCharge
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-800 py-12">
+      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-12">
         <div className="container mx-auto px-4">
           <Link href="/products">
             <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
@@ -104,7 +98,7 @@ export default function CartPage() {
             </Button>
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">Shopping Cart</h1>
-          <p className="text-amber-100 text-lg">{cart.length} items in your cart</p>
+          <p className="text-pink-100 text-lg">{cart.length} items in your cart</p>
         </div>
       </div>
 
@@ -115,7 +109,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold text-gray-700 mb-4">Your cart is empty</h2>
             <p className="text-gray-600 mb-8">Add some delicious treats to get started!</p>
             <Link href="/products">
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+              <Button className="bg-pink-600 hover:bg-pink-700 text-white">
                 Start Shopping
               </Button>
             </Link>
@@ -125,14 +119,14 @@ export default function CartPage() {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cart.map((item) => (
-                <Card key={item.id} className="overflow-hidden border-2 border-amber-100">
+                <Card key={item.id} className="overflow-hidden border-2 border-pink-100">
                   <CardContent className="p-4">
                     <div className="flex gap-4">
                       <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-amber-900 mb-1">{item.name}</h3>
+                        <h3 className="font-semibold text-pink-900 mb-1">{item.name}</h3>
                         <p className="text-sm text-gray-600 mb-2">Category: {item.category}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -155,7 +149,7 @@ export default function CartPage() {
                             </Button>
                           </div>
                           <div className="text-right">
-                            <p className="text-xl font-bold text-amber-900">₹{item.price * item.quantity}</p>
+                            <p className="text-xl font-bold text-pink-900">₹{item.price * item.quantity}</p>
                             <p className="text-sm text-gray-500">₹{item.price} each</p>
                           </div>
                         </div>
@@ -176,9 +170,9 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-24 border-2 border-amber-200">
+              <Card className="sticky top-24 border-2 border-pink-200">
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold font-serif text-amber-900 mb-6">Order Summary</h2>
+                  <h2 className="text-2xl font-bold font-serif text-pink-900 mb-6">Order Summary</h2>
                   
                   {/* Coupon */}
                   <div className="mb-6">
@@ -223,13 +217,13 @@ export default function CartPage() {
 
                   <Separator className="my-4" />
 
-                  <div className="flex justify-between text-xl font-bold text-amber-900 mb-6">
+                  <div className="flex justify-between text-xl font-bold text-pink-900 mb-6">
                     <span>Total</span>
                     <span>₹{total}</span>
                   </div>
 
                   <Link href="/checkout">
-                    <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white text-lg py-6">
+                    <Button className="w-full bg-pink-600 hover:bg-pink-700 text-white text-lg py-6">
                       Proceed to Checkout
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>

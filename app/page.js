@@ -58,40 +58,34 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              <Link href="/" className="text-amber-900 font-medium hover:text-amber-600 transition">Home</Link>
-              <Link href="/products?category=cakes" className="text-amber-900 font-medium hover:text-amber-600 transition">Cakes</Link>
-              <Link href="/products?category=cookies" className="text-amber-900 font-medium hover:text-amber-600 transition">Cookies</Link>
-              <Link href="/products?category=namkeen" className="text-amber-900 font-medium hover:text-amber-600 transition">Namkeen</Link>
-              <Link href="/products?category=gifts" className="text-amber-900 font-medium hover:text-amber-600 transition">Gift Packs</Link>
-              <Link href="/bulk-order" className="text-amber-900 font-medium hover:text-amber-600 transition">Bulk Orders</Link>
+              <Link href="/" className="text-pink-900 font-medium hover:text-pink-600 transition">Home</Link>
+              <Link href="/products?category=cakes" className="text-pink-900 font-medium hover:text-pink-600 transition">Cakes</Link>
+              <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition">Cookies</Link>
+              <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
+              <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
+              <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
             </nav>
 
             {/* Actions */}
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon" className="relative hidden sm:flex">
-                <Search className="w-5 h-5 text-amber-900" />
+                <Search className="w-5 h-5 text-pink-900" />
               </Button>
               <Link href="/wishlist">
                 <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5 text-amber-900" />
+                  <Heart className="w-5 h-5 text-pink-900" />
                   {wishlist.length > 0 && (
                     <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
                       {wishlist.length}
@@ -101,9 +95,9 @@ export default function Home() {
               </Link>
               <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5 text-amber-900" />
+                  <ShoppingCart className="w-5 h-5 text-pink-900" />
                   {cart.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-amber-600 text-white text-xs">
+                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-pink-600 text-white text-xs">
                       {cart.length}
                     </Badge>
                   )}
@@ -117,14 +111,14 @@ export default function Home() {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <nav className="lg:hidden py-4 border-t border-amber-200">
+            <nav className="lg:hidden py-4 border-t border-pink-200">
               <div className="flex flex-col space-y-3">
-                <Link href="/" className="text-amber-900 font-medium hover:text-amber-600 transition">Home</Link>
-                <Link href="/products?category=cakes" className="text-amber-900 font-medium hover:text-amber-600 transition">Cakes</Link>
-                <Link href="/products?category=cookies" className="text-amber-900 font-medium hover:text-amber-600 transition">Cookies</Link>
-                <Link href="/products?category=namkeen" className="text-amber-900 font-medium hover:text-amber-600 transition">Namkeen</Link>
-                <Link href="/products?category=gifts" className="text-amber-900 font-medium hover:text-amber-600 transition">Gift Packs</Link>
-                <Link href="/bulk-order" className="text-amber-900 font-medium hover:text-amber-600 transition">Bulk Orders</Link>
+                <Link href="/" className="text-pink-900 font-medium hover:text-pink-600 transition">Home</Link>
+                <Link href="/products?category=cakes" className="text-pink-900 font-medium hover:text-pink-600 transition">Cakes</Link>
+                <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition">Cookies</Link>
+                <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
+                <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
+                <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
               </div>
             </nav>
           )}
@@ -132,19 +126,19 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[600px] bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 overflow-hidden">
+      <section className="relative h-[600px] bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img src="https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Bakery" className="w-full h-full object-cover" />
         </div>
         <div className="relative container mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl text-white">
-            <Badge className="mb-4 bg-amber-600 hover:bg-amber-700 text-white border-0">Premium Bakery</Badge>
+            <Badge className="mb-4 bg-pink-600 hover:bg-pink-700 text-white border-0">Premium Bakery</Badge>
             <h1 className="text-5xl md:text-7xl font-bold font-serif mb-6 leading-tight">Keep It Simple,<br />Keep It Tasty</h1>
-            <p className="text-xl mb-8 text-amber-100">Indulge in premium cakes, cookies, and pastries crafted with love and the finest ingredients.</p>
+            <p className="text-xl mb-8 text-pink-100">Indulge in premium cakes, cookies, and pastries crafted with love and the finest ingredients.</p>
             
             {/* PIN Code Check */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-6 max-w-md">
-              <p className="text-sm mb-3 text-amber-100">Check delivery availability</p>
+              <p className="text-sm mb-3 text-pink-100">Check delivery availability</p>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Enter PIN Code" 
@@ -153,7 +147,7 @@ export default function Home() {
                   maxLength={6}
                   className="bg-white text-gray-900 border-0"
                 />
-                <Button onClick={checkPinCode} className="bg-amber-600 hover:bg-amber-700 text-white">
+                <Button onClick={checkPinCode} className="bg-pink-600 hover:bg-pink-700 text-white">
                   Check
                 </Button>
               </div>
@@ -161,12 +155,12 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4">
               <Link href="/products">
-                <Button size="lg" className="bg-white text-amber-900 hover:bg-amber-50 shadow-lg">
+                <Button size="lg" className="bg-white text-pink-900 hover:bg-pink-50 shadow-lg">
                   Shop Now <ChevronRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
               <Link href="/products?category=cakes">
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-amber-900">
+                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-pink-900">
                   Browse Cakes
                 </Button>
               </Link>
@@ -179,25 +173,25 @@ export default function Home() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold font-serif text-amber-900 mb-4">Shop by Category</h2>
+            <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">Shop by Category</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Explore our premium selection of freshly baked delights</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredCategories.map((category, index) => (
               <Link key={index} href={`/products?category=${category.name.toLowerCase()}`}>
-                <Card className="group cursor-pointer overflow-hidden border-2 border-amber-100 hover:border-amber-400 transition-all duration-300 hover:shadow-2xl">
+                <Card className="group cursor-pointer overflow-hidden border-2 border-pink-100 hover:border-pink-400 transition-all duration-300 hover:shadow-2xl">
                   <div className="relative h-64 overflow-hidden">
                     <img src={category.image} alt={category.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <Badge className="absolute top-4 right-4 bg-amber-600 text-white border-0">{category.count} Items</Badge>
+                    <Badge className="absolute top-4 right-4 bg-pink-600 text-white border-0">{category.count} Items</Badge>
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-2xl font-bold font-serif text-amber-900 mb-1">{category.name}</h3>
+                        <h3 className="text-2xl font-bold font-serif text-pink-900 mb-1">{category.name}</h3>
                         <p className="text-sm text-gray-600">Fresh & Premium</p>
                       </div>
-                      <ChevronRight className="w-6 h-6 text-amber-600 group-hover:translate-x-2 transition-transform" />
+                      <ChevronRight className="w-6 h-6 text-pink-600 group-hover:translate-x-2 transition-transform" />
                     </div>
                   </CardContent>
                 </Card>
@@ -208,16 +202,16 @@ export default function Home() {
       </section>
 
       {/* Best Sellers */}
-      <section className="py-16 bg-gradient-to-b from-amber-50 to-white">
+      <section className="py-16 bg-gradient-to-b from-pink-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <Badge className="mb-4 bg-amber-600 text-white border-0">Trending Now</Badge>
-            <h2 className="text-4xl font-bold font-serif text-amber-900 mb-4">Best Sellers</h2>
+            <Badge className="mb-4 bg-pink-600 text-white border-0">Trending Now</Badge>
+            <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">Best Sellers</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Our most loved products by customers</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {bestSellers.map((product) => (
-              <Card key={product.id} className="group overflow-hidden border-2 border-amber-100 hover:border-amber-400 hover:shadow-xl transition-all">
+              <Card key={product.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                 <Link href={`/products/${product.id}`}>
                   <div className="relative h-64 overflow-hidden bg-gray-100">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -235,7 +229,7 @@ export default function Home() {
                 </Link>
                 <CardContent className="p-4">
                   <Link href={`/products/${product.id}`}>
-                    <h3 className="font-semibold text-amber-900 mb-2 hover:text-amber-600 transition">{product.name}</h3>
+                    <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition">{product.name}</h3>
                   </Link>
                   <div className="flex items-center gap-1 mb-2">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -244,12 +238,12 @@ export default function Home() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-xl font-bold text-amber-900">₹{product.price}</span>
+                      <span className="text-xl font-bold text-pink-900">₹{product.price}</span>
                       {product.originalPrice && (
                         <span className="text-sm text-gray-400 line-through ml-2">₹{product.originalPrice}</span>
                       )}
                     </div>
-                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                    <Button size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
                       <ShoppingCart className="w-4 h-4" />
                     </Button>
                   </div>
@@ -259,7 +253,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-10">
             <Link href="/products">
-              <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white">
+              <Button size="lg" className="bg-pink-600 hover:bg-pink-700 text-white">
                 View All Products <ChevronRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
@@ -271,16 +265,16 @@ export default function Home() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold font-serif text-amber-900 mb-4">Why Choose Mr. COCO?</h2>
+            <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">Why Choose Mr. COCO?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Premium quality and exceptional service, every time</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {whyChooseUs.map((item, index) => (
-              <Card key={index} className="text-center p-6 border-2 border-amber-100 hover:border-amber-400 hover:shadow-lg transition-all">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Card key={index} className="text-center p-6 border-2 border-pink-100 hover:border-pink-400 hover:shadow-lg transition-all">
+                <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-amber-900 mb-2">{item.title}</h3>
+                <h3 className="text-xl font-bold text-pink-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.desc}</p>
               </Card>
             ))}
@@ -289,15 +283,15 @@ export default function Home() {
       </section>
 
       {/* Customer Reviews */}
-      <section className="py-16 bg-gradient-to-b from-amber-50 to-white">
+      <section className="py-16 bg-gradient-to-b from-pink-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold font-serif text-amber-900 mb-4">What Our Customers Say</h2>
+            <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">What Our Customers Say</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Loved by thousands of happy customers</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {reviews.map((review, index) => (
-              <Card key={index} className="p-6 border-2 border-amber-100 hover:shadow-lg transition-all">
+              <Card key={index} className="p-6 border-2 border-pink-100 hover:shadow-lg transition-all">
                 <div className="flex items-center gap-1 mb-3">
                   {[...Array(review.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -305,7 +299,7 @@ export default function Home() {
                 </div>
                 <p className="text-gray-700 mb-4 italic">&ldquo;{review.text}&rdquo;</p>
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold text-amber-900">{review.name}</p>
+                  <p className="font-semibold text-pink-900">{review.name}</p>
                   <p className="text-sm text-gray-500">{review.date}</p>
                 </div>
               </Card>
@@ -319,8 +313,8 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="mb-4 bg-amber-600 text-white border-0">Our Story</Badge>
-              <h2 className="text-4xl font-bold font-serif text-amber-900 mb-6">Crafting Happiness Since 2015</h2>
+              <Badge className="mb-4 bg-pink-600 text-white border-0">Our Story</Badge>
+              <h2 className="text-4xl font-bold font-serif text-pink-900 mb-6">Crafting Happiness Since 2015</h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
                 Mr. COCO Bakery was born from a passion for creating extraordinary baked goods that bring joy to every celebration. We believe in keeping things simple while delivering exceptional taste.
               </p>
@@ -328,7 +322,7 @@ export default function Home() {
                 Using only the finest ingredients and traditional baking techniques combined with modern innovation, we craft each product with love and attention to detail. From our family to yours, we&apos;re committed to making your special moments even more memorable.
               </p>
               <Link href="/about">
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+                <Button className="bg-pink-600 hover:bg-pink-700 text-white">
                   Learn More About Us <ChevronRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
@@ -345,13 +339,13 @@ export default function Home() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800">
+      <section className="py-16 bg-gradient-to-r from-pink-600 via-pink-700 to-pink-800">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold font-serif text-white mb-4">Join Our Sweet Community</h2>
-          <p className="text-amber-100 mb-8 max-w-2xl mx-auto">Subscribe to get exclusive offers, new product launches, and delicious recipes</p>
+          <p className="text-pink-100 mb-8 max-w-2xl mx-auto">Subscribe to get exclusive offers, new product launches, and delicious recipes</p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <Input placeholder="Enter your email" className="bg-white border-0" />
-            <Button className="bg-white text-amber-900 hover:bg-amber-50 whitespace-nowrap">
+            <Button className="bg-white text-pink-900 hover:bg-pink-50 whitespace-nowrap">
               Subscribe Now
             </Button>
           </div>
@@ -359,29 +353,23 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-amber-950 text-amber-100 pt-16 pb-8">
+      <footer className="bg-pink-950 text-pink-100 pt-16 pb-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Company Info */}
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center">
-                  <Cake className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold font-serif text-white">Mr. COCO</h3>
-                  <p className="text-xs text-amber-400">Bakery</p>
-                </div>
+              <div className="mb-4">
+                <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-20 w-auto" />
               </div>
               <p className="text-sm mb-4">Keep It Simple, Keep It Tasty</p>
               <div className="flex gap-3">
-                <Button size="icon" variant="ghost" className="hover:bg-amber-900">
+                <Button size="icon" variant="ghost" className="hover:bg-pink-900">
                   <Instagram className="w-5 h-5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-amber-900">
+                <Button size="icon" variant="ghost" className="hover:bg-pink-900">
                   <Facebook className="w-5 h-5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="hover:bg-amber-900">
+                <Button size="icon" variant="ghost" className="hover:bg-pink-900">
                   <Twitter className="w-5 h-5" />
                 </Button>
               </div>
@@ -391,11 +379,11 @@ export default function Home() {
             <div>
               <h4 className="font-bold text-white mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/products" className="hover:text-amber-400 transition">All Products</Link></li>
-                <li><Link href="/products?category=cakes" className="hover:text-amber-400 transition">Cakes</Link></li>
-                <li><Link href="/products?category=cookies" className="hover:text-amber-400 transition">Cookies</Link></li>
-                <li><Link href="/bulk-order" className="hover:text-amber-400 transition">Bulk Orders</Link></li>
-                <li><Link href="/about" className="hover:text-amber-400 transition">About Us</Link></li>
+                <li><Link href="/products" className="hover:text-pink-400 transition">All Products</Link></li>
+                <li><Link href="/products?category=cakes" className="hover:text-pink-400 transition">Cakes</Link></li>
+                <li><Link href="/products?category=cookies" className="hover:text-pink-400 transition">Cookies</Link></li>
+                <li><Link href="/bulk-order" className="hover:text-pink-400 transition">Bulk Orders</Link></li>
+                <li><Link href="/about" className="hover:text-pink-400 transition">About Us</Link></li>
               </ul>
             </div>
 
@@ -403,11 +391,11 @@ export default function Home() {
             <div>
               <h4 className="font-bold text-white mb-4">Customer Service</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/contact" className="hover:text-amber-400 transition">Contact Us</Link></li>
-                <li><Link href="/faq" className="hover:text-amber-400 transition">FAQ</Link></li>
-                <li><Link href="/shipping" className="hover:text-amber-400 transition">Shipping Info</Link></li>
-                <li><Link href="/returns" className="hover:text-amber-400 transition">Returns</Link></li>
-                <li><Link href="/privacy" className="hover:text-amber-400 transition">Privacy Policy</Link></li>
+                <li><Link href="/contact" className="hover:text-pink-400 transition">Contact Us</Link></li>
+                <li><Link href="/faq" className="hover:text-pink-400 transition">FAQ</Link></li>
+                <li><Link href="/shipping" className="hover:text-pink-400 transition">Shipping Info</Link></li>
+                <li><Link href="/returns" className="hover:text-pink-400 transition">Returns</Link></li>
+                <li><Link href="/privacy" className="hover:text-pink-400 transition">Privacy Policy</Link></li>
               </ul>
             </div>
 
@@ -417,21 +405,21 @@ export default function Home() {
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-2">
                   <Phone className="w-4 h-4 mt-1 flex-shrink-0" />
-                  <span>+91 98765 43210</span>
+                  <span>+918447655399</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Mail className="w-4 h-4 mt-1 flex-shrink-0" />
-                  <span>hello@mrcoco.com</span>
+                  <span>mrcocobakery@gmail.com</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 mt-1 flex-shrink-0" />
-                  <span>123 Baker Street, Mumbai, Maharashtra 400001</span>
+                  <span>Mr. Coco Bakery, Opposite Hotel Blue Saphire Country Side, Rampur Road, Haldwani, Nainital, U.K - 263139</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <Separator className="bg-amber-900 mb-8" />
+          <Separator className="bg-pink-900 mb-8" />
 
           <div className="text-center text-sm">
             <p>&copy; 2025 Mr. COCO Bakery. All rights reserved. | Made with ❤️ in India</p>

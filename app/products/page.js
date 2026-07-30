@@ -99,24 +99,18 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-amber-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
-                <Cake className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-serif text-amber-900">Mr. COCO</h1>
-                <p className="text-xs text-amber-700">Bakery</p>
-              </div>
+              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
             </Link>
             <div className="flex items-center space-x-4">
               <Link href="/wishlist">
                 <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5 text-amber-900" />
+                  <Heart className="w-5 h-5 text-pink-900" />
                   {wishlist.length > 0 && (
                     <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
                       {wishlist.length}
@@ -126,9 +120,9 @@ export default function ProductsPage() {
               </Link>
               <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5 text-amber-900" />
+                  <ShoppingCart className="w-5 h-5 text-pink-900" />
                   {cart.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-amber-600 text-white text-xs">
+                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-pink-600 text-white text-xs">
                       {cart.length}
                     </Badge>
                   )}
@@ -140,7 +134,7 @@ export default function ProductsPage() {
       </header>
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-amber-800 py-12">
+      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-12">
         <div className="container mx-auto px-4">
           <Link href="/">
             <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
@@ -148,12 +142,12 @@ export default function ProductsPage() {
             </Button>
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">Our Products</h1>
-          <p className="text-amber-100 text-lg">Discover our premium collection of freshly baked delights</p>
+          <p className="text-pink-100 text-lg">Discover our premium collection of freshly baked delights</p>
         </div>
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white border-b border-amber-200 sticky top-20 z-40">
+      <div className="bg-white border-b border-pink-200 sticky top-20 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
@@ -201,14 +195,14 @@ export default function ProductsPage() {
         {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl text-gray-600 mb-4">No products found</p>
-            <Button onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }} className="bg-amber-600 hover:bg-amber-700 text-white">
+            <Button onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }} className="bg-pink-600 hover:bg-pink-700 text-white">
               Clear Filters
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="group overflow-hidden border-2 border-amber-100 hover:border-amber-400 hover:shadow-xl transition-all">
+              <Card key={product.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                 <Link href={`/products/${product.id}`}>
                   <div className="relative h-64 overflow-hidden bg-gray-100">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -224,7 +218,7 @@ export default function ProductsPage() {
                 </Link>
                 <CardContent className="p-4">
                   <Link href={`/products/${product.id}`}>
-                    <h3 className="font-semibold text-amber-900 mb-2 hover:text-amber-600 transition line-clamp-1">{product.name}</h3>
+                    <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition line-clamp-1">{product.name}</h3>
                   </Link>
                   <div className="flex items-center gap-1 mb-2">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -233,7 +227,7 @@ export default function ProductsPage() {
                   </div>
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <span className="text-xl font-bold text-amber-900">₹{product.price}</span>
+                      <span className="text-xl font-bold text-pink-900">₹{product.price}</span>
                       {product.originalPrice && (
                         <span className="text-sm text-gray-400 line-through ml-2">₹{product.originalPrice}</span>
                       )}
@@ -243,7 +237,7 @@ export default function ProductsPage() {
                     <Button 
                       onClick={() => addToCart(product)} 
                       disabled={!product.inStock}
-                      className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+                      className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Add to Cart
