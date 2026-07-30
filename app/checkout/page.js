@@ -75,6 +75,21 @@ export default function CheckoutPage() {
       toast.error('Please enter a valid 6-digit PIN code')
       return false
     }
+    
+    // Check if cart contains cakes and validate PIN code
+    const hasCakes = cart.some(item => 
+      item.category === 'cakes' || 
+      item.name.toLowerCase().includes('cake')
+    )
+    
+    if (hasCakes && formData.pincode !== '263139') {
+      toast.error('Cake delivery not available in this area!', {
+        description: 'Cake delivery is only available in Haldwani (PIN: 263139). Please update your PIN code or remove cakes from cart.',
+        duration: 6000
+      })
+      return false
+    }
+    
     return true
   }
 

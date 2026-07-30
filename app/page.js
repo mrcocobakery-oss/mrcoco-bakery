@@ -24,10 +24,22 @@ export default function Home() {
   }, [])
 
   const checkPinCode = () => {
-    if (pinCode.length === 6) {
-      toast.success('Delivery available in your area!')
-    } else {
+    if (pinCode.length !== 6) {
       toast.error('Please enter a valid 6-digit PIN code')
+      return
+    }
+    
+    // Only allow 263139 for cake delivery (Haldwani area)
+    if (pinCode === '263139') {
+      toast.success('🎂 Great! Cake delivery available in your area!', {
+        description: 'We deliver fresh cakes to Haldwani - 263139',
+        duration: 4000
+      })
+    } else {
+      toast.error('Sorry! Cake delivery not available in this area', {
+        description: 'Cake delivery is only available in Haldwani (PIN: 263139). However, cookies, namkeen & gift packs can be delivered across India!',
+        duration: 5000
+      })
     }
   }
 
@@ -138,8 +150,8 @@ export default function Home() {
             
             {/* PIN Code Check */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-6 max-w-md">
-              <p className="text-sm mb-3 text-pink-100">Check delivery availability</p>
-              <div className="flex gap-2">
+              <p className="text-sm mb-3 text-pink-100">Check cake delivery availability</p>
+              <div className="flex gap-2 mb-3">
                 <Input 
                   placeholder="Enter PIN Code" 
                   value={pinCode}
@@ -151,6 +163,10 @@ export default function Home() {
                   Check
                 </Button>
               </div>
+              <p className="text-xs text-pink-200">
+                🎂 Cake delivery: Haldwani (263139) only<br />
+                📦 Cookies, Namkeen & Gifts: All India delivery
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-4">
