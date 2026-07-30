@@ -18,6 +18,10 @@ export default function CheckoutPage() {
   const router = useRouter()
   const [cart, setCart] = useState([])
   const [step, setStep] = useState(1)
+  const [loyaltyPoints, setLoyaltyPoints] = useState(0)
+  const [pointsToRedeem, setPointsToRedeem] = useState('')
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0)
+  const [applyingPoints, setApplyingPoints] = useState(false)
   const [formData, setFormData] = useState({
     // Personal Info
     name: '',
@@ -153,7 +157,45 @@ export default function CheckoutPage() {
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const deliveryCharge = subtotal > 500 ? 0 : 50
   const expressDeliveryFee = formData.expressDelivery ? 200 : 0
-  const total = subtotal + deliveryCharge + expressDeliveryFee
+  const total = Math.max(0, subtotal + deliveryCharge + expressDeliveryFee - loyaltyDiscount)
+
+  const applyLoyaltyPoints = async () => {
+    const points = parseInt(pointsToRedeem)
+    if (!points || points <= 0) {
+      toast.error('Please enter valid points')
+      return
+    }
+
+    if (points > loyaltyPoints) {
+      toast.error('Insufficient loyalty points')
+      return
+    }
+
+    setApplyingPoints(true)
+    try {
+      const response = await fetch('/api/loyalty/apply-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'current-user-id', // Replace with actual user ID from context
+          pointsToRedeem: points,
+          orderTotal: subtotal + deliveryCharge + expressDeliveryFee
+        })
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setLoyaltyDiscount(data.discount)
+        toast.success(`${points} points applied! You saved ₹${data.discount}`)
+      } else {
+        toast.error(data.error || 'Failed to apply points')
+      }
+    } catch (error) {
+      toast.error('Failed to apply points')
+    } finally {
+      setApplyingPoints(false)
+    }
+  }
 
   const customerInfo = {
     name: formData.name,
@@ -487,12 +529,50 @@ export default function CheckoutPage() {
                       <span>₹{expressDeliveryFee}</span>
                     </div>
                   )}
+                  {loyaltyDiscount > 0 && (
+                    <div className="flex justify-between text-green-600 font-medium">
+                      <span>Loyalty Discount</span>
+                      <span>-₹{loyaltyDiscount}</span>
+                    </div>
+                  )}
                   <Separator className="my-2" />
                   <div className="flex justify-between text-xl font-bold text-pink-900">
                     <span>Total</span>
                     <span>₹{total}</span>
                   </div>
                 </div>
+                
+                {/* Loyalty Points Redemption */}
+                {step === 3 && (
+                  <>
+                    <Separator className="my-4" />
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Loyalty Points</span>
+                        <Badge variant="outline" className="text-yellow-900">{loyaltyPoints} pts available</Badge>
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder="Points to redeem"
+                          value={pointsToRedeem}
+                          onChange={(e) => setPointsToRedeem(e.target.value)}
+                          max={loyaltyPoints}
+                          disabled={applyingPoints}
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={applyLoyaltyPoints}
+                          disabled={applyingPoints || !pointsToRedeem}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-500">1 point = ₹1 discount</p>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

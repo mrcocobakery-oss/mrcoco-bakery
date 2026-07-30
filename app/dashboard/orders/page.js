@@ -246,7 +246,19 @@ export default function OrdersPage() {
               </Card>
 
               <Card>
-                <CardHeader><CardTitle className="text-lg">Payment Summary</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center justify-between">
+                    <span>Payment Summary</span>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => window.open(`/api/orders/invoice?orderId=${selectedOrder._id}`, '_blank')}
+                      className="ml-auto"
+                    >
+                      Download Invoice
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex justify-between"><span>Subtotal:</span><span>₹{selectedOrder.subtotal}</span></div>
                   <div className="flex justify-between"><span>Delivery Fee:</span><span>₹{selectedOrder.deliveryFee || 0}</span></div>
