@@ -7,12 +7,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ShoppingCart, Heart, Search, Menu, X, Star, Phone, Mail, MapPin, Instagram, Facebook, Twitter, ChevronRight, Award, Clock, Shield, Cake, Cookie, Gift } from 'lucide-react'
+import { Star, Phone, Mail, MapPin, Instagram, Facebook, Twitter, ChevronRight, Award, Clock, Shield, ShoppingCart, Cake, Cookie, Gift, Heart } from 'lucide-react'
 import { toast } from 'sonner'
+import { Header } from '@/components/navigation/Header'
 
 export default function Home() {
   const [pinCode, setPinCode] = useState('')
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
 
@@ -72,70 +72,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3">
-              <img src="/images/mrcoco-logo.png" alt="Mr. COCO Bakery" className="h-16 w-auto" />
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link href="/" className="text-pink-900 font-medium hover:text-pink-600 transition">Home</Link>
-              <Link href="/products?category=cakes" className="text-pink-900 font-medium hover:text-pink-600 transition">Cakes</Link>
-              <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition">Cookies</Link>
-              <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
-              <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
-              <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
-            </nav>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative hidden sm:flex">
-                <Search className="w-5 h-5 text-pink-900" />
-              </Button>
-              <Link href="/wishlist">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="w-5 h-5 text-pink-900" />
-                  {wishlist.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
-                      {wishlist.length}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-              <Link href="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="w-5 h-5 text-pink-900" />
-                  {cart.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-pink-600 text-white text-xs">
-                      {cart.length}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-              <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="ghost" size="icon" className="lg:hidden">
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <nav className="lg:hidden py-4 border-t border-pink-200">
-              <div className="flex flex-col space-y-3">
-                <Link href="/" className="text-pink-900 font-medium hover:text-pink-600 transition">Home</Link>
-                <Link href="/products?category=cakes" className="text-pink-900 font-medium hover:text-pink-600 transition">Cakes</Link>
-                <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition">Cookies</Link>
-                <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
-                <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
-                <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
-              </div>
-            </nav>
-          )}
-        </div>
-      </header>
+      <Header cart={cart} wishlist={wishlist} />
 
       {/* Hero Section */}
       <section className="relative h-[600px] bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 overflow-hidden">
