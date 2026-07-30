@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { ShoppingCart, Heart, Star, Search, ArrowLeft, SlidersHorizontal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
+import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 
 export default function ProductsPage() {
   const searchParams = useSearchParams()
@@ -31,19 +32,19 @@ export default function ProductsPage() {
   // Enhanced mock products with subcategories
   const mockProducts = [
     // Cakes - Eggless
-    { id: 1, name: 'Chocolate Truffle Eggless Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'eggless', occasion: 'birthday', specialDay: '', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.8, reviews: 245, discount: 18, inStock: true },
-    { id: 2, name: 'Red Velvet Eggless Cake', price: 799, originalPrice: 999, category: 'cakes', cakeType: 'eggless', occasion: 'anniversary', specialDay: '', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.9, reviews: 312, discount: 20, inStock: true },
+    { id: 1, name: 'Chocolate Truffle Eggless Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'eggless', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.8, reviews: 245, discount: 18, inStock: true },
+    { id: 2, name: 'Red Velvet Eggless Cake', price: 799, originalPrice: 999, category: 'cakes', cakeType: 'eggless', occasion: 'anniversary', specialDay: '', size: '500g', flavour: 'Red Velvet', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.9, reviews: 312, discount: 20, inStock: true },
     
     // Cakes - Designer
-    { id: 3, name: 'White & Gold Designer Cake', price: 1299, originalPrice: 1599, category: 'cakes', cakeType: 'designer', occasion: 'wedding', specialDay: '', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 5.0, reviews: 156, discount: 19, inStock: true },
-    { id: 4, name: 'Floral Designer Cake', price: 1499, originalPrice: 1799, category: 'cakes', cakeType: 'designer', occasion: 'engagement', specialDay: '', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 178, discount: 17, inStock: true },
+    { id: 3, name: 'White & Gold Designer Cake', price: 1299, originalPrice: 1599, category: 'cakes', cakeType: 'designer', occasion: 'wedding', specialDay: '', size: '2kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 5.0, reviews: 156, discount: 19, inStock: true },
+    { id: 4, name: 'Floral Designer Cake', price: 1499, originalPrice: 1799, category: 'cakes', cakeType: 'designer', occasion: 'engagement', specialDay: '', size: '1.5kg', flavour: 'Strawberry', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 178, discount: 17, inStock: true },
     
     // Cakes - Photo
-    { id: 5, name: 'Personalized Photo Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'photo', occasion: 'birthday', specialDay: '', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 267, discount: 17, inStock: true },
+    { id: 5, name: 'Personalized Photo Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'photo', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 267, discount: 17, inStock: true },
     
     // Cakes - Chocolate
-    { id: 6, name: 'Black Forest Cake', price: 749, originalPrice: 899, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.6, reviews: 198, discount: 17, inStock: true },
-    { id: 7, name: 'Death By Chocolate Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 289, discount: 17, inStock: true },
+    { id: 6, name: 'Black Forest Cake', price: 749, originalPrice: 899, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.6, reviews: 198, discount: 17, inStock: true },
+    { id: 7, name: 'Death By Chocolate Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Rich Chocolate', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 289, discount: 17, inStock: true },
     
     // Cakes - Special Days
     { id: 8, name: "Mother's Day Special Cake", price: 1099, originalPrice: 1299, category: 'cakes', cakeType: 'premium', occasion: '', specialDay: 'mothers day', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 5.0, reviews: 145, discount: 15, inStock: true },
@@ -354,6 +355,15 @@ export default function ProductsPage() {
                           )}
                         </div>
                       </div>
+                      
+                      {/* WhatsApp Button for Cakes */}
+                      {product.category === 'cakes' && (
+                        <WhatsAppChatButton 
+                          product={product} 
+                          className="w-full mb-2"
+                        />
+                      )}
+                      
                       <div className="flex gap-2">
                         <Button
                           onClick={() => addToCart(product)}

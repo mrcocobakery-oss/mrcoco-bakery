@@ -1290,59 +1290,543 @@ def test_auth_mongodb_otps():
         log_test("Auth MongoDB OTPs", False, f"Exception: {str(e)}")
         return False
 
+def test_admin_products_unauthorized():
+    """Test 1: Admin Products API - Unauthorized Access"""
+    try:
+        # Try to access without admin token
+        response = requests.get(f"{BASE_URL}/admin/products")
+        
+        if response.status_code == 401:
+            result = response.json()
+            if 'error' in result and 'unauthorized' in result['error'].lower():
+                log_test("Admin Products - Unauthorized", True, 
+                        f"Correctly rejected unauthorized access: {result['error']}")
+                return True
+            else:
+                log_test("Admin Products - Unauthorized", False, 
+                        f"Wrong error message: {result}")
+                return False
+        else:
+            log_test("Admin Products - Unauthorized", False, 
+                    f"Should return 401 error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Products - Unauthorized", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_products_create():
+    """Test 2: Admin Products API - Create Product"""
+    try:
+        # Create product with admin token
+        product_data = {
+            "name": "Test Chocolate Cake",
+            "description": "Delicious chocolate cake for testing",
+            "price": 599,
+            "originalPrice": 699,
+            "discount": 14,
+            "category": "cakes",
+            "cakeType": "chocolate",
+            "occasion": "birthday",
+            "flavour": "Rich Chocolate",
+            "size": "500g",
+            "images": ["https://example.com/cake1.jpg"],
+            "stock": 50,
+            "inStock": True
+        }
+        
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.post(f"{BASE_URL}/admin/products", json=product_data, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Verify response structure
+            if not result.get('success') or 'product' not in result:
+                log_test("Admin Products - Create", False, f"Invalid response structure: {result}")
+                return None
+            
+            product = result['product']
+            
+            # Verify product fields
+            if product['name'] != product_data['name']:
+                log_test("Admin Products - Create", False, f"Name mismatch: {product['name']}")
+                return None
+            
+            if product['price'] != product_data['price']:
+                log_test("Admin Products - Create", False, f"Price mismatch: {product['price']}")
+                return None
+            
+            if '_id' not in product:
+                log_test("Admin Products - Create", False, "Missing _id field")
+                return None
+            
+            if 'slug' not in product:
+                log_test("Admin Products - Create", False, "Missing slug field")
+                return None
+            
+            log_test("Admin Products - Create", True, 
+                    f"Product created successfully. ID: {product['_id']}, Name: {product['name']}, Price: ₹{product['price']}, Slug: {product['slug']}")
+            return product
+        else:
+            log_test("Admin Products - Create", False, 
+                    f"Product creation failed with status {response.status_code}: {response.text}")
+            return None
+            
+    except Exception as e:
+        log_test("Admin Products - Create", False, f"Exception: {str(e)}")
+        return None
+
+def test_admin_products_get_all():
+    """Test 3: Admin Products API - Get All Products"""
+    try:
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.get(f"{BASE_URL}/admin/products", headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'products' not in result:
+                log_test("Admin Products - Get All", False, f"Missing products field: {result}")
+                return None
+            
+            products = result['products']
+            
+            log_test("Admin Products - Get All", True, 
+                    f"Successfully retrieved {len(products)} products")
+            return products
+        else:
+            log_test("Admin Products - Get All", False, 
+                    f"Request failed with status {response.status_code}: {response.text}")
+            return None
+            
+    except Exception as e:
+        log_test("Admin Products - Get All", False, f"Exception: {str(e)}")
+        return None
+
+def test_admin_products_get_by_category():
+    """Test 4: Admin Products API - Get Products by Category"""
+    try:
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.get(f"{BASE_URL}/admin/products?category=cakes", headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'products' not in result:
+                log_test("Admin Products - Get by Category", False, f"Missing products field: {result}")
+                return False
+            
+            products = result['products']
+            
+            # Verify all products are cakes
+            non_cakes = [p for p in products if p.get('category') != 'cakes']
+            if non_cakes:
+                log_test("Admin Products - Get by Category", False, 
+                        f"Found {len(non_cakes)} non-cake products in cakes filter")
+                return False
+            
+            log_test("Admin Products - Get by Category", True, 
+                    f"Successfully retrieved {len(products)} cake products")
+            return True
+        else:
+            log_test("Admin Products - Get by Category", False, 
+                    f"Request failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Products - Get by Category", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_products_update():
+    """Test 5: Admin Products API - Update Product"""
+    try:
+        # First create a product
+        product = test_admin_products_create()
+        if not product:
+            log_test("Admin Products - Update", False, "Failed to create product for update test")
+            return False
+        
+        product_id = product['_id']
+        
+        # Update the product
+        update_data = {
+            "_id": product_id,
+            "price": 649,
+            "stock": 75
+        }
+        
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.put(f"{BASE_URL}/admin/products", json=update_data, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if not result.get('success'):
+                log_test("Admin Products - Update", False, f"Update failed: {result}")
+                return False
+            
+            log_test("Admin Products - Update", True, 
+                    f"Product updated successfully. ID: {product_id}, New price: ₹{update_data['price']}, New stock: {update_data['stock']}")
+            return True
+        else:
+            log_test("Admin Products - Update", False, 
+                    f"Update failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Products - Update", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_products_delete():
+    """Test 6: Admin Products API - Delete Product"""
+    try:
+        # First create a product
+        product = test_admin_products_create()
+        if not product:
+            log_test("Admin Products - Delete", False, "Failed to create product for delete test")
+            return False
+        
+        product_id = product['_id']
+        
+        # Delete the product
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.delete(f"{BASE_URL}/admin/products?id={product_id}", headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if not result.get('success'):
+                log_test("Admin Products - Delete", False, f"Delete failed: {result}")
+                return False
+            
+            log_test("Admin Products - Delete", True, 
+                    f"Product deleted successfully. ID: {product_id}")
+            return True
+        else:
+            log_test("Admin Products - Delete", False, 
+                    f"Delete failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Products - Delete", False, f"Exception: {str(e)}")
+        return False
+
+def test_orders_create():
+    """Test 7: Orders API - Create Order"""
+    try:
+        order_data = {
+            "name": "Anjali Verma",
+            "email": "anjali.verma@example.com",
+            "phone": "9876543210",
+            "address": "123 Main Street, Sector 5",
+            "city": "Haldwani",
+            "state": "Uttarakhand",
+            "pincode": "263139",
+            "items": [{
+                "productId": "test-product-id",
+                "productName": "Chocolate Truffle Cake",
+                "productImage": "https://example.com/cake.jpg",
+                "price": 599,
+                "quantity": 1,
+                "category": "cakes"
+            }],
+            "subtotal": 599,
+            "deliveryFee": 0,
+            "total": 599,
+            "deliveryDate": "2025-02-01",
+            "deliveryTime": "10am-12pm",
+            "expressDelivery": False,
+            "paymentMethod": "online",
+            "paymentStatus": "pending"
+        }
+        
+        response = requests.post(f"{BASE_URL}/orders", json=order_data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if not result.get('success') or 'orderId' not in result:
+                log_test("Orders - Create", False, f"Invalid response structure: {result}")
+                return None
+            
+            order_id = result['orderId']
+            
+            log_test("Orders - Create", True, 
+                    f"Order created successfully. Order ID: {order_id}, Customer: {order_data['name']}, Total: ₹{order_data['total']}")
+            return order_id
+        else:
+            log_test("Orders - Create", False, 
+                    f"Order creation failed with status {response.status_code}: {response.text}")
+            return None
+            
+    except Exception as e:
+        log_test("Orders - Create", False, f"Exception: {str(e)}")
+        return None
+
+def test_orders_get_all():
+    """Test 8: Orders API - Get All Orders"""
+    try:
+        response = requests.get(f"{BASE_URL}/orders")
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'orders' not in result:
+                log_test("Orders - Get All", False, f"Missing orders field: {result}")
+                return False
+            
+            orders = result['orders']
+            
+            log_test("Orders - Get All", True, 
+                    f"Successfully retrieved {len(orders)} orders")
+            return True
+        else:
+            log_test("Orders - Get All", False, 
+                    f"Request failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Orders - Get All", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_orders_unauthorized():
+    """Test 9: Admin Orders API - Unauthorized Access"""
+    try:
+        # Try to access without admin token
+        response = requests.get(f"{BASE_URL}/admin/orders")
+        
+        if response.status_code == 401:
+            result = response.json()
+            if 'error' in result and 'unauthorized' in result['error'].lower():
+                log_test("Admin Orders - Unauthorized", True, 
+                        f"Correctly rejected unauthorized access: {result['error']}")
+                return True
+            else:
+                log_test("Admin Orders - Unauthorized", False, 
+                        f"Wrong error message: {result}")
+                return False
+        else:
+            log_test("Admin Orders - Unauthorized", False, 
+                    f"Should return 401 error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Orders - Unauthorized", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_orders_get_all():
+    """Test 10: Admin Orders API - Get All Orders"""
+    try:
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.get(f"{BASE_URL}/admin/orders", headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'orders' not in result:
+                log_test("Admin Orders - Get All", False, f"Missing orders field: {result}")
+                return None
+            
+            orders = result['orders']
+            
+            log_test("Admin Orders - Get All", True, 
+                    f"Successfully retrieved {len(orders)} orders")
+            return orders
+        else:
+            log_test("Admin Orders - Get All", False, 
+                    f"Request failed with status {response.status_code}: {response.text}")
+            return None
+            
+    except Exception as e:
+        log_test("Admin Orders - Get All", False, f"Exception: {str(e)}")
+        return None
+
+def test_admin_orders_get_by_status():
+    """Test 11: Admin Orders API - Get Orders by Status"""
+    try:
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.get(f"{BASE_URL}/admin/orders?status=pending", headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'orders' not in result:
+                log_test("Admin Orders - Get by Status", False, f"Missing orders field: {result}")
+                return False
+            
+            orders = result['orders']
+            
+            # Verify all orders have pending status
+            non_pending = [o for o in orders if o.get('status') != 'pending']
+            if non_pending:
+                log_test("Admin Orders - Get by Status", False, 
+                        f"Found {len(non_pending)} non-pending orders in pending filter")
+                return False
+            
+            log_test("Admin Orders - Get by Status", True, 
+                    f"Successfully retrieved {len(orders)} pending orders")
+            return True
+        else:
+            log_test("Admin Orders - Get by Status", False, 
+                    f"Request failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Orders - Get by Status", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_orders_update_status():
+    """Test 12: Admin Orders API - Update Order Status"""
+    try:
+        # First create an order
+        order_id = test_orders_create()
+        if not order_id:
+            log_test("Admin Orders - Update Status", False, "Failed to create order for update test")
+            return False
+        
+        # Update order status
+        update_data = {
+            "orderId": order_id,
+            "status": "processing"
+        }
+        
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.put(f"{BASE_URL}/admin/orders", json=update_data, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if not result.get('success'):
+                log_test("Admin Orders - Update Status", False, f"Update failed: {result}")
+                return False
+            
+            log_test("Admin Orders - Update Status", True, 
+                    f"Order status updated successfully. Order ID: {order_id}, New status: {update_data['status']}")
+            return True
+        else:
+            log_test("Admin Orders - Update Status", False, 
+                    f"Update failed with status {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Orders - Update Status", False, f"Exception: {str(e)}")
+        return False
+
+def test_admin_orders_invalid_status():
+    """Test 13: Admin Orders API - Invalid Status"""
+    try:
+        # Try to update with invalid status
+        update_data = {
+            "orderId": "test-order-id",
+            "status": "invalid_status"
+        }
+        
+        headers = {
+            "Authorization": "Bearer admin_logged_in"
+        }
+        
+        response = requests.put(f"{BASE_URL}/admin/orders", json=update_data, headers=headers)
+        
+        if response.status_code == 400:
+            result = response.json()
+            if 'error' in result and 'invalid' in result['error'].lower():
+                log_test("Admin Orders - Invalid Status", True, 
+                        f"Correctly rejected invalid status: {result['error']}")
+                return True
+            else:
+                log_test("Admin Orders - Invalid Status", False, 
+                        f"Wrong error message: {result}")
+                return False
+        else:
+            log_test("Admin Orders - Invalid Status", False, 
+                    f"Should return 400 error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Admin Orders - Invalid Status", False, f"Exception: {str(e)}")
+        return False
+
 def main():
-    """Run all authentication tests"""
+    """Run all tests"""
     print("\n" + "="*70)
-    print("Mr. COCO Bakery - Phase 2 Authentication System Tests")
+    print("Mr. COCO Bakery - Admin Product & Order Management API Tests")
     print("="*70)
     print(f"Backend URL: {BASE_URL}")
     print(f"MongoDB: {MONGO_URL}/{DB_NAME}")
     print("="*70 + "\n")
     
-    # Run authentication tests in order
-    print("Running Authentication API Tests...\n")
+    # Run Admin Products API tests
+    print("Running Admin Products API Tests...\n")
     
-    # Test 1: User Registration
-    test_auth_signup()
+    # Test 1: Unauthorized access
+    test_admin_products_unauthorized()
     
-    # Test 2: Duplicate Email Validation
-    test_auth_signup_duplicate()
+    # Test 2: Create product
+    test_admin_products_create()
     
-    # Test 3: User Login
-    test_auth_login()
+    # Test 3: Get all products
+    test_admin_products_get_all()
     
-    # Test 4: Login with Wrong Password
-    test_auth_login_wrong_password()
+    # Test 4: Get products by category
+    test_admin_products_get_by_category()
     
-    # Test 5: Login with Non-existent Email
-    test_auth_login_nonexistent()
+    # Test 5: Update product
+    test_admin_products_update()
     
-    # Test 6: Send OTP
-    test_auth_otp_send()
+    # Test 6: Delete product
+    test_admin_products_delete()
     
-    # Test 7: Send OTP with Invalid Phone
-    test_auth_otp_send_invalid_phone()
+    # Run Orders API tests
+    print("\nRunning Orders API Tests...\n")
     
-    # Test 8: Verify OTP
-    test_auth_otp_verify()
+    # Test 7: Create order
+    test_orders_create()
     
-    # Test 9: Verify OTP with Wrong OTP
-    test_auth_otp_verify_wrong()
+    # Test 8: Get all orders
+    test_orders_get_all()
     
-    # Test 10: Get Current User with Token
-    test_auth_me_with_token()
+    # Run Admin Orders API tests
+    print("\nRunning Admin Orders API Tests...\n")
     
-    # Test 11: Get Current User without Token
-    test_auth_me_without_token()
+    # Test 9: Unauthorized access
+    test_admin_orders_unauthorized()
     
-    # Test 12: Logout
-    test_auth_logout()
+    # Test 10: Get all orders
+    test_admin_orders_get_all()
     
-    # Test 13: MongoDB Users Collection
-    test_auth_mongodb_users()
+    # Test 11: Get orders by status
+    test_admin_orders_get_by_status()
     
-    # Test 14: MongoDB OTPs Collection
-    test_auth_mongodb_otps()
+    # Test 12: Update order status
+    test_admin_orders_update_status()
+    
+    # Test 13: Invalid status
+    test_admin_orders_invalid_status()
     
     # Print summary
     print_summary()

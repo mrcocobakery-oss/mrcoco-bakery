@@ -31,6 +31,7 @@ export default function CheckoutPage() {
     // Delivery
     deliveryDate: '',
     deliveryTime: 'morning',
+    expressDelivery: false,
     giftMessage: '',
     specialInstructions: '',
     // Payment
@@ -90,6 +91,24 @@ export default function CheckoutPage() {
       return false
     }
     
+    // Validate delivery date for cakes
+    if (hasCakes) {
+      if (!formData.deliveryDate) {
+        toast.error('Please select a delivery date for cake orders')
+        return false
+      }
+      
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const selectedDate = new Date(formData.deliveryDate)
+      selectedDate.setHours(0, 0, 0, 0)
+      
+      if (selectedDate < today) {
+        toast.error('Delivery date cannot be in the past')
+        return false
+      }
+    }
+    
     return true
   }
 
@@ -133,7 +152,8 @@ export default function CheckoutPage() {
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const deliveryCharge = subtotal > 500 ? 0 : 50
-  const total = subtotal + deliveryCharge
+  const expressDeliveryFee = formData.expressDelivery ? 200 : 0
+  const total = subtotal + deliveryCharge + expressDeliveryFee
 
   const customerInfo = {
     name: formData.name,
@@ -261,30 +281,64 @@ export default function CheckoutPage() {
                   <Separator className="my-6" />
                   
                   <div>
-                    <Label htmlFor="deliveryDate">Preferred Delivery Date</Label>
+                    <Label htmlFor="deliveryDate">Preferred Delivery Date {cart.some(item => item.category === 'cakes') && '*'}</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <Input id="deliveryDate" name="deliveryDate" type="date" value={formData.deliveryDate} onChange={handleInputChange} className="pl-10" />
+                      <Input 
+                        id="deliveryDate" 
+                        name="deliveryDate" 
+                        type="date" 
+                        value={formData.deliveryDate} 
+                        onChange={handleInputChange} 
+                        min={new Date().toISOString().split('T')[0]}
+                        className="pl-10" 
+                      />
                     </div>
+                    {cart.some(item => item.category === 'cakes') && (
+                      <p className="text-xs text-pink-600 mt-1">Delivery date is required for cake orders</p>
+                    )}
                   </div>
                   
                   <div>
                     <Label>Preferred Delivery Time</Label>
+                    <p className="text-xs text-gray-500 mb-2">Available: 10:00 AM - 8:00 PM</p>
                     <RadioGroup value={formData.deliveryTime} onValueChange={(value) => setFormData({...formData, deliveryTime: value})}>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="morning" id="morning" />
-                        <Label htmlFor="morning" className="font-normal cursor-pointer">Morning (9 AM - 12 PM)</Label>
+                        <RadioGroupItem value="10am-12pm" id="morning" />
+                        <Label htmlFor="morning" className="font-normal cursor-pointer">Morning (10 AM - 12 PM)</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="afternoon" id="afternoon" />
+                        <RadioGroupItem value="12pm-4pm" id="afternoon" />
                         <Label htmlFor="afternoon" className="font-normal cursor-pointer">Afternoon (12 PM - 4 PM)</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="evening" id="evening" />
+                        <RadioGroupItem value="4pm-8pm" id="evening" />
                         <Label htmlFor="evening" className="font-normal cursor-pointer">Evening (4 PM - 8 PM)</Label>
                       </div>
                     </RadioGroup>
                   </div>
+                  
+                  {/* Express Delivery Option */}
+                  <Card className="border-2 border-pink-200 bg-pink-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <input
+                          type="checkbox"
+                          id="expressDelivery"
+                          checked={formData.expressDelivery}
+                          onChange={(e) => setFormData({...formData, expressDelivery: e.target.checked})}
+                          className="mt-1 rounded border-pink-300 text-pink-600 focus:ring-pink-500"
+                        />
+                        <div className="flex-1">
+                          <Label htmlFor="expressDelivery" className="font-semibold cursor-pointer text-pink-900">
+                            Express Delivery (Within 2 Hours)
+                          </Label>
+                          <p className="text-sm text-gray-600 mt-1">Get your order delivered within 2 hours</p>
+                          <p className="text-sm font-semibold text-pink-600 mt-1">+ ₹200</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   
                   <div>
                     <Label htmlFor="giftMessage">Gift Message (Optional)</Label>
@@ -427,6 +481,12 @@ export default function CheckoutPage() {
                     <span>Delivery</span>
                     <span>{deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}</span>
                   </div>
+                  {formData.expressDelivery && (
+                    <div className="flex justify-between text-pink-600 font-medium">
+                      <span>Express Delivery (2 hrs)</span>
+                      <span>₹{expressDeliveryFee}</span>
+                    </div>
+                  )}
                   <Separator className="my-2" />
                   <div className="flex justify-between text-xl font-bold text-pink-900">
                     <span>Total</span>
