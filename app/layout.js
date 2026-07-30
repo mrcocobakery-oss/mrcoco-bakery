@@ -2,6 +2,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from '@/components/ui/sonner'
 import { Playfair_Display, Inter } from 'next/font/google'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -28,8 +29,10 @@ export default function RootLayout({ children }) {
       </head>
       <body className="font-sans">
         <Providers>
-          {children}
-          <Toaster />
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
         </Providers>
       </body>
     </html>
