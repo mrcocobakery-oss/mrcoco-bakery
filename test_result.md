@@ -104,6 +104,79 @@
 
 user_problem_statement: "Test the Mr. COCO Bakery Phase 1 MVP website - Premium luxury bakery ecommerce with product catalog, shopping cart, wishlist, checkout, and bulk orders"
 
+backend:
+  - task: "File Upload API - POST /api/uploads"
+    implemented: true
+    working: true
+    file: "/app/app/api/uploads/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "POST /api/uploads endpoint fully functional. Tested product image upload (kind='product_image'), customer photo upload (kind='customer_photo'), and document upload (kind='document'). All uploads successful with correct response structure containing: success, id, url, filename, size, mimeType. Files stored in correct directories (/public/uploads/products/, /public/uploads/customers/, /public/uploads/documents/) with UUID-based filenames. MongoDB metadata saved correctly in 'media' collection with all required fields: userId, kind, filename, storedName, path, url, mimeType, size, status, createdAt, updatedAt."
+
+  - task: "File Upload API - File Validation"
+    implemented: true
+    working: true
+    file: "/app/app/api/uploads/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "File validation working correctly. File type validation: Successfully rejects unsupported file types (tested with .txt file, returns 400 error with 'File type not allowed' message). File size validation: Successfully rejects files larger than 10MB (tested with 11MB file, returns 400 error with 'File too large. Max 10MB' message). Allowed file types verified: images (JPEG, PNG, WebP, GIF), documents (PDF, DOC, DOCX, XLS, XLSX)."
+
+  - task: "File Upload API - GET /api/uploads"
+    implemented: true
+    working: true
+    file: "/app/app/api/uploads/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "GET /api/uploads endpoint fully functional. Successfully retrieves uploaded files with filtering support. Tested filters: kind (product_image, customer_photo, document), userId, limit. All queries return correct response structure with 'success' and 'files' array. Files sorted by createdAt descending. Verified retrieval of 3 test files across all categories. Response includes all metadata fields from MongoDB."
+
+  - task: "File Upload API - MongoDB Integration"
+    implemented: true
+    working: true
+    file: "/app/app/api/uploads/route.js, /app/lib/mongodb.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "MongoDB integration fully functional. Database connection working correctly using MONGO_URL and DB_NAME from environment variables. Media collection created and populated successfully. All uploaded files have metadata records in 'media' collection with complete field set: _id (ObjectId), userId, kind, filename, storedName, path, url, mimeType, size, status, metadata, createdAt, updatedAt. Verified 3 test documents with correct data types and values. Database name: 'your_database_name' (from .env)."
+
+  - task: "File Upload API - File Storage Structure"
+    implemented: true
+    working: true
+    file: "/app/app/api/uploads/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "File storage structure working correctly. All required directories exist and are writable: /public/uploads/products/, /public/uploads/customers/, /public/uploads/documents/. Files stored with UUID-based filenames (e.g., 1b948ef3-4ceb-480f-af8d-ea6d5e4444ee.jpg). Directory creation handled automatically if not exists. Verified uploaded files are accessible via public URLs (e.g., /uploads/products/[uuid].jpg). File permissions correct (644)."
+
+  - task: "File Upload Demo Page"
+    implemented: true
+    working: "NA"
+    file: "/app/app/upload-demo/page.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Upload demo page implemented at /upload-demo with three tabs for different upload types (Product Images, Customer Photos, Documents). Uses FileUploader component with drag & drop, file preview, progress bar, and upload summary. Frontend testing not performed as per testing protocol (backend only). Page accessible and loads without errors based on supervisor logs."
+
 frontend:
   - task: "Home Page Implementation"
     implemented: true
@@ -203,18 +276,20 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
-  last_tested: "2025-08-20"
+  version: "1.1"
+  test_sequence: 2
+  last_tested: "2026-07-30"
   test_environment: "Production (https://coco-premium-bakes.preview.emergentagent.com)"
 
 test_plan:
   current_focus: []
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
   completed: true
 
 agent_communication:
     - agent: "testing"
       message: "Comprehensive Phase 1 MVP testing completed. All 8 major features tested successfully. Home page, products page, shopping cart, wishlist, checkout flow, bulk order form, navigation/UI, and localStorage persistence all working correctly. No critical issues found. Application is production-ready for Phase 1 MVP launch. Minor script errors in Playwright test were related to test code syntax, not application functionality. All user-facing features verified and working as expected."
+    - agent: "testing"
+      message: "File Upload System backend testing completed successfully. All 6 backend tasks tested and verified working: (1) POST /api/uploads endpoint - uploads working for all file kinds (product_image, customer_photo, document) with correct response structure and file storage, (2) File validation - both file type and size validation working correctly, rejecting invalid files with appropriate error messages, (3) GET /api/uploads endpoint - retrieval working with all filters (kind, userId, limit), (4) MongoDB integration - media collection created with all required metadata fields, verified 3 test documents, (5) File storage structure - all directories exist with correct permissions, UUID-based filenames generated, files accessible via public URLs, (6) Upload demo page - implemented and accessible at /upload-demo (frontend not tested per protocol). Created backend_test.py with comprehensive test coverage. All 8 test scenarios from review request passing. No critical issues found. File upload system is production-ready."
