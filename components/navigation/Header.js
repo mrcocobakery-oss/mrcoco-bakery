@@ -92,7 +92,7 @@ export function Header({ cart = [], wishlist = [] }) {
                         {cakesByType.map((cake) => (
                           <li key={cake}>
                             <Link 
-                              href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase())}`}
+                              href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase().replace(' cakes', ''))}`}
                               className="text-gray-700 hover:text-pink-600 transition text-sm block py-1"
                             >
                               {cake}
@@ -221,7 +221,7 @@ export function Header({ cart = [], wishlist = [] }) {
                       <p className="font-semibold text-sm text-pink-800 mb-2">By Type</p>
                       <div className="space-y-1">
                         {cakesByType.slice(0, 5).map((cake) => (
-                          <Link key={cake} href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase())}`} className="block text-sm text-gray-700">
+                          <Link key={cake} href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase().replace(' cakes', ''))}`} className="block text-sm text-gray-700">
                             {cake}
                           </Link>
                         ))}
