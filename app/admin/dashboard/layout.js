@@ -5,7 +5,7 @@ import { useAdmin } from '@/contexts/AdminContext'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, LogOut, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 export default function AdminLayout({ children }) {
@@ -24,6 +24,7 @@ export default function AdminLayout({ children }) {
     { icon: Package, label: 'Products', href: '/admin/products' },
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
     { icon: Users, label: 'Customers', href: '/admin/customers' },
+    { icon: Briefcase, label: 'Bulk Orders', href: '/admin/bulk-orders' },
     { icon: MapPin, label: 'Delivery Areas', href: '/admin/delivery-areas' },
     { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
   ]

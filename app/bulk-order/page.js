@@ -33,7 +33,7 @@ export default function BulkOrderPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
     // Basic validation
@@ -42,10 +42,27 @@ export default function BulkOrderPage() {
       return
     }
     
-    // Mock submission
-    console.log('Bulk Order Submitted:', formData)
-    toast.success('Your bulk order inquiry has been submitted! We\'ll contact you soon.')
-    setSubmitted(true)
+    try {
+      // Send bulk order request to API
+      const response = await fetch('/api/bulk-orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          createdAt: new Date()
+        })
+      })
+      
+      if (response.ok) {
+        toast.success('Your bulk order inquiry has been submitted! We\'ll contact you within 24 hours.')
+        setSubmitted(true)
+      } else {
+        toast.error('Failed to submit. Please try again or contact us directly.')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('Failed to submit. Please try again.')
+    }
   }
 
   if (submitted) {
