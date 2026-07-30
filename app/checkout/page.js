@@ -10,8 +10,9 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Cake, CreditCard, Truck, Calendar, Clock } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
+import { RazorpayCheckout } from '@/components/razorpay/RazorpayCheckout'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -85,8 +86,24 @@ export default function CheckoutPage() {
     }
   }
 
-  const placeOrder = () => {
-    // Mock order placement
+  const handlePaymentSuccess = (paymentData) => {
+    // Clear cart
+    localStorage.removeItem('cart')
+    
+    toast.success(`Order placed successfully! Order ID: ${paymentData.orderId}`)
+    
+    setTimeout(() => {
+      router.push(`/?payment=success&orderId=${paymentData.orderId}`)
+    }, 2000)
+  }
+
+  const handlePaymentFailure = (error) => {
+    toast.error('Payment failed. Please try again.')
+    console.error('Payment error:', error)
+  }
+
+  const placeOrderCOD = () => {
+    // For COD orders
     const orderId = 'MRC' + Math.random().toString(36).substr(2, 9).toUpperCase()
     
     // Clear cart
@@ -102,6 +119,17 @@ export default function CheckoutPage() {
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const deliveryCharge = subtotal > 500 ? 0 : 50
   const total = subtotal + deliveryCharge
+
+  const customerInfo = {
+    name: formData.name,
+    email: formData.email,
+    phone: formData.phone,
+    address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+    deliveryDate: formData.deliveryDate,
+    deliveryTime: formData.deliveryTime,
+    giftMessage: formData.giftMessage,
+    specialInstructions: formData.specialInstructions
+  }
 
   if (cart.length === 0) {
     return (
@@ -308,20 +336,44 @@ export default function CheckoutPage() {
                     </Card>
                   </RadioGroup>
                   
-                  <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 mt-6">
-                    <p className="text-sm text-pink-900">
-                      <strong>Note:</strong> This is a demo checkout. No actual payment will be processed.
-                    </p>
-                  </div>
+                  <Separator className="my-6" />
                   
-                  <div className="flex gap-4">
-                    <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
-                      Back
-                    </Button>
-                    <Button onClick={placeOrder} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-                      Place Order
-                    </Button>
-                  </div>
+                  {/* Payment Button based on method */}
+                  {formData.paymentMethod === 'online' ? (
+                    <div className="space-y-4">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p className="text-sm text-green-900">
+                          <strong>Secure Payment:</strong> Your payment is processed through Razorpay with industry-standard encryption.
+                        </p>
+                      </div>
+                      <RazorpayCheckout
+                        amount={total}
+                        customerInfo={customerInfo}
+                        cartItems={cart}
+                        onSuccess={handlePaymentSuccess}
+                        onFailure={handlePaymentFailure}
+                      />
+                      <Button onClick={() => setStep(2)} variant="outline" className="w-full">
+                        Back to Delivery Details
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <p className="text-sm text-pink-900">
+                          <strong>Cash on Delivery:</strong> Pay when your order is delivered to your doorstep.
+                        </p>
+                      </div>
+                      <div className="flex gap-4">
+                        <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
+                          Back
+                        </Button>
+                        <Button onClick={placeOrderCOD} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                          Place Order (COD)
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}

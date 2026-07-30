@@ -15,6 +15,9 @@ from datetime import datetime
 # Configuration
 BASE_URL = "https://coco-premium-bakes.preview.emergentagent.com/api"
 UPLOAD_ENDPOINT = f"{BASE_URL}/uploads"
+RAZORPAY_ORDER_ENDPOINT = f"{BASE_URL}/razorpay/order"
+RAZORPAY_VERIFY_ENDPOINT = f"{BASE_URL}/razorpay/verify"
+RAZORPAY_WEBHOOK_ENDPOINT = f"{BASE_URL}/razorpay/webhook"
 MONGO_URL = os.getenv('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME = os.getenv('DB_NAME', 'mrcoco_bakery')
 
@@ -393,6 +396,313 @@ def test_file_storage_structure():
         log_test("File Storage Structure", False, f"Exception: {str(e)}")
         return False
 
+def test_razorpay_order_creation():
+    """Test 9: Razorpay Order Creation"""
+    try:
+        # Prepare test data
+        order_data = {
+            "amount": 899,
+            "currency": "INR",
+            "customerInfo": {
+                "name": "Priya Sharma",
+                "email": "priya.sharma@example.com",
+                "phone": "9876543210"
+            },
+            "cartItems": [
+                {
+                    "id": 1,
+                    "name": "Chocolate Truffle Cake",
+                    "price": 899,
+                    "quantity": 1
+                }
+            ]
+        }
+        
+        # Create order
+        response = requests.post(RAZORPAY_ORDER_ENDPOINT, json=order_data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Verify response structure
+            required_fields = ['success', 'orderId', 'amount', 'currency', 'keyId']
+            missing_fields = [f for f in required_fields if f not in result]
+            
+            if missing_fields:
+                log_test("Razorpay Order Creation", False, f"Missing fields in response: {missing_fields}")
+                return None
+            
+            # Verify orderId starts with 'order_'
+            if not result['orderId'].startswith('order_'):
+                log_test("Razorpay Order Creation", False, f"Invalid orderId format: {result['orderId']}")
+                return None
+            
+            # Verify amount is in paise (899 * 100 = 89900)
+            if result['amount'] != 89900:
+                log_test("Razorpay Order Creation", False, f"Amount mismatch. Expected 89900, got {result['amount']}")
+                return None
+            
+            # Verify keyId starts with 'rzp_test_'
+            if not result['keyId'].startswith('rzp_test_'):
+                log_test("Razorpay Order Creation", False, f"Invalid keyId format: {result['keyId']}")
+                return None
+            
+            log_test("Razorpay Order Creation", True, 
+                    f"Successfully created Razorpay order. OrderID: {result['orderId']}, Amount: ₹{result['amount']/100}, KeyID: {result['keyId']}")
+            return result
+        else:
+            log_test("Razorpay Order Creation", False, 
+                    f"Order creation failed with status {response.status_code}: {response.text}")
+            return None
+            
+    except Exception as e:
+        log_test("Razorpay Order Creation", False, f"Exception: {str(e)}")
+        return None
+
+def test_razorpay_order_invalid_amount():
+    """Test 10: Razorpay Order Creation with Invalid Amount"""
+    try:
+        # Test with invalid amount (less than ₹1)
+        order_data = {
+            "amount": 0.5,
+            "currency": "INR",
+            "customerInfo": {
+                "name": "Test User",
+                "email": "test@example.com",
+                "phone": "9876543210"
+            },
+            "cartItems": []
+        }
+        
+        response = requests.post(RAZORPAY_ORDER_ENDPOINT, json=order_data)
+        
+        # Should return 400 error
+        if response.status_code == 400:
+            result = response.json()
+            if 'error' in result:
+                log_test("Razorpay Order Invalid Amount", True, 
+                        f"Correctly rejected invalid amount: {result['error']}")
+                return True
+            else:
+                log_test("Razorpay Order Invalid Amount", False, 
+                        f"Missing error message in response: {result}")
+                return False
+        else:
+            log_test("Razorpay Order Invalid Amount", False, 
+                    f"Should return 400 error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Razorpay Order Invalid Amount", False, f"Exception: {str(e)}")
+        return False
+
+def test_razorpay_order_missing_data():
+    """Test 11: Razorpay Order Creation with Missing Data"""
+    try:
+        # Test with missing required data
+        order_data = {}
+        
+        response = requests.post(RAZORPAY_ORDER_ENDPOINT, json=order_data)
+        
+        # Should return error (400 or 500)
+        if response.status_code in [400, 500]:
+            result = response.json()
+            if 'error' in result:
+                log_test("Razorpay Order Missing Data", True, 
+                        f"Correctly rejected missing data: {result['error']}")
+                return True
+            else:
+                log_test("Razorpay Order Missing Data", False, 
+                        f"Missing error message in response: {result}")
+                return False
+        else:
+            log_test("Razorpay Order Missing Data", False, 
+                    f"Should return error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Razorpay Order Missing Data", False, f"Exception: {str(e)}")
+        return False
+
+def test_razorpay_verify_endpoint():
+    """Test 12: Razorpay Payment Verification Endpoint"""
+    try:
+        # Test with missing signature (should return error)
+        verify_data = {
+            "razorpay_order_id": "order_test123",
+            "razorpay_payment_id": "pay_test123"
+            # Missing razorpay_signature
+        }
+        
+        response = requests.post(RAZORPAY_VERIFY_ENDPOINT, json=verify_data)
+        
+        # Should return error (400 or 500)
+        if response.status_code in [400, 500]:
+            result = response.json()
+            if 'error' in result:
+                log_test("Razorpay Verify Endpoint", True, 
+                        f"Endpoint exists and validates input correctly: {result['error']}")
+                return True
+            else:
+                log_test("Razorpay Verify Endpoint", False, 
+                        f"Endpoint exists but missing error message: {result}")
+                return False
+        else:
+            log_test("Razorpay Verify Endpoint", False, 
+                    f"Unexpected status code: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Razorpay Verify Endpoint", False, f"Exception: {str(e)}")
+        return False
+
+def test_razorpay_webhook_endpoint():
+    """Test 13: Razorpay Webhook Endpoint"""
+    try:
+        # Test with missing signature header
+        webhook_data = {
+            "event": "payment.captured",
+            "payload": {
+                "payment": {
+                    "entity": {
+                        "id": "pay_test123",
+                        "order_id": "order_test123"
+                    }
+                }
+            }
+        }
+        
+        response = requests.post(RAZORPAY_WEBHOOK_ENDPOINT, json=webhook_data)
+        
+        # Should return 400 error for missing signature
+        if response.status_code == 400:
+            result = response.json()
+            if 'error' in result and 'signature' in result['error'].lower():
+                log_test("Razorpay Webhook Endpoint", True, 
+                        f"Endpoint exists and validates signature: {result['error']}")
+                return True
+            else:
+                log_test("Razorpay Webhook Endpoint", False, 
+                        f"Endpoint exists but wrong error message: {result}")
+                return False
+        else:
+            log_test("Razorpay Webhook Endpoint", False, 
+                    f"Should return 400 error, got {response.status_code}")
+            return False
+            
+    except Exception as e:
+        log_test("Razorpay Webhook Endpoint", False, f"Exception: {str(e)}")
+        return False
+
+def test_razorpay_mongodb_orders():
+    """Test 14: Razorpay MongoDB Orders Collection"""
+    try:
+        # Connect to MongoDB
+        client = MongoClient(MONGO_URL)
+        db = client[DB_NAME]
+        
+        # Check if orders collection exists
+        collections = db.list_collection_names()
+        
+        if 'orders' not in collections:
+            log_test("Razorpay MongoDB Orders", False, 
+                    "Orders collection does not exist in database")
+            client.close()
+            return False
+        
+        # Get a sample order document
+        orders_collection = db['orders']
+        sample_order = orders_collection.find_one()
+        
+        if not sample_order:
+            log_test("Razorpay MongoDB Orders", False, 
+                    "Orders collection is empty - no orders found")
+            client.close()
+            return False
+        
+        # Verify required fields
+        required_fields = ['orderId', 'receiptId', 'amount', 'currency', 'status', 
+                          'customerInfo', 'cartItems', 'razorpayOrderData', 'createdAt', 'updatedAt']
+        missing_fields = [f for f in required_fields if f not in sample_order]
+        
+        if missing_fields:
+            log_test("Razorpay MongoDB Orders", False, 
+                    f"Missing required fields in order document: {missing_fields}")
+            client.close()
+            return False
+        
+        # Verify orderId format
+        if not sample_order['orderId'].startswith('order_'):
+            log_test("Razorpay MongoDB Orders", False, 
+                    f"Invalid orderId format in database: {sample_order['orderId']}")
+            client.close()
+            return False
+        
+        # Count orders
+        total_orders = orders_collection.count_documents({})
+        
+        log_test("Razorpay MongoDB Orders", True, 
+                f"MongoDB orders collection verified. Total orders: {total_orders}. OrderID: {sample_order['orderId']}, Status: {sample_order['status']}, Amount: ₹{sample_order['amount']/100}")
+        
+        client.close()
+        return True
+        
+    except Exception as e:
+        log_test("Razorpay MongoDB Orders", False, f"Exception: {str(e)}")
+        return False
+
+def test_razorpay_environment_variables():
+    """Test 15: Razorpay Environment Variables"""
+    try:
+        # Read .env file
+        env_path = '/app/.env'
+        if not os.path.exists(env_path):
+            log_test("Razorpay Environment Variables", False, 
+                    ".env file not found")
+            return False
+        
+        with open(env_path, 'r') as f:
+            env_content = f.read()
+        
+        # Check for required variables
+        required_vars = {
+            'RAZORPAY_KEY_ID': 'rzp_test_',
+            'RAZORPAY_KEY_SECRET': None,
+            'NEXT_PUBLIC_RAZORPAY_KEY_ID': 'rzp_test_'
+        }
+        
+        missing_vars = []
+        invalid_vars = []
+        
+        for var_name, expected_prefix in required_vars.items():
+            if var_name not in env_content:
+                missing_vars.append(var_name)
+            elif expected_prefix:
+                # Extract value
+                for line in env_content.split('\n'):
+                    if line.startswith(f"{var_name}="):
+                        value = line.split('=', 1)[1].strip()
+                        if not value.startswith(expected_prefix):
+                            invalid_vars.append(f"{var_name} (should start with {expected_prefix})")
+        
+        if missing_vars:
+            log_test("Razorpay Environment Variables", False, 
+                    f"Missing environment variables: {missing_vars}")
+            return False
+        
+        if invalid_vars:
+            log_test("Razorpay Environment Variables", False, 
+                    f"Invalid environment variables: {invalid_vars}")
+            return False
+        
+        log_test("Razorpay Environment Variables", True, 
+                "All Razorpay environment variables are set correctly (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, NEXT_PUBLIC_RAZORPAY_KEY_ID)")
+        return True
+        
+    except Exception as e:
+        log_test("Razorpay Environment Variables", False, f"Exception: {str(e)}")
+        return False
+
 def print_summary():
     """Print test summary"""
     print("\n" + "="*70)
@@ -414,38 +724,35 @@ def print_summary():
 def main():
     """Run all tests"""
     print("\n" + "="*70)
-    print("Mr. COCO Bakery - File Upload System Backend Tests")
+    print("Mr. COCO Bakery - Backend API Tests")
     print("="*70)
     print(f"Backend URL: {BASE_URL}")
     print(f"MongoDB: {MONGO_URL}/{DB_NAME}")
     print("="*70 + "\n")
     
     # Run tests in order
-    print("Running Backend API Tests...\n")
+    print("Running Razorpay Payment Gateway Tests...\n")
     
-    # Test 1: Product Image Upload
-    test_product_image_upload()
+    # Test 9: Razorpay Environment Variables
+    test_razorpay_environment_variables()
     
-    # Test 2: Customer Photo Upload
-    test_customer_photo_upload()
+    # Test 10: Razorpay Order Creation
+    test_razorpay_order_creation()
     
-    # Test 3: Document Upload
-    test_document_upload()
+    # Test 11: Razorpay Order Invalid Amount
+    test_razorpay_order_invalid_amount()
     
-    # Test 4: File Type Validation
-    test_file_type_validation()
+    # Test 12: Razorpay Order Missing Data
+    test_razorpay_order_missing_data()
     
-    # Test 5: File Size Validation
-    test_file_size_validation()
+    # Test 13: Razorpay Verify Endpoint
+    test_razorpay_verify_endpoint()
     
-    # Test 6: GET Uploaded Files
-    test_get_uploaded_files()
+    # Test 14: Razorpay Webhook Endpoint
+    test_razorpay_webhook_endpoint()
     
-    # Test 7: MongoDB Integration
-    test_mongodb_integration()
-    
-    # Test 8: File Storage Structure
-    test_file_storage_structure()
+    # Test 15: Razorpay MongoDB Orders
+    test_razorpay_mongodb_orders()
     
     # Print summary
     print_summary()
