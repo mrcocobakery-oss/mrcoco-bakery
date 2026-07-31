@@ -71,6 +71,12 @@ export function RecentlyViewed({ currentProductId }) {
               </div>
             </Link>
             <CardContent className="p-4">
+              {/* Category Badge */}
+              <div className="mb-2">
+                <Badge className="bg-pink-100 text-pink-700 text-xs">
+                  {product.category}
+                </Badge>
+              </div>
               <Link href={`/products/${product.id}`}>
                 <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition line-clamp-2">
                   {product.name}

@@ -372,6 +372,92 @@ export default function ProductsPage() {
                       </Button>
                     </div>
                     <CardContent className="p-4">
+                      {/* Category Badges - Clickable for Quick Filtering */}
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {/* Main Category Badge */}
+                        <Badge
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setSelectedCategory(product.category)
+                            setSelectedCakeType('all')
+                            setSelectedOccasion('all')
+                            setSelectedSpecialDay('all')
+                          }}
+                          className="cursor-pointer bg-pink-100 text-pink-700 hover:bg-pink-200 text-xs"
+                        >
+                          {product.category}
+                        </Badge>
+
+                        {/* Cake-specific badges */}
+                        {product.category === 'cakes' && (
+                          <>
+                            {product.cakeType && (
+                              <Badge
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setSelectedCategory('cakes')
+                                  setSelectedCakeType(product.cakeType)
+                                }}
+                                className="cursor-pointer bg-purple-100 text-purple-700 hover:bg-purple-200 text-xs"
+                              >
+                                {product.cakeType}
+                              </Badge>
+                            )}
+                            {product.occasion && (
+                              <Badge
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setSelectedCategory('cakes')
+                                  setSelectedOccasion(product.occasion)
+                                }}
+                                className="cursor-pointer bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs"
+                              >
+                                {product.occasion}
+                              </Badge>
+                            )}
+                            {product.specialDay && (
+                              <Badge
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setSelectedCategory('cakes')
+                                  setSelectedSpecialDay(product.specialDay)
+                                }}
+                                className="cursor-pointer bg-amber-100 text-amber-700 hover:bg-amber-200 text-xs"
+                              >
+                                {product.specialDay}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+
+                        {/* Cookie-specific badge */}
+                        {product.category === 'cookies' && product.cookieType && (
+                          <Badge
+                            className="bg-orange-100 text-orange-700 text-xs"
+                          >
+                            {product.cookieType}
+                          </Badge>
+                        )}
+
+                        {/* Namkeen-specific badge */}
+                        {product.category === 'namkeen' && product.namkeenType && (
+                          <Badge
+                            className="bg-yellow-100 text-yellow-700 text-xs"
+                          >
+                            {product.namkeenType}
+                          </Badge>
+                        )}
+
+                        {/* Gift-specific badge */}
+                        {product.category === 'gifts' && product.giftType && (
+                          <Badge
+                            className="bg-green-100 text-green-700 text-xs"
+                          >
+                            {product.giftType}
+                          </Badge>
+                        )}
+                      </div>
+
                       <Link href={`/products/${product.id}`}>
                         <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2">{product.name}</h3>
                       </Link>
