@@ -11,7 +11,9 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye, Plus, Minus } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye, Plus, Minus, Calendar, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
@@ -35,6 +37,12 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [quickViewProduct, setQuickViewProduct] = useState(null)
   const [showQuickView, setShowQuickView] = useState(false)
+  
+  // Delivery Time Picker States
+  const [showDeliveryPicker, setShowDeliveryPicker] = useState(false)
+  const [selectedProductForDelivery, setSelectedProductForDelivery] = useState(null)
+  const [deliveryDate, setDeliveryDate] = useState('')
+  const [deliveryTimeSlot, setDeliveryTimeSlot] = useState('morning')
 
   // Fetch products from API
   useEffect(() => {
@@ -109,11 +117,45 @@ export default function ProductsPage() {
     setFilteredProducts(filtered)
   }, [searchQuery, selectedCategory, selectedCakeType, selectedOccasion, selectedSpecialDay, sortBy, products])
 
-  const addToCart = (product) => {
-    const newCart = [...cart, product]
+  const addToCart = (product, deliveryInfo = null) => {
+    // For cakes, require delivery time selection first
+    if (product.category === 'cakes' && !deliveryInfo) {
+      setSelectedProductForDelivery(product)
+      
+      // Set minimum date (tomorrow for cakes)
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const minDate = tomorrow.toISOString().split('T')[0]
+      setDeliveryDate(minDate)
+      
+      setShowDeliveryPicker(true)
+      return
+    }
+    
+    // Add product with delivery info if it's a cake
+    const cartItem = deliveryInfo 
+      ? { ...product, deliveryDate: deliveryInfo.date, deliveryTime: deliveryInfo.slot }
+      : product
+    
+    const newCart = [...cart, cartItem]
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
     toast.success(`${product.name} added to cart!`)
+  }
+  
+  const confirmDeliveryAndAddToCart = () => {
+    if (!deliveryDate) {
+      toast.error('Please select a delivery date')
+      return
+    }
+    
+    addToCart(selectedProductForDelivery, {
+      date: deliveryDate,
+      slot: deliveryTimeSlot
+    })
+    
+    setShowDeliveryPicker(false)
+    setSelectedProductForDelivery(null)
   }
 
   const toggleWishlist = async (product) => {
@@ -570,6 +612,110 @@ export default function ProductsPage() {
         onToggleWishlist={toggleWishlist}
         isInWishlist={quickViewProduct ? isInWishlist(quickViewProduct.id) : false}
       />
+
+      {/* Delivery Time Picker Dialog */}
+      <Dialog open={showDeliveryPicker} onOpenChange={setShowDeliveryPicker}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif text-pink-900">Choose Delivery Time</DialogTitle>
+            <DialogDescription>
+              Select your preferred delivery date and time slot for {selectedProductForDelivery?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Delivery Date */}
+            <div>
+              <Label htmlFor="delivery-date" className="flex items-center gap-2 text-base font-semibold mb-3">
+                <Calendar className="w-4 h-4 text-pink-600" />
+                Delivery Date
+              </Label>
+              <Input
+                id="delivery-date"
+                type="date"
+                value={deliveryDate}
+                onChange={(e) => setDeliveryDate(e.target.value)}
+                min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} // Tomorrow
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                * Cakes require minimum 24 hours advance order
+              </p>
+            </div>
+
+            {/* Time Slots */}
+            <div>
+              <Label className="flex items-center gap-2 text-base font-semibold mb-3">
+                <Clock className="w-4 h-4 text-pink-600" />
+                Time Slot
+              </Label>
+              <RadioGroup value={deliveryTimeSlot} onValueChange={setDeliveryTimeSlot}>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 p-3 border-2 rounded-lg hover:bg-pink-50 transition cursor-pointer">
+                    <RadioGroupItem value="morning" id="morning" />
+                    <Label htmlFor="morning" className="flex-1 cursor-pointer">
+                      <div className="font-semibold">Morning</div>
+                      <div className="text-sm text-gray-500">10:00 AM - 12:00 PM</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-3 border-2 rounded-lg hover:bg-pink-50 transition cursor-pointer">
+                    <RadioGroupItem value="afternoon" id="afternoon" />
+                    <Label htmlFor="afternoon" className="flex-1 cursor-pointer">
+                      <div className="font-semibold">Afternoon</div>
+                      <div className="text-sm text-gray-500">12:00 PM - 4:00 PM</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-3 border-2 rounded-lg hover:bg-pink-50 transition cursor-pointer">
+                    <RadioGroupItem value="evening" id="evening" />
+                    <Label htmlFor="evening" className="flex-1 cursor-pointer">
+                      <div className="font-semibold">Evening</div>
+                      <div className="text-sm text-gray-500">4:00 PM - 8:00 PM</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-3 border-2 rounded-lg hover:bg-pink-50 transition cursor-pointer">
+                    <RadioGroupItem value="midnight" id="midnight" />
+                    <Label htmlFor="midnight" className="flex-1 cursor-pointer">
+                      <div className="font-semibold">Midnight Delivery</div>
+                      <div className="text-sm text-gray-500">11:00 PM - 12:30 AM</div>
+                      <Badge className="mt-1 bg-pink-600">+₹200</Badge>
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Express Delivery Option */}
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <Clock className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-blue-900">Express Delivery Available</p>
+                  <p className="text-sm text-blue-700">Get it in 2-3 hours (+₹100)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeliveryPicker(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDeliveryAndAddToCart}
+              className="flex-1 bg-pink-600 hover:bg-pink-700"
+            >
+              Confirm & Add to Cart
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
