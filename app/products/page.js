@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye } from 'lucide-react'
+import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye, Plus, Minus } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
@@ -487,16 +487,64 @@ export default function ProductsPage() {
                       )}
                       
                       <div className="flex gap-2">
+                        {/* Check if product is already in cart */}
+                        {cart.filter(item => item.id === product.id).length > 0 ? (
+                          <div className="flex-1 flex items-center gap-2 bg-pink-50 border-2 border-pink-600 rounded-md px-3 py-2">
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                const existingCount = cart.filter(item => item.id === product.id).length
+                                if (existingCount > 1) {
+                                  const updatedCart = [...cart]
+                                  const indexToRemove = updatedCart.findIndex(item => item.id === product.id)
+                                  updatedCart.splice(indexToRemove, 1)
+                                  setCart(updatedCart)
+                                  localStorage.setItem('cart', JSON.stringify(updatedCart))
+                                } else {
+                                  const updatedCart = cart.filter(item => item.id !== product.id)
+                                  setCart(updatedCart)
+                                  localStorage.setItem('cart', JSON.stringify(updatedCart))
+                                }
+                              }}
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 text-pink-600 hover:bg-pink-100"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                            <span className="font-bold text-pink-900 min-w-[20px] text-center">
+                              {cart.filter(item => item.id === product.id).length}
+                            </span>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                addToCart(product)
+                              }}
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 text-pink-600 hover:bg-pink-100"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              addToCart(product)
+                            }}
+                            disabled={!product.inStock}
+                            className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
+                          >
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                        )}
                         <Button
-                          onClick={() => addToCart(product)}
-                          disabled={!product.inStock}
-                          className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
-                        >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Add
-                        </Button>
-                        <Button
-                          onClick={() => toggleWishlist(product)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            toggleWishlist(product)
+                          }}
                           variant="outline"
                           size="icon"
                           className={isInWishlist(product.id) ? 'border-red-500 text-red-500' : ''}

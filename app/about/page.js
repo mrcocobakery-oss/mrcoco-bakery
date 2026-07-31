@@ -109,11 +109,11 @@ export default function AboutUsPage() {
                 </div>
                 <p className="text-gray-700 mb-3">Teenpani, Haldwani, Uttarakhand</p>
                 <p className="text-gray-600 text-sm mb-4">Mon - Sun: 9:00 AM - 9:00 PM</p>
-                <Link href="/contact">
+                <a href="https://maps.app.goo.gl/zqXRYavsKb4Ak4qk9" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full">
                     Get Directions
                   </Button>
-                </Link>
+                </a>
               </CardContent>
             </Card>
 
@@ -125,11 +125,11 @@ export default function AboutUsPage() {
                 </div>
                 <p className="text-gray-700 mb-3">Rampur Road, Haldwani, Uttarakhand</p>
                 <p className="text-gray-600 text-sm mb-4">Mon - Sun: 8:00 AM - 10:00 PM</p>
-                <Link href="/contact">
+                <a href="https://maps.app.goo.gl/uMMgCgzYdX7CcBHf9" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full">
                     Get Directions
                   </Button>
-                </Link>
+                </a>
               </CardContent>
             </Card>
           </div>

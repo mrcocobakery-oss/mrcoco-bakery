@@ -68,8 +68,8 @@ export default function ContactPage() {
     {
       name: 'Factory Outlet - Teenpani',
       address: 'Teenpani, Haldwani, Uttarakhand',
-      mapLink: 'https://maps.app.goo.gl/P7N5fVXVsmSJkwjK6',
-      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.234567890123!2d79.53456789012345!3d29.23456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDE0JzA0LjQiTiA3OcKwMzInMDQuNCJF!5e0!3m2!1sen!2sin!4v1234567890124!5m2!1sen!2sin',
+      mapLink: 'https://maps.app.goo.gl/zqXRYavsKb4Ak4qk9',
+      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3483.2680995052942!2d79.5146898!3d29.186232799999992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39a0853963e65f9d%3A0xede1bb8e0f8d2b33!2sMr.%20Coco%20Bakery%2C%20Teenpani%2C%20Haldwani!5e0!3m2!1sen!2sin!4v1785510491708!5m2!1sen!2sin',
       icon: Factory,
       type: 'Factory Outlet',
       hours: 'Mon - Sun: 9:00 AM - 9:00 PM'
@@ -77,8 +77,8 @@ export default function ContactPage() {
     {
       name: 'Bakery & Restaurant - Rampur Road',
       address: 'Rampur Road, Haldwani, Uttarakhand',
-      mapLink: 'https://maps.app.goo.gl/qKqVkJX64GPUtHay8',
-      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.123456789012!2d79.52345678901234!3d29.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDA3JzI0LjQiTiA3OcKwMzEnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin',
+      mapLink: 'https://maps.app.goo.gl/uMMgCgzYdX7CcBHf9',
+      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3482.8525235096745!2d79.5133986!3d29.198468499999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39a09bd4fd30e089%3A0xf2be01250566cd02!2sMr.%20COCO%20Bakery%2C%20Rampur%20Road%2C%20Haldwani!5e0!3m2!1sen!2sin!4v1785510652976!5m2!1sen!2sin',
       icon: Store,
       type: 'Bakery & Restaurant',
       hours: 'Mon - Sun: 8:00 AM - 10:00 PM'
