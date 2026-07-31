@@ -153,6 +153,9 @@ export function Header({ cart = [], wishlist = [] }) {
             <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">
               Bulk Orders
             </Link>
+            <Link href="/contact" className="text-pink-900 font-medium hover:text-pink-600 transition">
+              Contact Us
+            </Link>
           </nav>
 
           {/* Actions */}
@@ -247,6 +250,7 @@ export function Header({ cart = [], wishlist = [] }) {
               <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
               <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
               <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
+              <Link href="/contact" className="text-pink-900 font-medium hover:text-pink-600 transition">Contact Us</Link>
               
               {!user && (
                 <Link href="/login">
