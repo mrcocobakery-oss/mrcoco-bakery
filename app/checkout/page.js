@@ -722,10 +722,10 @@ export default function CheckoutPage() {
                         <div className="bg-white rounded-lg p-4 border-2 border-blue-300 mb-3">
                           <p className="text-center font-bold text-xl mb-2">UPI ID</p>
                           <p className="text-center text-2xl font-mono bg-gray-100 p-3 rounded select-all">
-                            mrcocobakery@paytm
+                            krishnabaskheti-5@oksbi
                           </p>
                           <p className="text-center text-sm text-gray-600 mt-2">
-                            Or scan QR code (coming soon)
+                            Tap to copy • Pay via any UPI app
                           </p>
                         </div>
                         <div className="text-sm text-blue-800 space-y-2">
@@ -760,16 +760,16 @@ export default function CheckoutPage() {
                             <p className="text-right">Mr. COCO Bakery</p>
                             
                             <p className="font-semibold">Account Number:</p>
-                            <p className="text-right font-mono">1234567890</p>
+                            <p className="text-right font-mono">47040200000462</p>
                             
                             <p className="font-semibold">IFSC Code:</p>
-                            <p className="text-right font-mono">SBIN0001234</p>
+                            <p className="text-right font-mono">BARB0RAMHAL</p>
                             
                             <p className="font-semibold">Bank Name:</p>
-                            <p className="text-right">State Bank of India</p>
+                            <p className="text-right">Bank Of Baroda</p>
                             
                             <p className="font-semibold">Branch:</p>
-                            <p className="text-right">Haldwani</p>
+                            <p className="text-right">Rampur Road Haldwani</p>
                             
                             <p className="font-semibold text-lg mt-2">Amount to Pay:</p>
                             <p className="text-right text-lg font-bold text-purple-900">₹{total}</p>
