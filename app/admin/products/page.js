@@ -470,7 +470,7 @@ export default function AdminProductsPage() {
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         <SelectItem value="eggless">Eggless</SelectItem>
                         <SelectItem value="designer">Designer</SelectItem>
                         <SelectItem value="photo">Photo Cake</SelectItem>
@@ -492,7 +492,7 @@ export default function AdminProductsPage() {
                         <SelectValue placeholder="Select occasion" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         <SelectItem value="birthday">Birthday</SelectItem>
                         <SelectItem value="anniversary">Anniversary</SelectItem>
                         <SelectItem value="wedding">Wedding</SelectItem>
@@ -515,7 +515,7 @@ export default function AdminProductsPage() {
                         <SelectValue placeholder="Select day" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         <SelectItem value="mothers day">Mother's Day</SelectItem>
                         <SelectItem value="fathers day">Father's Day</SelectItem>
                         <SelectItem value="valentine">Valentine's Day</SelectItem>
@@ -558,7 +558,7 @@ export default function AdminProductsPage() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="premium">Premium</SelectItem>
                     <SelectItem value="butter">Butter</SelectItem>
                     <SelectItem value="tea">Tea Cookies</SelectItem>
@@ -579,7 +579,7 @@ export default function AdminProductsPage() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="traditional">Traditional</SelectItem>
                     <SelectItem value="baked">Baked</SelectItem>
                   </SelectContent>
@@ -596,7 +596,7 @@ export default function AdminProductsPage() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="festival hamper">Festival Hamper</SelectItem>
                     <SelectItem value="corporate">Corporate</SelectItem>
                     <SelectItem value="wedding">Wedding</SelectItem>
