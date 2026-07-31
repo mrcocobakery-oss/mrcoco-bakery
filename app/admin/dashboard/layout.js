@@ -5,18 +5,46 @@ import { useAdmin } from '@/contexts/AdminContext'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, Bell, LogOut, Menu, X, MessageSquare } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function AdminLayout({ children }) {
   const { admin, logoutAdmin } = useAdmin()
   const router = useRouter()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [newInquiriesCount, setNewInquiriesCount] = useState(0)
+
+  useEffect(() => {
+    fetchNewInquiriesCount()
+    // Poll every 30 seconds for new inquiries
+    const interval = setInterval(fetchNewInquiriesCount, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const fetchNewInquiriesCount = async () => {
+    try {
+      const response = await fetch('/api/contact?status=new')
+      const data = await response.json()
+      if (data.success) {
+        setNewInquiriesCount(data.count || 0)
+      }
+    } catch (error) {
+      console.error('Error fetching new inquiries count:', error)
+    }
+  }
 
   const handleLogout = () => {
     logoutAdmin()
     router.push('/admin/login')
+  }
+
+  const handleMenuClick = () => {
+    // Close menu on mobile after clicking a link
+    if (window.innerWidth < 1024) {
+      setMenuOpen(false)
+    }
   }
 
   const menuItems = [
@@ -25,7 +53,7 @@ export default function AdminLayout({ children }) {
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
     { icon: Users, label: 'Customers', href: '/admin/customers' },
     { icon: Briefcase, label: 'Bulk Orders', href: '/admin/bulk-orders' },
-    { icon: MessageSquare, label: 'Contact Inquiries', href: '/admin/contact-inquiries' },
+    { icon: MessageSquare, label: 'Contact Inquiries', href: '/admin/contact-inquiries', badge: newInquiriesCount },
     { icon: MapPin, label: 'Delivery Areas', href: '/admin/delivery-areas' },
     { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
     { icon: Bell, label: 'Notifications', href: '/admin/notifications' },
@@ -61,21 +89,49 @@ export default function AdminLayout({ children }) {
           </div>
         </header>
 
-        <div className="flex">
+        <div className="flex relative">
+          {/* Mobile Backdrop Overlay */}
+          {menuOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+              onClick={() => setMenuOpen(false)}
+            />
+          )}
+
           {/* Sidebar */}
-          <aside className={`${menuOpen ? 'block' : 'hidden'} lg:block w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)] sticky top-[73px]`}>
+          <aside
+            className={`
+              fixed lg:sticky top-[73px] left-0 z-40
+              w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)]
+              transform transition-transform duration-300 ease-in-out
+              ${menuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}
+          >
             <nav className="p-4 space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
                 return (
-                  <Link key={item.href} href={item.href}>
+                  <Link key={item.href} href={item.href} onClick={handleMenuClick}>
                     <Button
                       variant={isActive ? 'default' : 'ghost'}
-                      className={`w-full justify-start ${isActive ? 'bg-pink-600 text-white hover:bg-pink-700' : 'hover:bg-gray-100'}`}
+                      className={`w-full justify-start relative ${
+                        isActive ? 'bg-pink-600 text-white hover:bg-pink-700' : 'hover:bg-gray-100'
+                      }`}
                     >
                       <Icon className="w-5 h-5 mr-3" />
                       {item.label}
+                      {item.badge > 0 && (
+                        <Badge
+                          className={`ml-auto ${
+                            isActive
+                              ? 'bg-white text-pink-600'
+                              : 'bg-red-500 text-white'
+                          }`}
+                        >
+                          {item.badge}
+                        </Badge>
+                      )}
                     </Button>
                   </Link>
                 )

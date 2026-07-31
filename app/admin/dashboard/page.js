@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { TrendingUp, DollarSign, ShoppingCart, Users, Package } from 'lucide-react'
+import { TrendingUp, DollarSign, ShoppingCart, Users, Package, MessageSquare, Mail, RefreshCw, CheckCircle, Clock } from 'lucide-react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 export default function AdminDashboardPage() {
   const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [inquiriesStats, setInquiriesStats] = useState(null)
 
   useEffect(() => {
     fetchAnalytics()
+    fetchInquiriesStats()
   }, [])
 
   const fetchAnalytics = async () => {
@@ -32,6 +36,24 @@ export default function AdminDashboardPage() {
       toast.error('Failed to fetch analytics')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchInquiriesStats = async () => {
+    try {
+      const response = await fetch('/api/contact')
+      const data = await response.json()
+      if (data.success) {
+        const inquiries = data.inquiries || []
+        setInquiriesStats({
+          total: inquiries.length,
+          new: inquiries.filter(i => i.status === 'new').length,
+          inProgress: inquiries.filter(i => i.status === 'in-progress').length,
+          resolved: inquiries.filter(i => i.status === 'resolved').length
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching inquiries stats:', error)
     }
   }
 
@@ -143,6 +165,81 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Contact Inquiries Widget */}
+      {inquiriesStats && (
+        <Card className="border-2 border-pink-100">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-pink-600" />
+                Contact Inquiries
+              </CardTitle>
+              <p className="text-sm text-gray-500 mt-1">Customer inquiries overview</p>
+            </div>
+            <Link href="/admin/contact-inquiries">
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-pink-50 to-white p-4 rounded-lg border border-pink-100">
+                <div className="flex items-center justify-between mb-2">
+                  <MessageSquare className="w-8 h-8 text-pink-600 opacity-80" />
+                  <span className="text-xs text-gray-500">Total</span>
+                </div>
+                <p className="text-3xl font-bold text-gray-900">{inquiriesStats.total}</p>
+                <p className="text-xs text-gray-600 mt-1">All inquiries</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-lg border border-blue-100">
+                <div className="flex items-center justify-between mb-2">
+                  <Mail className="w-8 h-8 text-blue-600 opacity-80" />
+                  <span className="text-xs text-gray-500">New</span>
+                </div>
+                <p className="text-3xl font-bold text-blue-900">{inquiriesStats.new}</p>
+                <p className="text-xs text-gray-600 mt-1">Needs attention</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-yellow-50 to-white p-4 rounded-lg border border-yellow-100">
+                <div className="flex items-center justify-between mb-2">
+                  <RefreshCw className="w-8 h-8 text-yellow-600 opacity-80" />
+                  <span className="text-xs text-gray-500">Processing</span>
+                </div>
+                <p className="text-3xl font-bold text-yellow-900">{inquiriesStats.inProgress}</p>
+                <p className="text-xs text-gray-600 mt-1">In progress</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-lg border border-green-100">
+                <div className="flex items-center justify-between mb-2">
+                  <CheckCircle className="w-8 h-8 text-green-600 opacity-80" />
+                  <span className="text-xs text-gray-500">Done</span>
+                </div>
+                <p className="text-3xl font-bold text-green-900">{inquiriesStats.resolved}</p>
+                <p className="text-xs text-gray-600 mt-1">Resolved</p>
+              </div>
+            </div>
+            
+            {inquiriesStats.new > 0 && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <p className="text-sm text-blue-900">
+                    You have <strong>{inquiriesStats.new}</strong> new {inquiriesStats.new === 1 ? 'inquiry' : 'inquiries'} waiting for response
+                  </p>
+                </div>
+                <Link href="/admin/contact-inquiries">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    Respond Now
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
