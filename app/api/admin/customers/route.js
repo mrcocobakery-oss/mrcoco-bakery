@@ -1,83 +1,161 @@
-import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/mongodb'
+import { MongoClient } from 'mongodb'
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
-// Admin authentication check
-function checkAdminAuth(request) {
-  const authHeader = request.headers.get('authorization')
-  const adminToken = request.cookies.get('admin_token')?.value
-  
-  if (adminToken !== 'admin_logged_in' && authHeader !== 'Bearer admin_logged_in') {
+const uri = process.env.MONGO_URL
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+
+let cachedClient = null
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient
+  }
+  const client = await MongoClient.connect(uri)
+  cachedClient = client
+  return client
+}
+
+// Verify admin token
+async function verifyAdmin() {
+  try {
+    const cookieStore = await cookies()
+    const adminToken = cookieStore.get('admin_token')?.value
+    
+    if (!adminToken) {
+      return false
+    }
+    
+    const decoded = jwt.verify(adminToken, JWT_SECRET)
+    return decoded.role === 'admin'
+  } catch (error) {
     return false
   }
-  return true
 }
 
 // GET - Fetch all customers
 export async function GET(request) {
   try {
-    if (!checkAdminAuth(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { db } = await connectToDatabase()
-    
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')
-    
-    let query = {}
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } }
-      ]
+    const isAdmin = await verifyAdmin()
+    if (!isAdmin) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
     
-    const customers = await db.collection('users').find(query).sort({ createdAt: -1 }).toArray()
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
     
-    // Remove password field
-    const sanitizedCustomers = customers.map(({ password, ...customer }) => customer)
+    const customers = await db.collection('users')
+      .find({ role: { $ne: 'admin' } })
+      .sort({ createdAt: -1 })
+      .toArray()
     
-    return NextResponse.json({ customers: sanitizedCustomers })
+    return Response.json({
+      success: true,
+      customers: customers
+    })
   } catch (error) {
     console.error('Error fetching customers:', error)
-    return NextResponse.json({ error: 'Failed to fetch customers' }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to fetch customers' }, { status: 500 })
   }
 }
 
-// PUT - Update customer status
+// POST - Add new customer manually
+export async function POST(request) {
+  try {
+    const isAdmin = await verifyAdmin()
+    if (!isAdmin) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    const body = await request.json()
+    const { name, email, phone, address, birthdays } = body
+    
+    if (!name || !phone) {
+      return Response.json({ success: false, error: 'Name and phone are required' }, { status: 400 })
+    }
+    
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    // Check if customer already exists
+    const existing = await db.collection('users').findOne({ phone })
+    if (existing) {
+      return Response.json({ success: false, error: 'Customer with this phone number already exists' }, { status: 400 })
+    }
+    
+    const newCustomer = {
+      name,
+      email: email || '',
+      phone,
+      address: address || '',
+      birthdays: birthdays || [], // Array of { name, date }
+      walletBalance: 0,
+      loyaltyPoints: 0,
+      status: 'active',
+      emailVerified: false,
+      phoneVerified: false,
+      role: 'customer',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    
+    const result = await db.collection('users').insertOne(newCustomer)
+    
+    return Response.json({
+      success: true,
+      message: 'Customer added successfully',
+      customerId: result.insertedId
+    })
+  } catch (error) {
+    console.error('Error adding customer:', error)
+    return Response.json({ success: false, error: 'Failed to add customer' }, { status: 500 })
+  }
+}
+
+// PUT - Update customer
 export async function PUT(request) {
   try {
-    if (!checkAdminAuth(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const isAdmin = await verifyAdmin()
+    if (!isAdmin) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
-
+    
     const body = await request.json()
-    const { userId, status } = body
+    const { customerId, name, email, phone, address, birthdays, status } = body
     
-    if (!userId || !status) {
-      return NextResponse.json({ error: 'User ID and status are required' }, { status: 400 })
+    if (!customerId) {
+      return Response.json({ success: false, error: 'Customer ID is required' }, { status: 400 })
     }
     
-    const { db } = await connectToDatabase()
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    const updateData = {
+      updatedAt: new Date()
+    }
+    
+    if (name) updateData.name = name
+    if (email !== undefined) updateData.email = email
+    if (phone) updateData.phone = phone
+    if (address !== undefined) updateData.address = address
+    if (birthdays) updateData.birthdays = birthdays
+    if (status) updateData.status = status
     
     const result = await db.collection('users').updateOne(
-      { _id: userId },
-      { 
-        $set: { 
-          status,
-          updatedAt: new Date()
-        }
-      }
+      { _id: customerId },
+      { $set: updateData }
     )
     
-    if (result.matchedCount === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    if (result.modifiedCount === 0) {
+      return Response.json({ success: false, error: 'Customer not found' }, { status: 404 })
     }
     
-    return NextResponse.json({ success: true })
+    return Response.json({
+      success: true,
+      message: 'Customer updated successfully'
+    })
   } catch (error) {
     console.error('Error updating customer:', error)
-    return NextResponse.json({ error: 'Failed to update customer' }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to update customer' }, { status: 500 })
   }
 }
