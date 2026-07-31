@@ -1,169 +1,219 @@
-import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/mongodb'
-import Cookies from 'cookies'
+import { MongoClient, ObjectId } from 'mongodb'
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
-function getUserFromCookies(request) {
-  const cookieHeader = request.headers.get('cookie')
-  if (!cookieHeader) return null
-  const cookies = new Cookies(request)
-  return cookies.get('user_email') || null
+const uri = process.env.MONGO_URL
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+
+let cachedClient = null
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient
+  }
+  const client = await MongoClient.connect(uri)
+  cachedClient = client
+  return client
 }
 
-// GET - Fetch user's addresses
+// Get user from token
+async function getUserFromToken() {
+  try {
+    const cookieStore = await cookies()
+    const token = cookieStore.get('token')?.value
+    
+    if (!token) {
+      return null
+    }
+    
+    const decoded = jwt.verify(token, JWT_SECRET)
+    return decoded
+  } catch (error) {
+    return null
+  }
+}
+
+// GET - Fetch all addresses for logged-in user
 export async function GET(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const user = await getUserFromToken()
     
-    if (!userEmail) {
-      return NextResponse.json({ 
-        success: false,
-        error: 'Not authenticated' 
-      }, { status: 401 })
+    if (!user) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
-
-    const { db } = await connectToDatabase()
     
-    const addresses = await db.collection('addresses')
-      .find({ userEmail })
-      .sort({ isDefault: -1, createdAt: -1 })
-      .toArray()
-
-    return NextResponse.json({ 
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    const userDoc = await db.collection('users').findOne(
+      { email: user.email },
+      { projection: { addresses: 1 } }
+    )
+    
+    return Response.json({
       success: true,
-      addresses 
+      addresses: userDoc?.addresses || []
     })
   } catch (error) {
     console.error('Error fetching addresses:', error)
-    return NextResponse.json({ 
-      success: false,
-      error: 'Failed to fetch addresses' 
-    }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to fetch addresses' }, { status: 500 })
   }
 }
 
 // POST - Add new address
 export async function POST(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const user = await getUserFromToken()
     
-    if (!userEmail) {
-      return NextResponse.json({ 
-        success: false,
-        error: 'Not authenticated' 
-      }, { status: 401 })
+    if (!user) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
-
-    const addressData = await request.json()
-    const { db } = await connectToDatabase()
     
-    // If this is set as default, unset other defaults
-    if (addressData.isDefault) {
-      await db.collection('addresses').updateMany(
-        { userEmail },
-        { $set: { isDefault: false } }
+    const body = await request.json()
+    const { name, phone, address, city, state, pincode, isDefault } = body
+    
+    // Validation
+    if (!name || !phone || !address || !city || !state || !pincode) {
+      return Response.json({ success: false, error: 'All fields are required' }, { status: 400 })
+    }
+    
+    if (pincode.length !== 6) {
+      return Response.json({ success: false, error: 'Invalid PIN code' }, { status: 400 })
+    }
+    
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    const newAddress = {
+      _id: new ObjectId().toString(),
+      name,
+      phone,
+      address,
+      city,
+      state,
+      pincode,
+      isDefault: isDefault || false,
+      createdAt: new Date()
+    }
+    
+    // If this is set as default, unset all other defaults
+    if (isDefault) {
+      await db.collection('users').updateOne(
+        { email: user.email },
+        { $set: { 'addresses.$[].isDefault': false } }
       )
     }
-
-    const newAddress = {
-      _id: crypto.randomUUID(),
-      userEmail,
-      ...addressData,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-
-    await db.collection('addresses').insertOne(newAddress)
-
-    return NextResponse.json({ 
+    
+    // Add address to user's addresses array
+    await db.collection('users').updateOne(
+      { email: user.email },
+      { $push: { addresses: newAddress } }
+    )
+    
+    return Response.json({
       success: true,
-      address: newAddress,
-      message: 'Address added successfully' 
+      message: 'Address added successfully',
+      address: newAddress
     })
   } catch (error) {
     console.error('Error adding address:', error)
-    return NextResponse.json({ 
-      success: false,
-      error: 'Failed to add address' 
-    }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to add address' }, { status: 500 })
   }
 }
 
-// PUT - Update address
+// PUT - Update existing address
 export async function PUT(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const user = await getUserFromToken()
     
-    if (!userEmail) {
-      return NextResponse.json({ 
-        success: false,
-        error: 'Not authenticated' 
-      }, { status: 401 })
+    if (!user) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
-
-    const { addressId, ...updates } = await request.json()
-    const { db } = await connectToDatabase()
     
-    // If setting as default, unset other defaults
-    if (updates.isDefault) {
-      await db.collection('addresses').updateMany(
-        { userEmail, _id: { $ne: addressId } },
-        { $set: { isDefault: false } }
+    const body = await request.json()
+    const { addressId, name, phone, address, city, state, pincode, isDefault } = body
+    
+    if (!addressId) {
+      return Response.json({ success: false, error: 'Address ID is required' }, { status: 400 })
+    }
+    
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    // If setting as default, unset all other defaults first
+    if (isDefault) {
+      await db.collection('users').updateOne(
+        { email: user.email },
+        { $set: { 'addresses.$[].isDefault': false } }
       )
     }
-
-    await db.collection('addresses').updateOne(
-      { _id: addressId, userEmail },
-      { 
-        $set: { 
-          ...updates,
-          updatedAt: new Date()
+    
+    // Update the specific address
+    const result = await db.collection('users').updateOne(
+      { email: user.email, 'addresses._id': addressId },
+      {
+        $set: {
+          'addresses.$.name': name,
+          'addresses.$.phone': phone,
+          'addresses.$.address': address,
+          'addresses.$.city': city,
+          'addresses.$.state': state,
+          'addresses.$.pincode': pincode,
+          'addresses.$.isDefault': isDefault || false,
+          'addresses.$.updatedAt': new Date()
         }
       }
     )
-
-    return NextResponse.json({ 
+    
+    if (result.modifiedCount === 0) {
+      return Response.json({ success: false, error: 'Address not found' }, { status: 404 })
+    }
+    
+    return Response.json({
       success: true,
-      message: 'Address updated successfully' 
+      message: 'Address updated successfully'
     })
   } catch (error) {
     console.error('Error updating address:', error)
-    return NextResponse.json({ 
-      success: false,
-      error: 'Failed to update address' 
-    }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to update address' }, { status: 500 })
   }
 }
 
-// DELETE - Remove address
+// DELETE - Delete address
 export async function DELETE(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const user = await getUserFromToken()
     
-    if (!userEmail) {
-      return NextResponse.json({ 
-        success: false,
-        error: 'Not authenticated' 
-      }, { status: 401 })
+    if (!user) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
-
+    
     const { searchParams } = new URL(request.url)
     const addressId = searchParams.get('addressId')
-    const { db } = await connectToDatabase()
-
-    await db.collection('addresses').deleteOne({
-      _id: addressId,
-      userEmail
-    })
-
-    return NextResponse.json({ 
+    
+    if (!addressId) {
+      return Response.json({ success: false, error: 'Address ID is required' }, { status: 400 })
+    }
+    
+    const client = await connectToDatabase()
+    const db = client.db('bakery')
+    
+    // Remove address from user's addresses array
+    const result = await db.collection('users').updateOne(
+      { email: user.email },
+      { $pull: { addresses: { _id: addressId } } }
+    )
+    
+    if (result.modifiedCount === 0) {
+      return Response.json({ success: false, error: 'Address not found' }, { status: 404 })
+    }
+    
+    return Response.json({
       success: true,
-      message: 'Address deleted successfully' 
+      message: 'Address deleted successfully'
     })
   } catch (error) {
     console.error('Error deleting address:', error)
-    return NextResponse.json({ 
-      success: false,
-      error: 'Failed to delete address' 
-    }, { status: 500 })
+    return Response.json({ success: false, error: 'Failed to delete address' }, { status: 500 })
   }
 }

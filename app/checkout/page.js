@@ -10,18 +10,24 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, CreditCard, Truck, Calendar } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Calendar, MapPin, Plus, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { RazorpayCheckout } from '@/components/razorpay/RazorpayCheckout'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { user } = useAuth()
   const [cart, setCart] = useState([])
   const [step, setStep] = useState(1)
   const [loyaltyPoints, setLoyaltyPoints] = useState(0)
   const [pointsToRedeem, setPointsToRedeem] = useState('')
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0)
   const [applyingPoints, setApplyingPoints] = useState(false)
+  const [savedAddresses, setSavedAddresses] = useState([])
+  const [selectedAddressId, setSelectedAddressId] = useState('')
+  const [useNewAddress, setUseNewAddress] = useState(false)
+  const [loadingAddresses, setLoadingAddresses] = useState(false)
   const [formData, setFormData] = useState({
     // Personal Info
     name: '',
@@ -57,7 +63,73 @@ export default function CheckoutPage() {
       }, [])
       setCart(grouped)
     }
-  }, [])
+    
+    // Fetch saved addresses if user is logged in
+    if (user) {
+      fetchSavedAddresses()
+      // Pre-fill user information
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || ''
+      }))
+    }
+  }, [user])
+  
+  const fetchSavedAddresses = async () => {
+    try {
+      setLoadingAddresses(true)
+      const response = await fetch('/api/addresses')
+      const data = await response.json()
+      
+      if (data.success) {
+        setSavedAddresses(data.addresses || [])
+        
+        // Auto-select default address if exists
+        const defaultAddr = data.addresses?.find(addr => addr.isDefault)
+        if (defaultAddr && !selectedAddressId) {
+          setSelectedAddressId(defaultAddr._id)
+          populateAddressFields(defaultAddr)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error)
+    } finally {
+      setLoadingAddresses(false)
+    }
+  }
+  
+  const populateAddressFields = (address) => {
+    setFormData(prev => ({
+      ...prev,
+      address: address.address,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode
+    }))
+  }
+  
+  const handleAddressSelection = (addressId) => {
+    setSelectedAddressId(addressId)
+    setUseNewAddress(false)
+    const selected = savedAddresses.find(addr => addr._id === addressId)
+    if (selected) {
+      populateAddressFields(selected)
+    }
+  }
+  
+  const handleUseNewAddress = () => {
+    setUseNewAddress(true)
+    setSelectedAddressId('')
+    setFormData(prev => ({
+      ...prev,
+      address: '',
+      city: '',
+      state: '',
+      pincode: ''
+    }))
+  }
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -301,26 +373,132 @@ export default function CheckoutPage() {
                   <CardTitle className="text-2xl font-serif text-pink-900">Delivery Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">Delivery Address *</Label>
-                    <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="House/Flat No., Street, Area" rows={3} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="city">City *</Label>
-                      <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="City" />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">State *</Label>
-                      <Input id="state" name="state" value={formData.state} onChange={handleInputChange} placeholder="State" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="pincode">PIN Code *</Label>
-                    <Input id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} maxLength={6} placeholder="6-digit PIN code" />
-                  </div>
                   
-                  <Separator className="my-6" />
+                  {/* Saved Addresses Section (only for logged-in users) */}
+                  {user && savedAddresses.length > 0 && !useNewAddress && (
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">Select Saved Address</Label>
+                      <div className="grid gap-3">
+                        {savedAddresses.map((addr) => (
+                          <div
+                            key={addr._id}
+                            onClick={() => handleAddressSelection(addr._id)}
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                              selectedAddressId === addr._id
+                                ? 'border-pink-600 bg-pink-50'
+                                : 'border-gray-200 hover:border-pink-300'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start gap-3">
+                                <MapPin className="w-5 h-5 text-pink-600 mt-1 flex-shrink-0" />
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <p className="font-semibold text-gray-900">{addr.name}</p>
+                                    {addr.isDefault && (
+                                      <span className="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded">Default</span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-600">{addr.phone}</p>
+                                  <p className="text-sm text-gray-700 mt-1">{addr.address}</p>
+                                  <p className="text-sm text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
+                                </div>
+                              </div>
+                              {selectedAddressId === addr._id && (
+                                <div className="w-6 h-6 bg-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <Check className="w-4 h-4 text-white" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleUseNewAddress}
+                        className="w-full border-pink-300 text-pink-700 hover:bg-pink-50"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Use Different Address
+                      </Button>
+                      
+                      <Separator className="my-4" />
+                    </div>
+                  )}
+                  
+                  {/* New Address Form - Always show if no saved addresses or user clicks "Use Different Address" */}
+                  {(useNewAddress || !user || savedAddresses.length === 0) && (
+                    <>
+                      {user && savedAddresses.length > 0 && (
+                        <div className="flex items-center justify-between mb-2">
+                          <Label className="text-base font-semibold">Enter New Address</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setUseNewAddress(false)
+                              if (savedAddresses.length > 0) {
+                                handleAddressSelection(savedAddresses[0]._id)
+                              }
+                            }}
+                            className="text-pink-600 hover:text-pink-700"
+                          >
+                            Choose from saved
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <Label htmlFor="address">Delivery Address *</Label>
+                        <Textarea 
+                          id="address" 
+                          name="address" 
+                          value={formData.address} 
+                          onChange={handleInputChange} 
+                          placeholder="House/Flat No., Street, Area" 
+                          rows={3} 
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="city">City *</Label>
+                          <Input 
+                            id="city" 
+                            name="city" 
+                            value={formData.city} 
+                            onChange={handleInputChange} 
+                            placeholder="City" 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="state">State *</Label>
+                          <Input 
+                            id="state" 
+                            name="state" 
+                            value={formData.state} 
+                            onChange={handleInputChange} 
+                            placeholder="State" 
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="pincode">PIN Code *</Label>
+                        <Input 
+                          id="pincode" 
+                          name="pincode" 
+                          value={formData.pincode} 
+                          onChange={handleInputChange} 
+                          maxLength={6} 
+                          placeholder="6-digit PIN code" 
+                        />
+                      </div>
+                      
+                      <Separator className="my-6" />
+                    </>
+                  )}
                   
                   <div>
                     <Label htmlFor="deliveryDate">Preferred Delivery Date {cart.some(item => item.category === 'cakes') && '*'}</Label>

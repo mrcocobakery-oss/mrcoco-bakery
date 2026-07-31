@@ -391,9 +391,10 @@ export default function Home() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/contact" className="hover:text-pink-400 transition">Contact Us</Link></li>
                 <li><Link href="/faq" className="hover:text-pink-400 transition">FAQ</Link></li>
-                <li><Link href="/shipping" className="hover:text-pink-400 transition">Shipping Info</Link></li>
-                <li><Link href="/returns" className="hover:text-pink-400 transition">Returns</Link></li>
+                <li><Link href="/terms" className="hover:text-pink-400 transition">Terms & Conditions</Link></li>
                 <li><Link href="/privacy" className="hover:text-pink-400 transition">Privacy Policy</Link></li>
+                <li><Link href="/shipping" className="hover:text-pink-400 transition">Shipping & Delivery</Link></li>
+                <li><Link href="/returns" className="hover:text-pink-400 transition">Returns</Link></li>
               </ul>
             </div>
 

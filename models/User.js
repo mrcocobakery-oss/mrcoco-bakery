@@ -13,6 +13,21 @@ export const UserSchema = {
   emailVerified: 'boolean',
   phoneVerified: 'boolean',
   status: 'string',
+  addresses: 'array', // Array of saved delivery addresses
+  createdAt: 'Date',
+  updatedAt: 'Date'
+}
+
+// Address Schema (nested in User)
+export const AddressSchema = {
+  _id: 'string',
+  name: 'string',
+  phone: 'string',
+  address: 'string',
+  city: 'string',
+  state: 'string',
+  pincode: 'string',
+  isDefault: 'boolean',
   createdAt: 'Date',
   updatedAt: 'Date'
 }
