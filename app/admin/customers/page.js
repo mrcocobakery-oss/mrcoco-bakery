@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Search, Users, Mail, Phone, Calendar, Plus, Edit, MessageSquare, Gift, Trash2 } from 'lucide-react'
+import { Search, Users, Mail, Phone, Calendar, Plus, Edit, MessageSquare, Gift, Trash2, ShoppingBag, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 
@@ -23,6 +23,11 @@ export default function AdminCustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [whatsappMessage, setWhatsappMessage] = useState('')
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false)
+  
+  // Order History states
+  const [customerOrders, setCustomerOrders] = useState([])
+  const [orderStats, setOrderStats] = useState(null)
+  const [loadingOrders, setLoadingOrders] = useState(false)
   
   // Form states
   const [formData, setFormData] = useState({
@@ -107,7 +112,7 @@ export default function AdminCustomersPage() {
     }
   }
 
-  const handleEditCustomer = (customer) => {
+  const handleEditCustomer = async (customer) => {
     setSelectedCustomer(customer)
     setFormData({
       name: customer.name || '',
@@ -116,7 +121,31 @@ export default function AdminCustomersPage() {
       address: customer.address || '',
       birthdays: customer.birthdays || []
     })
+    
+    // Fetch customer orders
+    await fetchCustomerOrders(customer._id, customer.email)
+    
     setShowEditDialog(true)
+  }
+  
+  const fetchCustomerOrders = async (customerId, email) => {
+    setLoadingOrders(true)
+    try {
+      const adminToken = Cookies.get('admin_token')
+      const response = await fetch(`/api/admin/customers/orders?customerId=${customerId}&email=${email}`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      })
+      const data = await response.json()
+      
+      if (response.ok) {
+        setCustomerOrders(data.orders || [])
+        setOrderStats(data.statistics || null)
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error)
+    } finally {
+      setLoadingOrders(false)
+    }
   }
 
   const handleUpdateCustomer = async () => {
@@ -184,6 +213,8 @@ export default function AdminCustomersPage() {
     })
     setNewBirthday({ name: '', date: '' })
     setSelectedCustomer(null)
+    setCustomerOrders([])
+    setOrderStats(null)
   }
 
   const handleBulkWhatsApp = async () => {
@@ -458,99 +489,191 @@ export default function AdminCustomersPage() {
 
       {/* Edit Customer Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Customer</DialogTitle>
             <DialogDescription>
-              Update customer details and birthday dates
+              Update customer details, birthdays, and view order history
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
+            {/* Left Column - Customer Details */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-name">Name *</Label>
+                  <Input
+                    id="edit-name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-phone">Phone *</Label>
+                  <Input
+                    id="edit-phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    maxLength={10}
+                  />
+                </div>
+              </div>
               <div>
-                <Label htmlFor="edit-name">Name *</Label>
+                <Label htmlFor="edit-email">Email</Label>
                 <Input
-                  id="edit-name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  id="edit-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
               <div>
-                <Label htmlFor="edit-phone">Phone *</Label>
-                <Input
-                  id="edit-phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  maxLength={10}
+                <Label htmlFor="edit-address">Address</Label>
+                <Textarea
+                  id="edit-address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  rows={2}
                 />
               </div>
-            </div>
-            <div>
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-address">Address</Label>
-              <Textarea
-                id="edit-address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                rows={2}
-              />
+              
+              {/* Birthdays Section */}
+              <div className="border-t pt-4">
+                <Label className="text-base font-semibold mb-3 flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-purple-600" />
+                  Birthday Dates
+                </Label>
+                
+                {formData.birthdays.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {formData.birthdays.map((birthday, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-purple-50 p-2 rounded">
+                        <Calendar className="w-4 h-4 text-purple-600" />
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{birthday.name}</div>
+                          <div className="text-xs text-gray-500">{birthday.date}</div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => removeBirthdayFromForm(index)}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <Input
+                    placeholder="Person name"
+                    value={newBirthday.name}
+                    onChange={(e) => setNewBirthday({ ...newBirthday, name: e.target.value })}
+                  />
+                  <Input
+                    type="date"
+                    value={newBirthday.date}
+                    onChange={(e) => setNewBirthday({ ...newBirthday, date: e.target.value })}
+                  />
+                  <Button onClick={addBirthdayToForm} variant="outline">
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
+              </div>
             </div>
             
-            {/* Birthdays Section */}
-            <div className="border-t pt-4">
-              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                <Gift className="w-4 h-4 text-purple-600" />
-                Birthday Dates
-              </Label>
-              
-              {formData.birthdays.length > 0 && (
-                <div className="space-y-2 mb-3">
-                  {formData.birthdays.map((birthday, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-purple-50 p-2 rounded">
-                      <Calendar className="w-4 h-4 text-purple-600" />
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{birthday.name}</div>
-                        <div className="text-xs text-gray-500">{birthday.date}</div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeBirthdayFromForm(index)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              <div className="grid grid-cols-3 gap-2">
-                <Input
-                  placeholder="Person name"
-                  value={newBirthday.name}
-                  onChange={(e) => setNewBirthday({ ...newBirthday, name: e.target.value })}
-                />
-                <Input
-                  type="date"
-                  value={newBirthday.date}
-                  onChange={(e) => setNewBirthday({ ...newBirthday, date: e.target.value })}
-                />
-                <Button onClick={addBirthdayToForm} variant="outline">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add
-                </Button>
+            {/* Right Column - Order History */}
+            <div className="border-l pl-6">
+              <div className="flex items-center gap-2 mb-4">
+                <ShoppingBag className="w-5 h-5 text-pink-600" />
+                <h3 className="text-lg font-semibold">Order History</h3>
               </div>
+              
+              {loadingOrders ? (
+                <div className="text-center py-8 text-gray-500">Loading orders...</div>
+              ) : (
+                <>
+                  {/* Order Statistics */}
+                  {orderStats && (
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <Card className="bg-blue-50 border-blue-200">
+                        <CardContent className="p-3">
+                          <div className="text-xs text-blue-600">Total Orders</div>
+                          <div className="text-2xl font-bold text-blue-900">{orderStats.totalOrders}</div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-green-50 border-green-200">
+                        <CardContent className="p-3">
+                          <div className="text-xs text-green-600">Total Spent</div>
+                          <div className="text-2xl font-bold text-green-900">₹{orderStats.totalSpent}</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+                  
+                  {/* Orders List */}
+                  {customerOrders.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <ShoppingBag className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                      <p>No orders yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {customerOrders.map((order) => (
+                        <Card key={order._id} className="border-2 hover:border-pink-300 transition">
+                          <CardContent className="p-3">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <div className="font-semibold text-sm">Order #{order._id?.toString().slice(-6).toUpperCase()}</div>
+                                <div className="text-xs text-gray-500">
+                                  {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                  })}
+                                </div>
+                              </div>
+                              <Badge className={
+                                order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                                order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }>
+                                {order.status}
+                              </Badge>
+                            </div>
+                            
+                            <div className="space-y-1 mb-2">
+                              {order.items?.slice(0, 2).map((item, idx) => (
+                                <div key={idx} className="text-xs text-gray-600">
+                                  • {item.name} x {item.quantity}
+                                </div>
+                              ))}
+                              {order.items?.length > 2 && (
+                                <div className="text-xs text-gray-500">
+                                  +{order.items.length - 2} more items
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center justify-between pt-2 border-t">
+                              <span className="text-xs text-gray-500">Total</span>
+                              <span className="font-bold text-pink-600">₹{order.totalAmount}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
-          <div className="flex justify-end gap-2">
+          
+          <div className="flex justify-end gap-2 border-t pt-4">
             <Button variant="outline" onClick={() => { setShowEditDialog(false); resetForm(); }}>
               Cancel
             </Button>
