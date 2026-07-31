@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
+import { sendContactNotification, sendCustomerAutoReply } from '@/lib/emailService'
 
 export async function POST(request) {
   try {
@@ -39,6 +40,17 @@ export async function POST(request) {
 
     // Save to database
     await db.collection('contact_inquiries').insertOne(contactInquiry)
+
+    // Send email notifications (non-blocking - don't wait for completion)
+    // Send notification to business
+    sendContactNotification(contactInquiry).catch(err => 
+      console.error('Failed to send business notification:', err)
+    )
+    
+    // Send auto-reply to customer
+    sendCustomerAutoReply(contactInquiry).catch(err => 
+      console.error('Failed to send customer auto-reply:', err)
+    )
 
     return NextResponse.json({ 
       success: true,
