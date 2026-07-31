@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -90,9 +91,15 @@ export default function WishlistPage() {
               <Card key={product.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                 <Link href={`/products/${product.id}`}>
                   <div className="relative h-64 overflow-hidden bg-gray-100">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                     {product.discount && (
-                      <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0">{product.discount}% OFF</Badge>
+                      <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0 z-10">{product.discount}% OFF</Badge>
                     )}
                   </div>
                 </Link>

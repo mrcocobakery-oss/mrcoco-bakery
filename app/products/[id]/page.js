@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -198,9 +199,15 @@ export default function ProductDetailPage() {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`border-2 rounded-lg overflow-hidden ${selectedImage === idx ? 'border-pink-600' : 'border-gray-200'}`}
+                    className={`border-2 rounded-lg overflow-hidden relative h-20 ${selectedImage === idx ? 'border-pink-600' : 'border-gray-200'}`}
                   >
-                    <img src={img} alt={`Product ${idx + 1}`} className="w-full h-20 object-cover" />
+                    <Image
+                      src={img}
+                      alt={`Product ${idx + 1}`}
+                      fill
+                      sizes="100px"
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -360,9 +367,15 @@ export default function ProductDetailPage() {
                 <Card key={relatedProduct.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                   <Link href={`/products/${relatedProduct.id}`}>
                     <div className="relative h-48 overflow-hidden bg-gray-100">
-                      <img src={relatedProduct.image} alt={relatedProduct.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <Image
+                        src={relatedProduct.image}
+                        alt={relatedProduct.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
                       {relatedProduct.discount && (
-                        <Badge className="absolute top-2 left-2 bg-red-500 text-white border-0">
+                        <Badge className="absolute top-2 left-2 bg-red-500 text-white border-0 z-10">
                           {relatedProduct.discount}% OFF
                         </Badge>
                       )}

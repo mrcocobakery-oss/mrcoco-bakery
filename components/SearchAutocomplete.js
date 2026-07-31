@@ -2,22 +2,47 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Search, X } from 'lucide-react'
+import Image from 'next/image'
+import { Search, X, TrendingUp, Clock, ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+
+const TRENDING_SEARCHES = [
+  'Birthday Cake',
+  'Chocolate Cake',
+  'Black Forest',
+  'Butter Cookies',
+  'Namkeen Mix',
+  'Anniversary Cake'
+]
 
 export function SearchAutocomplete() {
   const [searchQuery, setSearchQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [recentSearches, setRecentSearches] = useState([])
+  const [showDefaultView, setShowDefaultView] = useState(false)
   const searchRef = useRef(null)
+
+  // Load recent searches from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('recentSearches')
+    if (saved) {
+      try {
+        setRecentSearches(JSON.parse(saved))
+      } catch (e) {
+        console.error('Error loading recent searches:', e)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     // Close suggestions when clicking outside
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowSuggestions(false)
+        setShowDefaultView(false)
       }
     }
 
@@ -34,6 +59,7 @@ export function SearchAutocomplete() {
       }
 
       setLoading(true)
+      setShowDefaultView(false)
       try {
         const response = await fetch(`/api/products?search=${encodeURIComponent(searchQuery)}`)
         const data = await response.json()
@@ -57,11 +83,41 @@ export function SearchAutocomplete() {
     setSearchQuery('')
     setSuggestions([])
     setShowSuggestions(false)
+    setShowDefaultView(false)
+  }
+
+  const handleFocus = () => {
+    if (searchQuery.trim().length === 0) {
+      setShowDefaultView(true)
+    }
+  }
+
+  const saveRecentSearch = (term) => {
+    if (!term.trim()) return
+    
+    const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 5)
+    setRecentSearches(updated)
+    localStorage.setItem('recentSearches', JSON.stringify(updated))
   }
 
   const handleSelectProduct = () => {
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery.trim())
+    }
     setShowSuggestions(false)
+    setShowDefaultView(false)
     setSearchQuery('')
+  }
+
+  const handleSearchClick = (term) => {
+    setSearchQuery(term)
+    saveRecentSearch(term)
+    setShowDefaultView(false)
+  }
+
+  const clearRecentSearches = () => {
+    setRecentSearches([])
+    localStorage.removeItem('recentSearches')
   }
 
   return (
@@ -73,6 +129,7 @@ export function SearchAutocomplete() {
           placeholder="Search for cakes, cookies, namkeen..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={handleFocus}
           className="pl-10 pr-10"
         />
         {searchQuery && (
@@ -85,7 +142,63 @@ export function SearchAutocomplete() {
         )}
       </div>
 
-      {showSuggestions && (
+      {/* Default View - Trending & Recent Searches */}
+      {showDefaultView && !showSuggestions && (
+        <Card className="absolute top-full mt-2 w-full z-50 border-2 border-pink-200">
+          <div className="py-2">
+            {/* Recent Searches */}
+            {recentSearches.length > 0 && (
+              <div className="mb-2">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <Clock className="w-4 h-4" />
+                    Recent Searches
+                  </div>
+                  <button
+                    onClick={clearRecentSearches}
+                    className="text-xs text-pink-600 hover:text-pink-700"
+                  >
+                    Clear
+                  </button>
+                </div>
+                {recentSearches.map((term, idx) => (
+                  <Link
+                    key={idx}
+                    href={`/products?search=${encodeURIComponent(term)}`}
+                    onClick={() => handleSearchClick(term)}
+                    className="flex items-center justify-between px-4 py-2 hover:bg-pink-50 transition group"
+                  >
+                    <span className="text-gray-700">{term}</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-pink-600" />
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Trending Searches */}
+            <div>
+              <div className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700">
+                <TrendingUp className="w-4 h-4" />
+                Trending Searches
+              </div>
+              {TRENDING_SEARCHES.map((term, idx) => (
+                <Link
+                  key={idx}
+                  href={`/products?search=${encodeURIComponent(term)}`}
+                  onClick={() => handleSearchClick(term)}
+                  className="flex items-center justify-between px-4 py-2 hover:bg-pink-50 transition group"
+                >
+                  <span className="text-gray-700">{term}</span>
+                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-pink-600" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Product Suggestions */}
+      {showSuggestions && searchQuery.trim().length >= 2 && (
         <Card className="absolute top-full mt-2 w-full z-50 max-h-96 overflow-y-auto border-2 border-pink-200">
           {loading ? (
             <div className="p-4 text-center text-gray-500">Searching...</div>
@@ -100,11 +213,15 @@ export function SearchAutocomplete() {
                   onClick={handleSelectProduct}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-pink-50 transition"
                 >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-12 h-12 object-cover rounded"
-                  />
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="48px"
+                      className="object-cover rounded"
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">{product.name}</p>
                     <div className="flex items-center gap-2">

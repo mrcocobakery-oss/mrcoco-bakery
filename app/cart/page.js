@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -122,8 +123,14 @@ export default function CartPage() {
                 <Card key={item.id} className="overflow-hidden border-2 border-pink-100">
                   <CardContent className="p-4">
                     <div className="flex gap-4">
-                      <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          sizes="96px"
+                          className="object-cover"
+                        />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-pink-900 mb-1">{item.name}</h3>
