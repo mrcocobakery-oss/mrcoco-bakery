@@ -42,6 +42,8 @@ export default function AdminProductsPage() {
     weight: '',
     inStock: true
   })
+  const [uploadedImages, setUploadedImages] = useState([])
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     fetchProducts()
@@ -102,6 +104,47 @@ export default function AdminProductsPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files)
+    if (files.length === 0) return
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      files.forEach(file => {
+        formData.append('images', file)
+      })
+
+      const adminToken = Cookies.get('admin_token')
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: formData
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setUploadedImages([...uploadedImages, ...data.urls])
+        toast.success(`${files.length} image(s) uploaded successfully!`)
+      } else {
+        toast.error(data.error || 'Failed to upload images')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error('Failed to upload images')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const removeImage = (index) => {
+    const newImages = [...uploadedImages]
+    newImages.splice(index, 1)
+    setUploadedImages(newImages)
+  }
+
   const openAddDialog = () => {
     setFormData({
       name: '',
@@ -123,6 +166,7 @@ export default function AdminProductsPage() {
       weight: '',
       inStock: true
     })
+    setUploadedImages([])
     setEditMode(false)
     setCurrentProduct(null)
     setShowDialog(true)
@@ -149,6 +193,7 @@ export default function AdminProductsPage() {
       weight: product.weight || '',
       inStock: product.inStock !== false
     })
+    setUploadedImages(Array.isArray(product.images) ? product.images : [])
     setEditMode(true)
     setCurrentProduct(product)
     setShowDialog(true)
@@ -164,7 +209,11 @@ export default function AdminProductsPage() {
 
     try {
       const adminToken = Cookies.get('admin_token')
-      const imagesArray = formData.images ? formData.images.split(',').map(img => img.trim()) : []
+      
+      // Use uploaded images if available, otherwise fall back to manual URLs
+      const finalImages = uploadedImages.length > 0 
+        ? uploadedImages 
+        : (formData.images ? formData.images.split(',').map(img => img.trim()) : [])
       
       const productData = {
         ...formData,
@@ -172,7 +221,7 @@ export default function AdminProductsPage() {
         originalPrice: parseFloat(formData.originalPrice || formData.price),
         discount: parseInt(formData.discount || 0),
         stock: parseInt(formData.stock || 0),
-        images: imagesArray
+        images: finalImages
       }
 
       if (editMode && currentProduct) {
@@ -629,15 +678,68 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Image URLs (comma-separated)</Label>
-              <Textarea
-                name="images"
-                value={formData.images}
-                onChange={handleInputChange}
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                rows={2}
-              />
+            {/* Image Upload Section */}
+            <div className="space-y-3">
+              <Label>Product Images</Label>
+              
+              {/* Upload Button */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  id="imageUpload"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('imageUpload').click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Uploading...' : 'Upload Images'}
+                </Button>
+                <span className="text-xs text-gray-500">
+                  {uploadedImages.length} image(s) uploaded
+                </span>
+              </div>
+
+              {/* Preview Uploaded Images */}
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {uploadedImages.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-24 object-cover rounded border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Optional: Manual URL Input */}
+              <details className="text-sm">
+                <summary className="cursor-pointer text-gray-600">Or enter image URLs manually</summary>
+                <Textarea
+                  name="images"
+                  value={formData.images}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  rows={2}
+                  className="mt-2"
+                />
+              </details>
             </div>
 
             <div className="flex items-center space-x-2">
