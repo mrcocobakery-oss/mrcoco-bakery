@@ -46,8 +46,12 @@ export default function CheckoutPage() {
     giftMessage: '',
     specialInstructions: '',
     // Payment
-    paymentMethod: 'online'
+    paymentMethod: 'cod' // Changed default to COD
   })
+  
+  const [showUpiQr, setShowUpiQr] = useState(false)
+  const [showBankDetails, setShowBankDetails] = useState(false)
+  const [paymentProofFile, setPaymentProofFile] = useState(null)
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart')
@@ -590,24 +594,12 @@ export default function CheckoutPage() {
                   <CardTitle className="text-2xl font-serif text-pink-900">Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({...formData, paymentMethod: value})}>
-                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="online" id="online" />
-                          <Label htmlFor="online" className="flex-1 font-normal cursor-pointer">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="font-semibold">Online Payment</p>
-                                <p className="text-sm text-gray-600">Razorpay, UPI, Cards, Net Banking</p>
-                              </div>
-                              <CreditCard className="w-6 h-6 text-pink-600" />
-                            </div>
-                          </Label>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
+                  <RadioGroup value={formData.paymentMethod} onValueChange={(value) => {
+                    setFormData({...formData, paymentMethod: value})
+                    setShowUpiQr(false)
+                    setShowBankDetails(false)
+                  }}>
+                    {/* Cash on Delivery */}
                     <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
@@ -615,10 +607,85 @@ export default function CheckoutPage() {
                           <Label htmlFor="cod" className="flex-1 font-normal cursor-pointer">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="font-semibold">Cash on Delivery</p>
-                                <p className="text-sm text-gray-600">Pay when you receive</p>
+                                <p className="font-semibold">💵 Cash on Delivery</p>
+                                <p className="text-sm text-gray-600">Pay when you receive (Available for PIN 263139)</p>
                               </div>
-                              <Truck className="w-6 h-6 text-pink-600" />
+                              <Truck className="w-6 h-6 text-green-600" />
+                            </div>
+                          </Label>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* UPI Payment */}
+                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="upi" id="upi" />
+                          <Label htmlFor="upi" className="flex-1 font-normal cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold">📱 UPI Payment (PhonePe/GPay/Paytm)</p>
+                                <p className="text-sm text-gray-600">Instant payment via UPI</p>
+                              </div>
+                              <div className="text-2xl">📲</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Bank Transfer */}
+                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="bank" id="bank" />
+                          <Label htmlFor="bank" className="flex-1 font-normal cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold">🏦 Bank Transfer / NEFT / IMPS</p>
+                                <p className="text-sm text-gray-600">Direct bank account transfer</p>
+                              </div>
+                              <div className="text-2xl">💳</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* WhatsApp Order */}
+                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="whatsapp" id="whatsapp" />
+                          <Label htmlFor="whatsapp" className="flex-1 font-normal cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold">💬 Order via WhatsApp</p>
+                                <p className="text-sm text-gray-600">Coordinate payment with our team</p>
+                              </div>
+                              <div className="text-2xl">📞</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Online Payment (Razorpay) - Coming Soon Badge */}
+                    <Card className="border-2 border-gray-200 opacity-60">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="online" id="online" disabled />
+                          <Label htmlFor="online" className="flex-1 font-normal">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-semibold text-gray-500">Online Payment (Card/UPI/Net Banking)</p>
+                                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Coming Soon</span>
+                                </div>
+                                <p className="text-sm text-gray-500">Razorpay integration - Available in 24-48 hours</p>
+                              </div>
+                              <CreditCard className="w-6 h-6 text-gray-400" />
                             </div>
                           </Label>
                         </div>
@@ -626,33 +693,16 @@ export default function CheckoutPage() {
                     </Card>
                   </RadioGroup>
                   
-                  <Separator className="my-6" />
-                  
-                  {/* Payment Button based on method */}
-                  {formData.paymentMethod === 'online' ? (
+                  {/* Payment Instructions & Actions based on selected method */}
+                  {formData.paymentMethod === 'cod' && (
                     <div className="space-y-4">
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <p className="text-sm text-green-900">
-                          <strong>Secure Payment:</strong> Your payment is processed through Razorpay with industry-standard encryption.
-                        </p>
-                      </div>
-                      <RazorpayCheckout
-                        amount={total}
-                        customerInfo={customerInfo}
-                        cartItems={cart}
-                        onSuccess={handlePaymentSuccess}
-                        onFailure={handlePaymentFailure}
-                      />
-                      <Button onClick={() => setStep(2)} variant="outline" className="w-full">
-                        Back to Delivery Details
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
-                        <p className="text-sm text-pink-900">
-                          <strong>Cash on Delivery:</strong> Pay when your order is delivered to your doorstep.
-                        </p>
+                      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                        <p className="font-semibold text-green-900 mb-2">✅ Cash on Delivery</p>
+                        <ul className="text-sm text-green-800 space-y-1 list-disc pl-5">
+                          <li>Pay in cash when you receive your order</li>
+                          <li>Keep exact change ready for smooth delivery</li>
+                          <li>Available for PIN code 263139 only</li>
+                        </ul>
                       </div>
                       <div className="flex gap-4">
                         <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
@@ -660,6 +710,123 @@ export default function CheckoutPage() {
                         </Button>
                         <Button onClick={placeOrderCOD} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
                           Place Order (COD)
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.paymentMethod === 'upi' && (
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <p className="font-semibold text-blue-900 mb-3">📱 UPI Payment Instructions</p>
+                        <div className="bg-white rounded-lg p-4 border-2 border-blue-300 mb-3">
+                          <p className="text-center font-bold text-xl mb-2">UPI ID</p>
+                          <p className="text-center text-2xl font-mono bg-gray-100 p-3 rounded select-all">
+                            mrcocobakery@paytm
+                          </p>
+                          <p className="text-center text-sm text-gray-600 mt-2">
+                            Or scan QR code (coming soon)
+                          </p>
+                        </div>
+                        <div className="text-sm text-blue-800 space-y-2">
+                          <p className="font-semibold">Steps to Pay:</p>
+                          <ol className="list-decimal pl-5 space-y-1">
+                            <li>Open PhonePe/GPay/Paytm</li>
+                            <li>Enter UPI ID: <strong>mrcocobakery@paytm</strong></li>
+                            <li>Pay <strong>₹{total}</strong></li>
+                            <li>Take screenshot of payment success</li>
+                            <li>Click "Place Order" below</li>
+                          </ol>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
+                          Back
+                        </Button>
+                        <Button onClick={placeOrderCOD} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                          I've Paid via UPI - Place Order
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.paymentMethod === 'bank' && (
+                    <div className="space-y-4">
+                      <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                        <p className="font-semibold text-purple-900 mb-3">🏦 Bank Transfer Details</p>
+                        <div className="bg-white rounded-lg p-4 border-2 border-purple-300 space-y-2">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <p className="font-semibold">Account Name:</p>
+                            <p className="text-right">Mr. COCO Bakery</p>
+                            
+                            <p className="font-semibold">Account Number:</p>
+                            <p className="text-right font-mono">1234567890</p>
+                            
+                            <p className="font-semibold">IFSC Code:</p>
+                            <p className="text-right font-mono">SBIN0001234</p>
+                            
+                            <p className="font-semibold">Bank Name:</p>
+                            <p className="text-right">State Bank of India</p>
+                            
+                            <p className="font-semibold">Branch:</p>
+                            <p className="text-right">Haldwani</p>
+                            
+                            <p className="font-semibold text-lg mt-2">Amount to Pay:</p>
+                            <p className="text-right text-lg font-bold text-purple-900">₹{total}</p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-purple-800 mt-3 space-y-1">
+                          <p className="font-semibold">After transferring:</p>
+                          <ul className="list-disc pl-5 space-y-1">
+                            <li>Take screenshot of transaction</li>
+                            <li>Note the transaction reference number</li>
+                            <li>Click "Place Order" below</li>
+                            <li>We'll confirm your order once payment is verified</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
+                          Back
+                        </Button>
+                        <Button onClick={placeOrderCOD} className="flex-1 bg-purple-600 hover:bg-purple-700 text-white">
+                          I've Transferred - Place Order
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.paymentMethod === 'whatsapp' && (
+                    <div className="space-y-4">
+                      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                        <p className="font-semibold text-green-900 mb-3">💬 Order via WhatsApp</p>
+                        <p className="text-sm text-green-800 mb-3">
+                          Your order details will be sent to our WhatsApp. Our team will contact you to coordinate payment and delivery.
+                        </p>
+                        <div className="bg-white rounded-lg p-4 border-2 border-green-300">
+                          <p className="text-center font-semibold mb-2">Contact Numbers</p>
+                          <div className="space-y-2">
+                            <a href="https://wa.me/918447655399" target="_blank" className="flex items-center justify-center gap-2 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+                              <span className="text-xl">📱</span>
+                              <span className="font-semibold">+91 8447655399</span>
+                            </a>
+                            <a href="https://wa.me/918979751914" target="_blank" className="flex items-center justify-center gap-2 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+                              <span className="text-xl">📱</span>
+                              <span className="font-semibold">+91 8979751914</span>
+                            </a>
+                            <a href="https://wa.me/917455065399" target="_blank" className="flex items-center justify-center gap-2 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+                              <span className="text-xl">📱</span>
+                              <span className="font-semibold">+91 7455065399</span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
+                          Back
+                        </Button>
+                        <Button onClick={placeOrderCOD} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                          Confirm Order (WhatsApp)
                         </Button>
                       </div>
                     </div>
