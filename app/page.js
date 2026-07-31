@@ -267,7 +267,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <Badge className="mb-4 bg-pink-600 text-white border-0">Our Story</Badge>
-              <h2 className="text-4xl font-bold font-serif text-pink-900 mb-6">Crafting Happiness Since 2015</h2>
+              <h2 className="text-4xl font-bold font-serif text-pink-900 mb-6">Crafting Happiness Since 2018</h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
                 Mr. COCO Bakery was born from a passion for creating extraordinary baked goods that bring joy to every celebration. We believe in keeping things simple while delivering exceptional taste.
               </p>
@@ -291,16 +291,61 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-16 bg-gradient-to-r from-pink-600 via-pink-700 to-pink-800">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold font-serif text-white mb-4">Join Our Sweet Community</h2>
-          <p className="text-pink-100 mb-8 max-w-2xl mx-auto">Subscribe to get exclusive offers, new product launches, and delicious recipes</p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <Input placeholder="Enter your email" className="bg-white border-0" />
-            <Button className="bg-white text-pink-900 hover:bg-pink-50 whitespace-nowrap">
-              Subscribe Now
-            </Button>
+      {/* Instagram Feed */}
+      <section className="py-16 bg-gradient-to-br from-pink-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Instagram className="w-8 h-8 text-pink-600" />
+              <h2 className="text-4xl font-bold font-serif text-pink-900">Follow Us on Instagram</h2>
+            </div>
+            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+              Join our sweet community! See our latest creations, customer celebrations, and behind-the-scenes moments
+            </p>
+            <a 
+              href="https://www.instagram.com/mrcocobakery" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-600 to-pink-700 text-white px-6 py-3 rounded-lg hover:shadow-lg transition"
+            >
+              <Instagram className="w-5 h-5" />
+              @mrcocobakery
+            </a>
+          </div>
+          
+          {/* Instagram Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              'https://images.unsplash.com/photo-1780586377241-41b03171419b?w=400',
+              'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?w=400',
+              'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a?w=400',
+              'https://images.unsplash.com/photo-1654703109300-e924e52b091a?w=400',
+              'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?w=400',
+              'https://images.unsplash.com/photo-1780586377241-41b03171419b?w=400'
+            ].map((img, idx) => (
+              <a
+                key={idx}
+                href="https://www.instagram.com/mrcocobakery"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative aspect-square overflow-hidden rounded-lg group cursor-pointer"
+              >
+                <img 
+                  src={img} 
+                  alt={`Instagram post ${idx + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </a>
+            ))}
+          </div>
+          
+          <div className="text-center mt-8">
+            <p className="text-gray-600 text-sm">
+              Tag us <span className="text-pink-600 font-semibold">#MrCOCOBakery</span> to be featured! 🎂✨
+            </p>
           </div>
         </div>
       </section>

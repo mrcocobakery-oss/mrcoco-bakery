@@ -68,8 +68,8 @@ export default function ContactPage() {
     {
       name: 'Factory Outlet - Teenpani',
       address: 'Teenpani, Haldwani, Uttarakhand',
-      mapLink: 'https://maps.app.goo.gl/wnpt6HV19GTgh9KD9?g_st=ac',
-      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.123456789012!2d79.52345678901234!3d29.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDA3JzI0LjQiTiA3OcKwMzEnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin',
+      mapLink: 'https://maps.app.goo.gl/P7N5fVXVsmSJkwjK6',
+      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.234567890123!2d79.53456789012345!3d29.23456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDE0JzA0LjQiTiA3OcKwMzInMDQuNCJF!5e0!3m2!1sen!2sin!4v1234567890124!5m2!1sen!2sin',
       icon: Factory,
       type: 'Factory Outlet',
       hours: 'Mon - Sun: 9:00 AM - 9:00 PM'
@@ -77,8 +77,8 @@ export default function ContactPage() {
     {
       name: 'Bakery & Restaurant - Rampur Road',
       address: 'Rampur Road, Haldwani, Uttarakhand',
-      mapLink: 'https://maps.app.goo.gl/6rPSjJmcPVx183D49?g_st=ac',
-      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.234567890123!2d79.53456789012345!3d29.23456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDE0JzA0LjQiTiA3OcKwMzInMDQuNCJF!5e0!3m2!1sen!2sin!4v1234567890124!5m2!1sen!2sin',
+      mapLink: 'https://maps.app.goo.gl/qKqVkJX64GPUtHay8',
+      embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3467.123456789012!2d79.52345678901234!3d29.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDA3JzI0LjQiTiA3OcKwMzEnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin',
       icon: Store,
       type: 'Bakery & Restaurant',
       hours: 'Mon - Sun: 8:00 AM - 10:00 PM'
