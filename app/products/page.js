@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, Heart, Star, Search, ArrowLeft, SlidersHorizontal } from 'lucide-react'
+import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
@@ -321,13 +321,8 @@ export default function ProductsPage() {
                     </Link>
                     <CardContent className="p-4">
                       <Link href={`/products/${product.id}`}>
-                        <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition line-clamp-2">{product.name}</h3>
+                        <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2">{product.name}</h3>
                       </Link>
-                      <div className="flex items-center gap-1 mb-2">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{product.rating}</span>
-                        <span className="text-sm text-gray-500">({product.reviews})</span>
-                      </div>
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <span className="text-xl font-bold text-pink-900">₹{product.price}</span>

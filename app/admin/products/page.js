@@ -340,7 +340,6 @@ export default function AdminProductsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
@@ -348,7 +347,7 @@ export default function AdminProductsPage() {
               <tbody className="divide-y divide-gray-200">
                 {filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                       No products found. Add your first product to get started!
                     </td>
                   </tr>
@@ -390,11 +389,6 @@ export default function AdminProductsPage() {
                         {product.originalPrice && product.originalPrice > product.price && (
                           <div className="text-xs text-gray-500 line-through">₹{product.originalPrice}</div>
                         )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                          {product.stock || 0}
-                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <Badge variant={product.inStock ? 'default' : 'secondary'} className={product.inStock ? 'bg-green-100 text-green-800' : ''}>
@@ -655,27 +649,15 @@ export default function AdminProductsPage() {
               </div>
             )}
 
-            {/* Stock & Images */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Stock Quantity</Label>
-                <Input
-                  name="stock"
-                  type="number"
-                  value={formData.stock}
-                  onChange={handleInputChange}
-                  placeholder="100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Weight</Label>
-                <Input
-                  name="weight"
-                  value={formData.weight}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 500g"
-                />
-              </div>
+            {/* Weight */}
+            <div className="space-y-2">
+              <Label>Weight</Label>
+              <Input
+                name="weight"
+                value={formData.weight}
+                onChange={handleInputChange}
+                placeholder="e.g., 500g"
+              />
             </div>
 
             {/* Image Upload Section */}

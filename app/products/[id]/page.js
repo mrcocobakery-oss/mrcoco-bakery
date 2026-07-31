@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, ShoppingCart, Heart, Star, Truck, Shield, Clock, MessageCircle } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Heart, Truck, Shield, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
+import { RecentlyViewed } from '@/components/RecentlyViewed'
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -47,6 +48,9 @@ export default function ProductDetailPage() {
       if (productData.success && productData.product) {
         setProduct(productData.product)
         
+        // Track this product in recently viewed
+        trackRecentlyViewed(productData.product.id)
+        
         // Fetch all products to get related ones
         const allProductsResponse = await fetch('/api/products')
         const allProductsData = await allProductsResponse.json()
@@ -66,6 +70,24 @@ export default function ProductDetailPage() {
       setProduct(null)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const trackRecentlyViewed = (productId) => {
+    try {
+      // Get existing recently viewed products
+      const existing = JSON.parse(localStorage.getItem('recentlyViewed') || '[]')
+      
+      // Remove if already exists (to avoid duplicates)
+      const filtered = existing.filter(id => id !== productId)
+      
+      // Add to beginning of array
+      const updated = [productId, ...filtered].slice(0, 8) // Keep only last 8 products
+      
+      // Save back to localStorage
+      localStorage.setItem('recentlyViewed', JSON.stringify(updated))
+    } catch (error) {
+      console.error('Error tracking recently viewed:', error)
     }
   }
 
@@ -187,15 +209,10 @@ export default function ProductDetailPage() {
 
           {/* Product Details */}
           <div>
-            <h1 className="text-3xl font-bold font-serif text-pink-900 mb-3">{product.name}</h1>
+            <h1 className="text-3xl font-bold font-serif text-pink-900 mb-4">{product.name}</h1>
             
-            {/* Rating */}
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">{product.rating}</span>
-                <span className="text-gray-500">({product.reviews} reviews)</span>
-              </div>
+            {/* Stock Status */}
+            <div className="mb-4">
               <Badge variant={product.inStock ? 'default' : 'secondary'} 
                      className={product.inStock ? 'bg-green-100 text-green-800' : ''}>
                 {product.inStock ? 'In Stock' : 'Out of Stock'}
@@ -353,14 +370,10 @@ export default function ProductDetailPage() {
                   </Link>
                   <CardContent className="p-4">
                     <Link href={`/products/${relatedProduct.id}`}>
-                      <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition line-clamp-2">
+                      <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2">
                         {relatedProduct.name}
                       </h3>
                     </Link>
-                    <div className="flex items-center gap-1 mb-2">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{relatedProduct.rating}</span>
-                    </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-lg font-bold text-pink-900">₹{relatedProduct.price}</span>
@@ -375,6 +388,9 @@ export default function ProductDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Recently Viewed Products */}
+        <RecentlyViewed currentProductId={productId} />
       </div>
     </div>
   )
