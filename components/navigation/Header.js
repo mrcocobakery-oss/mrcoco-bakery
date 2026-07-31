@@ -84,7 +84,7 @@ export function Header({ cart = [], wishlist = [] }) {
               
               {/* Mega Menu Dropdown */}
               {showCakesMenu && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[800px] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6">
+                <div className="absolute top-full left-0 mt-2 w-[800px] max-w-[90vw] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6 z-50">
                   <div className="grid grid-cols-3 gap-8">
                     {/* Cake By Type */}
                     <div>
