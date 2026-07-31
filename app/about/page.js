@@ -1,6 +1,7 @@
 'use client'
 
 import { Header } from '@/components/navigation/Header'
+import { Footer } from '@/components/navigation/Footer'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Heart, Users, Award, Target, MapPin, Phone, Mail } from 'lucide-react'
@@ -158,6 +159,8 @@ export default function AboutUsPage() {
           </CardContent>
         </Card>
       </div>
+      
+      <Footer />
     </div>
   )
 }

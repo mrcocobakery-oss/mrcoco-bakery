@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Header } from '@/components/navigation/Header'
+import { Footer } from '@/components/navigation/Footer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -346,6 +347,8 @@ export default function ContactPage() {
           </Card>
         </div>
       </div>
+      
+      <Footer />
     </div>
   )
 }

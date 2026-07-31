@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Header } from '@/components/navigation/Header'
+import { Footer } from '@/components/navigation/Footer'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp, HelpCircle, Package, Truck, CreditCard, RefreshCw } from 'lucide-react'
@@ -209,6 +210,8 @@ export default function FAQPage() {
           </CardContent>
         </Card>
       </div>
+      
+      <Footer />
     </div>
   )
 }
