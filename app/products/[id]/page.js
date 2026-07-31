@@ -23,24 +23,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
-
-  // Mock products data (same as products page)
-  const mockProducts = [
-    { id: 1, name: 'Chocolate Truffle Eggless Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'eggless', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.8, reviews: 245, discount: 18, inStock: true, description: 'Rich and decadent chocolate truffle cake made with premium Belgian chocolate. Perfect for birthdays and celebrations.' },
-    { id: 2, name: 'Red Velvet Eggless Cake', price: 799, originalPrice: 999, category: 'cakes', cakeType: 'eggless', occasion: 'anniversary', specialDay: '', size: '500g', flavour: 'Red Velvet', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.9, reviews: 312, discount: 20, inStock: true, description: 'Classic red velvet cake with smooth cream cheese frosting. A timeless favorite for special occasions.' },
-    { id: 3, name: 'White & Gold Designer Cake', price: 1299, originalPrice: 1599, category: 'cakes', cakeType: 'designer', occasion: 'wedding', specialDay: '', size: '2kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 5.0, reviews: 156, discount: 19, inStock: true, description: 'Elegant designer cake with white fondant and gold accents. Perfect for weddings and upscale events.' },
-    { id: 4, name: 'Floral Designer Cake', price: 1499, originalPrice: 1799, category: 'cakes', cakeType: 'designer', occasion: 'engagement', specialDay: '', size: '1.5kg', flavour: 'Strawberry', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 178, discount: 17, inStock: true, description: 'Beautiful floral designer cake with fresh flowers and delicate decorations. Ideal for engagements.' },
-    { id: 5, name: 'Personalized Photo Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'photo', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 267, discount: 17, inStock: true, description: 'Custom photo cake with edible print. Add your favorite photo to make birthdays extra special.' },
-    { id: 6, name: 'Black Forest Cake', price: 749, originalPrice: 899, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.6, reviews: 198, discount: 17, inStock: true, description: 'Traditional Black Forest cake with layers of chocolate sponge, whipped cream, and cherries.' },
-    { id: 7, name: 'Death By Chocolate Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Rich Chocolate', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 289, discount: 17, inStock: true, description: 'Ultimate chocolate indulgence with multiple layers of chocolate sponge and ganache.' },
-    { id: 8, name: "Mother's Day Special Cake", price: 1099, originalPrice: 1299, category: 'cakes', cakeType: 'premium', occasion: '', specialDay: 'mothers day', size: '1kg', flavour: 'Mixed Berry', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 5.0, reviews: 145, discount: 15, inStock: true, description: 'Special cake designed for Mother\'s Day with fresh berries and elegant decorations.' },
-    { id: 9, name: 'Valentine Heart Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'designer', occasion: '', specialDay: 'valentine', size: '1kg', flavour: 'Strawberry', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 321, discount: 18, inStock: true, description: 'Romantic heart-shaped cake perfect for Valentine\'s Day celebrations.' },
-    { id: 10, name: 'Diwali Special Cake', price: 1199, originalPrice: 1499, category: 'cakes', cakeType: 'premium', occasion: '', specialDay: 'diwali', size: '1.5kg', flavour: 'Dry Fruit', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 234, discount: 20, inStock: true, description: 'Festive cake with dry fruits and traditional Indian flavors for Diwali.' },
-    { id: 11, name: 'Bento Cake Collection', price: 399, originalPrice: 499, category: 'cakes', cakeType: 'bento', occasion: 'birthday', specialDay: '', size: '250g', flavour: 'Assorted', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 298, discount: 20, inStock: true, description: 'Trendy mini bento cakes - perfect individual servings with various flavors.' },
-    { id: 12, name: 'Mini Cake Set of 6', price: 599, originalPrice: 749, category: 'cakes', cakeType: 'mini', occasion: '', specialDay: '', size: '150g each', flavour: 'Mixed', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.7, reviews: 187, discount: 20, inStock: true, description: 'Assorted mini cakes in 6 different flavors. Great for parties and sampling.' },
-    { id: 13, name: 'Premium Butter Cookies', price: 399, originalPrice: 499, category: 'cookies', cookieType: 'premium', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.7, reviews: 189, discount: 20, inStock: true, description: 'Melt-in-mouth butter cookies made with premium ingredients.' },
-    { id: 14, name: 'Healthy Oat Cookies', price: 299, originalPrice: 399, category: 'cookies', cookieType: 'healthy', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.4, reviews: 87, discount: 25, inStock: true, description: 'Nutritious oat cookies with no added sugar. Perfect healthy snack.' },
-  ]
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Load cart and wishlist from localStorage
@@ -49,18 +32,42 @@ export default function ProductDetailPage() {
     if (savedCart) setCart(JSON.parse(savedCart))
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
 
-    // Find the product
-    const foundProduct = mockProducts.find(p => p.id === parseInt(productId))
-    if (foundProduct) {
-      setProduct(foundProduct)
-      
-      // Get related products (same category, excluding current)
-      const related = mockProducts
-        .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-        .slice(0, 4)
-      setRelatedProducts(related)
-    }
+    // Fetch product from API
+    fetchProduct()
   }, [productId])
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch the specific product
+      const productResponse = await fetch(`/api/products/${productId}`)
+      const productData = await productResponse.json()
+      
+      if (productData.success && productData.product) {
+        setProduct(productData.product)
+        
+        // Fetch all products to get related ones
+        const allProductsResponse = await fetch('/api/products')
+        const allProductsData = await allProductsResponse.json()
+        
+        if (allProductsData.success && allProductsData.products) {
+          // Get related products (same category, excluding current)
+          const related = allProductsData.products
+            .filter(p => p.category === productData.product.category && p.id !== productData.product.id)
+            .slice(0, 4)
+          setRelatedProducts(related)
+        }
+      } else {
+        setProduct(null)
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error)
+      setProduct(null)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const addToCart = () => {
     if (!product) return
@@ -95,6 +102,18 @@ export default function ProductDetailPage() {
 
   const isInWishlist = () => {
     return product && wishlist.some(item => item.id === product.id)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading product...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!product) {
