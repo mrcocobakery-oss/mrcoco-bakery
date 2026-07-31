@@ -18,6 +18,7 @@ import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 export default function ProductsPage() {
   const searchParams = useSearchParams()
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [filteredProducts, setFilteredProducts] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
@@ -29,51 +30,31 @@ export default function ProductsPage() {
   const [wishlist, setWishlist] = useState([])
   const [showFilters, setShowFilters] = useState(false)
 
-  // Enhanced mock products with subcategories
-  const mockProducts = [
-    // Cakes - Eggless
-    { id: 1, name: 'Chocolate Truffle Eggless Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'eggless', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.8, reviews: 245, discount: 18, inStock: true },
-    { id: 2, name: 'Red Velvet Eggless Cake', price: 799, originalPrice: 999, category: 'cakes', cakeType: 'eggless', occasion: 'anniversary', specialDay: '', size: '500g', flavour: 'Red Velvet', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.9, reviews: 312, discount: 20, inStock: true },
-    
-    // Cakes - Designer
-    { id: 3, name: 'White & Gold Designer Cake', price: 1299, originalPrice: 1599, category: 'cakes', cakeType: 'designer', occasion: 'wedding', specialDay: '', size: '2kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 5.0, reviews: 156, discount: 19, inStock: true },
-    { id: 4, name: 'Floral Designer Cake', price: 1499, originalPrice: 1799, category: 'cakes', cakeType: 'designer', occasion: 'engagement', specialDay: '', size: '1.5kg', flavour: 'Strawberry', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 178, discount: 17, inStock: true },
-    
-    // Cakes - Photo
-    { id: 5, name: 'Personalized Photo Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'photo', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Vanilla', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 267, discount: 17, inStock: true },
-    
-    // Cakes - Chocolate
-    { id: 6, name: 'Black Forest Cake', price: 749, originalPrice: 899, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Chocolate', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.6, reviews: 198, discount: 17, inStock: true },
-    { id: 7, name: 'Death By Chocolate Cake', price: 999, originalPrice: 1199, category: 'cakes', cakeType: 'chocolate', occasion: 'birthday', specialDay: '', size: '1kg', flavour: 'Rich Chocolate', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 289, discount: 17, inStock: true },
-    
-    // Cakes - Special Days
-    { id: 8, name: "Mother's Day Special Cake", price: 1099, originalPrice: 1299, category: 'cakes', cakeType: 'premium', occasion: '', specialDay: 'mothers day', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 5.0, reviews: 145, discount: 15, inStock: true },
-    { id: 9, name: 'Valentine Heart Cake', price: 899, originalPrice: 1099, category: 'cakes', cakeType: 'designer', occasion: '', specialDay: 'valentine', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.8, reviews: 321, discount: 18, inStock: true },
-    { id: 10, name: 'Diwali Special Cake', price: 1199, originalPrice: 1499, category: 'cakes', cakeType: 'premium', occasion: '', specialDay: 'diwali', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 234, discount: 20, inStock: true },
-    
-    // Cakes - Bento & Mini
-    { id: 11, name: 'Bento Cake Collection', price: 399, originalPrice: 499, category: 'cakes', cakeType: 'bento', occasion: 'birthday', specialDay: '', image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.9, reviews: 298, discount: 20, inStock: true },
-    { id: 12, name: 'Mini Cake Set of 6', price: 599, originalPrice: 749, category: 'cakes', cakeType: 'mini', occasion: '', specialDay: '', image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b', rating: 4.7, reviews: 187, discount: 20, inStock: true },
-    
-    // Cookies
-    { id: 13, name: 'Premium Butter Cookies', price: 399, originalPrice: 499, category: 'cookies', cookieType: 'premium', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.7, reviews: 189, discount: 20, inStock: true },
-    { id: 14, name: 'Healthy Oat Cookies', price: 299, originalPrice: 399, category: 'cookies', cookieType: 'healthy', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.4, reviews: 87, discount: 25, inStock: true },
-    { id: 15, name: 'Tea Time Cookie Mix', price: 349, originalPrice: 449, category: 'cookies', cookieType: 'tea', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.6, reviews: 142, discount: 22, inStock: true },
-    
-    // Namkeen
-    { id: 16, name: 'Traditional Namkeen Mix', price: 249, originalPrice: 299, category: 'namkeen', namkeenType: 'traditional', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.7, reviews: 203, discount: 17, inStock: true },
-    { id: 17, name: 'Baked Snacks Combo', price: 299, originalPrice: 399, category: 'namkeen', namkeenType: 'baked', image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg', rating: 4.5, reviews: 156, discount: 25, inStock: true },
-    
-    // Gifts
-    { id: 18, name: 'Premium Gift Hamper', price: 1499, originalPrice: 1899, category: 'gifts', giftType: 'festival hamper', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.9, reviews: 176, discount: 21, inStock: true },
-    { id: 19, name: 'Corporate Gift Box', price: 999, originalPrice: 1199, category: 'gifts', giftType: 'corporate', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 4.8, reviews: 134, discount: 17, inStock: true },
-    { id: 20, name: 'Wedding Gift Pack', price: 1799, originalPrice: 2199, category: 'gifts', giftType: 'wedding', image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a', rating: 5.0, reviews: 98, discount: 18, inStock: true },
-  ]
-
+  // Fetch products from API
   useEffect(() => {
-    setProducts(mockProducts)
-    setFilteredProducts(mockProducts)
-    
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setProducts(data.products || [])
+      } else {
+        toast.error('Failed to load products')
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      toast.error('Failed to load products')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load cart and wishlist from localStorage
+  useEffect(() => {
     const savedCart = localStorage.getItem('cart')
     const savedWishlist = localStorage.getItem('wishlist')
     if (savedCart) setCart(JSON.parse(savedCart))
