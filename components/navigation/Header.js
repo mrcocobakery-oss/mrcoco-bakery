@@ -4,8 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ShoppingCart, Heart, Search, Menu, X, ChevronDown, User } from 'lucide-react'
+import { ShoppingCart, Heart, Menu, X, ChevronDown, User } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { SearchAutocomplete } from '@/components/SearchAutocomplete'
 
 export function Header({ cart = [], wishlist = [] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -156,9 +157,10 @@ export function Header({ cart = [], wishlist = [] }) {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="relative hidden sm:flex">
-              <Search className="w-5 h-5 text-pink-900" />
-            </Button>
+            {/* Search Autocomplete - Desktop */}
+            <div className="hidden lg:block">
+              <SearchAutocomplete />
+            </div>
             
             {user ? (
               <Link href="/dashboard">

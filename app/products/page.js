@@ -10,13 +10,16 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal } from 'lucide-react'
+import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
+import { QuickViewModal } from '@/components/QuickViewModal'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ProductsPage() {
   const searchParams = useSearchParams()
+  const { user } = useAuth()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [filteredProducts, setFilteredProducts] = useState([])
@@ -29,6 +32,8 @@ export default function ProductsPage() {
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
   const [showFilters, setShowFilters] = useState(false)
+  const [quickViewProduct, setQuickViewProduct] = useState(null)
+  const [showQuickView, setShowQuickView] = useState(false)
 
   // Fetch products from API
   useEffect(() => {
@@ -110,9 +115,10 @@ export default function ProductsPage() {
     toast.success(`${product.name} added to cart!`)
   }
 
-  const toggleWishlist = (product) => {
+  const toggleWishlist = async (product) => {
     const exists = wishlist.find(item => item.id === product.id)
     let newWishlist
+    
     if (exists) {
       newWishlist = wishlist.filter(item => item.id !== product.id)
       toast.success('Removed from wishlist')
@@ -120,8 +126,42 @@ export default function ProductsPage() {
       newWishlist = [...wishlist, product]
       toast.success('Added to wishlist!')
     }
+    
     setWishlist(newWishlist)
+    
+    // Save to localStorage for non-logged-in users
     localStorage.setItem('wishlist', JSON.stringify(newWishlist))
+    
+    // Save to database for logged-in users
+    if (user) {
+      try {
+        if (exists) {
+          await fetch(`/api/wishlist?productId=${product.id}`, { method: 'DELETE' })
+        } else {
+          await fetch('/api/wishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id })
+          })
+        }
+      } catch (error) {
+        console.error('Error syncing wishlist:', error)
+      }
+    }
+  }
+
+  const handleQuickView = (product) => {
+    setQuickViewProduct(product)
+    setShowQuickView(true)
+  }
+
+  const handleQuickViewAddToCart = (product, quantity) => {
+    const newCart = [...cart]
+    for (let i = 0; i < quantity; i++) {
+      newCart.push(product)
+    }
+    setCart(newCart)
+    localStorage.setItem('cart', JSON.stringify(newCart))
   }
 
   const isInWishlist = (productId) => {
@@ -311,14 +351,26 @@ export default function ProductsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <Card key={product.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
-                    <Link href={`/products/${product.id}`}>
-                      <div className="relative h-64 overflow-hidden bg-gray-100">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        {product.discount && (
-                          <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0">{product.discount}% OFF</Badge>
-                        )}
-                      </div>
-                    </Link>
+                    <div className="relative">
+                      <Link href={`/products/${product.id}`}>
+                        <div className="relative h-64 overflow-hidden bg-gray-100">
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          {product.discount && (
+                            <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0">{product.discount}% OFF</Badge>
+                          )}
+                        </div>
+                      </Link>
+                      {/* Quick View Button */}
+                      <Button
+                        onClick={() => handleQuickView(product)}
+                        size="sm"
+                        variant="secondary"
+                        className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 hover:bg-white"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Quick View
+                      </Button>
+                    </div>
                     <CardContent className="p-4">
                       <Link href={`/products/${product.id}`}>
                         <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2">{product.name}</h3>
@@ -366,6 +418,16 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
+
+      {/* Quick View Modal */}
+      <QuickViewModal
+        product={quickViewProduct}
+        isOpen={showQuickView}
+        onClose={() => setShowQuickView(false)}
+        onAddToCart={handleQuickViewAddToCart}
+        onToggleWishlist={toggleWishlist}
+        isInWishlist={quickViewProduct ? isInWishlist(quickViewProduct.id) : false}
+      />
     </div>
   )
 }
