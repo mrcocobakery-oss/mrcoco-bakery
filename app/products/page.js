@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ShoppingCart, Heart, Search, ArrowLeft, SlidersHorizontal, Eye, Plus, Minus, Calendar, Clock } from 'lucide-react'
 import { toast } from 'sonner'
+import { successToast } from '@/lib/toast-animations'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 import { QuickViewModal } from '@/components/QuickViewModal'
@@ -132,6 +133,12 @@ export default function ProductsPage() {
       return
     }
     
+    // Check stock
+    if (!product.inStock) {
+      successToast.outOfStock(product.name)
+      return
+    }
+    
     // Add product with delivery info if it's a cake
     const cartItem = deliveryInfo 
       ? { ...product, deliveryDate: deliveryInfo.date, deliveryTime: deliveryInfo.slot }
@@ -140,7 +147,7 @@ export default function ProductsPage() {
     const newCart = [...cart, cartItem]
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
-    toast.success(`${product.name} added to cart!`)
+    successToast.addToCart(product.name)
   }
   
   const confirmDeliveryAndAddToCart = () => {
@@ -164,10 +171,10 @@ export default function ProductsPage() {
     
     if (exists) {
       newWishlist = wishlist.filter(item => item.id !== product.id)
-      toast.success('Removed from wishlist')
+      successToast.removeFromWishlist(product.name)
     } else {
       newWishlist = [...wishlist, product]
-      toast.success('Added to wishlist!')
+      successToast.addToWishlist(product.name)
     }
     
     setWishlist(newWishlist)
@@ -407,6 +414,9 @@ export default function ProductsPage() {
                           />
                           {product.discount && (
                             <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0 z-10">{product.discount}% OFF</Badge>
+                          )}
+                          {!product.inStock && (
+                            <Badge className="absolute top-3 right-3 bg-gray-900 text-white border-0 z-10">Out of Stock</Badge>
                           )}
                         </div>
                       </Link>
