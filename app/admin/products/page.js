@@ -32,6 +32,7 @@ export default function AdminProductsPage() {
     cakeType: '',
     occasion: '',
     specialDay: '',
+    theme: '',
     flavour: '',
     size: '',
     cookieType: '',
@@ -156,6 +157,7 @@ export default function AdminProductsPage() {
       cakeType: '',
       occasion: '',
       specialDay: '',
+      theme: '',
       flavour: '',
       size: '',
       cookieType: '',
@@ -183,6 +185,7 @@ export default function AdminProductsPage() {
       cakeType: product.cakeType || '',
       occasion: product.occasion || '',
       specialDay: product.specialDay || '',
+      theme: product.theme || '',
       flavour: product.flavour || '',
       size: product.size || '',
       cookieType: product.cookieType || '',
@@ -514,17 +517,13 @@ export default function AdminProductsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="eggless">Eggless</SelectItem>
-                        <SelectItem value="designer">Designer</SelectItem>
-                        <SelectItem value="photo">Photo Cake</SelectItem>
-                        <SelectItem value="fondant">Fondant</SelectItem>
-                        <SelectItem value="fruit">Fruit</SelectItem>
-                        <SelectItem value="chocolate">Chocolate</SelectItem>
-                        <SelectItem value="premium">Premium</SelectItem>
-                        <SelectItem value="cheesecake">Cheesecake</SelectItem>
-                        <SelectItem value="bento">Bento</SelectItem>
-                        <SelectItem value="jar">Jar Cake</SelectItem>
-                        <SelectItem value="mini">Mini Cake</SelectItem>
+                        <SelectItem value="regular cakes">Regular Cakes</SelectItem>
+                        <SelectItem value="mini cakes">Mini Cakes</SelectItem>
+                        <SelectItem value="photo cakes">Photo Cakes</SelectItem>
+                        <SelectItem value="jar cake">Jar Cake</SelectItem>
+                        <SelectItem value="pinata cake">Pinata Cake</SelectItem>
+                        <SelectItem value="number cake">Number Cake</SelectItem>
+                        <SelectItem value="alphabet cake">Alphabet cake</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -536,21 +535,21 @@ export default function AdminProductsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="birthday">Birthday</SelectItem>
-                        <SelectItem value="anniversary">Anniversary</SelectItem>
-                        <SelectItem value="wedding">Wedding</SelectItem>
-                        <SelectItem value="engagement">Engagement</SelectItem>
-                        <SelectItem value="baby shower">Baby Shower</SelectItem>
-                        <SelectItem value="retirement">Retirement</SelectItem>
-                        <SelectItem value="house warming">House Warming</SelectItem>
-                        <SelectItem value="graduation">Graduation</SelectItem>
-                        <SelectItem value="congratulations">Congratulations</SelectItem>
-                        <SelectItem value="corporate">Corporate</SelectItem>
+                        <SelectItem value="birthday cake">Birthday Cake</SelectItem>
+                        <SelectItem value="anniversary cake">Anniversary Cake</SelectItem>
+                        <SelectItem value="engagement & wedding cake">Engagement & Wedding Cake</SelectItem>
+                        <SelectItem value="bride to be cake">Bride To Be cake</SelectItem>
+                        <SelectItem value="kids birthday cake for girls">Kids Birthday Cake For Girls</SelectItem>
+                        <SelectItem value="kids birthday cake for boys">Kids Birthday Cake For Boys</SelectItem>
+                        <SelectItem value="husband birthday cake">Husband Birthday Cake</SelectItem>
+                        <SelectItem value="wife birthday cake">Wife Birthday cake</SelectItem>
+                        <SelectItem value="retirement cake">Retirement Cake</SelectItem>
+                        <SelectItem value="farewell cake">Farewell Cake</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Special Day</Label>
                     <Select value={formData.specialDay} onValueChange={(val) => handleSelectChange('specialDay', val)}>
@@ -559,17 +558,42 @@ export default function AdminProductsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="mothers day">Mother's Day</SelectItem>
-                        <SelectItem value="fathers day">Father's Day</SelectItem>
-                        <SelectItem value="valentine">Valentine's Day</SelectItem>
-                        <SelectItem value="christmas">Christmas</SelectItem>
+                        <SelectItem value="mother's day">Mother's Day</SelectItem>
+                        <SelectItem value="father's day">Father's Day</SelectItem>
+                        <SelectItem value="friendship day">Friendship Day</SelectItem>
+                        <SelectItem value="valentine's day">Valentine's Day</SelectItem>
+                        <SelectItem value="daughter's day">Daughter's day</SelectItem>
+                        <SelectItem value="brother's day">Brother's Day</SelectItem>
+                        <SelectItem value="teacher's day">Teacher's Day</SelectItem>
+                        <SelectItem value="christmas day">Christmas Day</SelectItem>
                         <SelectItem value="new year">New Year</SelectItem>
-                        <SelectItem value="diwali">Diwali</SelectItem>
-                        <SelectItem value="holi">Holi</SelectItem>
-                        <SelectItem value="eid">Eid</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Theme</Label>
+                    <Select value={formData.theme} onValueChange={(val) => handleSelectChange('theme', val)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="6 month birthday cake">6 month Birthday Cake</SelectItem>
+                        <SelectItem value="6 month anniversary cake">6 Month Anniversary Cake</SelectItem>
+                        <SelectItem value="hidden message cake">Hidden Message Cake</SelectItem>
+                        <SelectItem value="prank cake">Prank Cake</SelectItem>
+                        <SelectItem value="annaprashan (rice feeding ceremony) cake">Annaprashan (Rice feeding ceremony) Cake</SelectItem>
+                        <SelectItem value="18th birthday cake">18th Birthday Cake</SelectItem>
+                        <SelectItem value="sorry cake">Sorry Cake</SelectItem>
+                        <SelectItem value="good luck cake">Good Luck Cake</SelectItem>
+                        <SelectItem value="divorce cake">Divorce Cake</SelectItem>
+                        <SelectItem value="bachelor party cakes">Bachelor Party Cakes</SelectItem>
+                        <SelectItem value="naming ceremony cake">Naming Ceremony Cake</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Flavour</Label>
                     <Input

@@ -32,6 +32,7 @@ function ProductsPageContent() {
   const [selectedCakeType, setSelectedCakeType] = useState(searchParams.get('type') || 'all')
   const [selectedOccasion, setSelectedOccasion] = useState(searchParams.get('occasion') || 'all')
   const [selectedSpecialDay, setSelectedSpecialDay] = useState(searchParams.get('special') || 'all')
+  const [selectedTheme, setSelectedTheme] = useState(searchParams.get('theme') || 'all')
   const [sortBy, setSortBy] = useState('popular')
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
@@ -106,6 +107,11 @@ function ProductsPageContent() {
       filtered = filtered.filter(p => p.specialDay === selectedSpecialDay)
     }
 
+    // Filter by theme (if cakes selected)
+    if (selectedCategory === 'cakes' && selectedTheme !== 'all') {
+      filtered = filtered.filter(p => p.theme === selectedTheme)
+    }
+
     // Sort
     if (sortBy === 'price-low') {
       filtered.sort((a, b) => a.price - b.price)
@@ -116,7 +122,7 @@ function ProductsPageContent() {
     }
 
     setFilteredProducts(filtered)
-  }, [searchQuery, selectedCategory, selectedCakeType, selectedOccasion, selectedSpecialDay, sortBy, products])
+  }, [searchQuery, selectedCategory, selectedCakeType, selectedOccasion, selectedSpecialDay, selectedTheme, sortBy, products])
 
   const addToCart = (product, deliveryInfo = null) => {
     // For cakes, require delivery time selection first
@@ -251,6 +257,7 @@ function ProductsPageContent() {
                       setSelectedCakeType('all')
                       setSelectedOccasion('all')
                       setSelectedSpecialDay('all')
+                      setSelectedTheme('all')
                       setSearchQuery('')
                     }}
                   >
@@ -300,15 +307,13 @@ function ProductsPageContent() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="eggless">Eggless</SelectItem>
-                          <SelectItem value="designer">Designer</SelectItem>
-                          <SelectItem value="photo">Photo</SelectItem>
-                          <SelectItem value="fondant">Fondant</SelectItem>
-                          <SelectItem value="chocolate">Chocolate</SelectItem>
-                          <SelectItem value="premium">Premium</SelectItem>
-                          <SelectItem value="cheesecake">Cheesecake</SelectItem>
-                          <SelectItem value="bento">Bento</SelectItem>
-                          <SelectItem value="mini">Mini</SelectItem>
+                          <SelectItem value="regular cakes">Regular Cakes</SelectItem>
+                          <SelectItem value="mini cakes">Mini Cakes</SelectItem>
+                          <SelectItem value="photo cakes">Photo Cakes</SelectItem>
+                          <SelectItem value="jar cake">Jar Cake</SelectItem>
+                          <SelectItem value="pinata cake">Pinata Cake</SelectItem>
+                          <SelectItem value="number cake">Number Cake</SelectItem>
+                          <SelectItem value="alphabet cake">Alphabet cake</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -321,10 +326,16 @@ function ProductsPageContent() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Occasions</SelectItem>
-                          <SelectItem value="birthday">Birthday</SelectItem>
-                          <SelectItem value="anniversary">Anniversary</SelectItem>
-                          <SelectItem value="wedding">Wedding</SelectItem>
-                          <SelectItem value="engagement">Engagement</SelectItem>
+                          <SelectItem value="birthday cake">Birthday Cake</SelectItem>
+                          <SelectItem value="anniversary cake">Anniversary Cake</SelectItem>
+                          <SelectItem value="engagement & wedding cake">Engagement & Wedding Cake</SelectItem>
+                          <SelectItem value="bride to be cake">Bride To Be cake</SelectItem>
+                          <SelectItem value="kids birthday cake for girls">Kids Birthday Cake For Girls</SelectItem>
+                          <SelectItem value="kids birthday cake for boys">Kids Birthday Cake For Boys</SelectItem>
+                          <SelectItem value="husband birthday cake">Husband Birthday Cake</SelectItem>
+                          <SelectItem value="wife birthday cake">Wife Birthday cake</SelectItem>
+                          <SelectItem value="retirement cake">Retirement Cake</SelectItem>
+                          <SelectItem value="farewell cake">Farewell Cake</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -337,11 +348,38 @@ function ProductsPageContent() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Days</SelectItem>
-                          <SelectItem value="mothers day">Mother's Day</SelectItem>
-                          <SelectItem value="fathers day">Father's Day</SelectItem>
-                          <SelectItem value="valentine">Valentine</SelectItem>
-                          <SelectItem value="christmas">Christmas</SelectItem>
-                          <SelectItem value="diwali">Diwali</SelectItem>
+                          <SelectItem value="mother's day">Mother's Day</SelectItem>
+                          <SelectItem value="father's day">Father's Day</SelectItem>
+                          <SelectItem value="friendship day">Friendship Day</SelectItem>
+                          <SelectItem value="valentine's day">Valentine's Day</SelectItem>
+                          <SelectItem value="daughter's day">Daughter's day</SelectItem>
+                          <SelectItem value="brother's day">Brother's Day</SelectItem>
+                          <SelectItem value="teacher's day">Teacher's Day</SelectItem>
+                          <SelectItem value="christmas day">Christmas Day</SelectItem>
+                          <SelectItem value="new year">New Year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="mb-6">
+                      <Label className="mb-2 block font-bold">Theme</Label>
+                      <Select value={selectedTheme} onValueChange={setSelectedTheme}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Themes</SelectItem>
+                          <SelectItem value="6 month birthday cake">6 month Birthday Cake</SelectItem>
+                          <SelectItem value="6 month anniversary cake">6 Month Anniversary Cake</SelectItem>
+                          <SelectItem value="hidden message cake">Hidden Message Cake</SelectItem>
+                          <SelectItem value="prank cake">Prank Cake</SelectItem>
+                          <SelectItem value="annaprashan (rice feeding ceremony) cake">Annaprashan (Rice feeding ceremony) Cake</SelectItem>
+                          <SelectItem value="18th birthday cake">18th Birthday Cake</SelectItem>
+                          <SelectItem value="sorry cake">Sorry Cake</SelectItem>
+                          <SelectItem value="good luck cake">Good Luck Cake</SelectItem>
+                          <SelectItem value="divorce cake">Divorce Cake</SelectItem>
+                          <SelectItem value="bachelor party cakes">Bachelor Party Cakes</SelectItem>
+                          <SelectItem value="naming ceremony cake">Naming Ceremony Cake</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
