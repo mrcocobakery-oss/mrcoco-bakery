@@ -14,46 +14,52 @@ export function Header({ cart = [], wishlist = [] }) {
   const { user } = useAuth()
 
   const cakesByType = [
-    'Eggless Cakes',
-    'Designer Cakes',
+    'Regular Cakes',
+    'Mini Cakes',
     'Photo Cakes',
-    'Fondant Cakes',
-    'Fruit Cakes',
-    'Chocolate Cakes',
-    'Premium Cakes',
-    'Cheesecakes',
-    'Bento Cakes',
-    'Jar Cakes',
-    'Mini Cakes'
+    'Jar Cake',
+    'Pinata Cake',
+    'Number Cake',
+    'Alphabet cake'
   ]
 
   const cakesByOccasion = [
-    'Birthday',
-    'Anniversary',
-    'Wedding',
-    'Engagement',
-    'Baby Shower',
-    'Retirement',
-    'House Warming',
-    'Graduation',
-    'Congratulations',
-    'Corporate'
+    'Birthday Cake',
+    'Anniversary Cake',
+    'Engagement & Wedding Cake',
+    'Bride To Be cake',
+    'Kids Birthday Cake For Girls',
+    'Kids Birthday Cake For Boys',
+    'Husband Birthday Cake',
+    'Wife Birthday cake',
+    'Retirement Cake',
+    'Farewell Cake'
   ]
 
   const cakesBySpecialDays = [
     "Mother's Day",
     "Father's Day",
-    'Valentine',
-    'Christmas',
-    'New Year',
-    'Raksha Bandhan',
-    'Bhai Dooj',
-    'Diwali',
-    'Holi',
-    'Eid',
+    'Friendship Day',
+    "Valentine's Day",
+    "Daughter's day",
+    "Brother's Day",
     "Teacher's Day",
-    "Women's Day",
-    "Children's Day"
+    'Christmas Day',
+    'New Year'
+  ]
+
+  const cakesByTheme = [
+    '6 month Birthday Cake',
+    '6 Month Anniversary Cake',
+    'Hidden Message Cake',
+    'Prank Cake',
+    'Annaprashan (Rice feeding ceremony) Cake',
+    '18th Birthday Cake',
+    'Sorry Cake',
+    'Good Luck Cake',
+    'Divorce Cake',
+    'Bachelor Party Cakes',
+    'Naming Ceremony Cake'
   ]
 
   return (
@@ -84,16 +90,16 @@ export function Header({ cart = [], wishlist = [] }) {
               
               {/* Mega Menu Dropdown */}
               {showCakesMenu && (
-                <div className="absolute top-full left-0 mt-2 w-[800px] max-w-[90vw] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6 z-50">
-                  <div className="grid grid-cols-3 gap-8">
+                <div className="absolute top-full left-0 mt-2 w-[1000px] max-w-[90vw] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6 z-50">
+                  <div className="grid grid-cols-4 gap-6">
                     {/* Cake By Type */}
                     <div>
-                      <h3 className="font-bold text-pink-900 mb-3 text-lg">Cake By Type</h3>
+                      <h3 className="font-bold text-pink-900 mb-3 text-lg border-b border-pink-200 pb-2">Cake By Type</h3>
                       <ul className="space-y-2">
                         {cakesByType.map((cake) => (
                           <li key={cake}>
                             <Link 
-                              href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase().replace(' cakes', ''))}`}
+                              href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase())}`}
                               className="text-gray-700 hover:text-pink-600 transition text-sm block py-1"
                             >
                               {cake}
@@ -105,7 +111,7 @@ export function Header({ cart = [], wishlist = [] }) {
 
                     {/* Cake By Occasion */}
                     <div>
-                      <h3 className="font-bold text-pink-900 mb-3 text-lg">Cake By Occasion</h3>
+                      <h3 className="font-bold text-pink-900 mb-3 text-lg border-b border-pink-200 pb-2">Cake By Occasion</h3>
                       <ul className="space-y-2">
                         {cakesByOccasion.map((occasion) => (
                           <li key={occasion}>
@@ -122,7 +128,7 @@ export function Header({ cart = [], wishlist = [] }) {
 
                     {/* Cake By Special Days */}
                     <div>
-                      <h3 className="font-bold text-pink-900 mb-3 text-lg">Cake By Special Days</h3>
+                      <h3 className="font-bold text-pink-900 mb-3 text-lg border-b border-pink-200 pb-2">Cake By Special Days</h3>
                       <ul className="space-y-2">
                         {cakesBySpecialDays.map((day) => (
                           <li key={day}>
@@ -131,6 +137,23 @@ export function Header({ cart = [], wishlist = [] }) {
                               className="text-gray-700 hover:text-pink-600 transition text-sm block py-1"
                             >
                               {day}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Cake By Theme */}
+                    <div>
+                      <h3 className="font-bold text-pink-900 mb-3 text-lg border-b border-pink-200 pb-2">Cake By Theme</h3>
+                      <ul className="space-y-2">
+                        {cakesByTheme.map((theme) => (
+                          <li key={theme}>
+                            <Link 
+                              href={`/products?category=cakes&theme=${encodeURIComponent(theme.toLowerCase())}`}
+                              className="text-gray-700 hover:text-pink-600 transition text-sm block py-1"
+                            >
+                              {theme}
                             </Link>
                           </li>
                         ))}
