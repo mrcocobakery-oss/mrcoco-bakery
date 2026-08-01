@@ -23,9 +23,12 @@ export function AdminProvider({ children }) {
   }
 
   const loginAdmin = (username, password) => {
-    // Simple hardcoded authentication
-    if (username === 'admin' && password === 'admin123') {
-      setAdmin({ username: 'admin' })
+    // Check against environment variables or default secure credentials
+    const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'mrcocoadmin'
+    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'MrCoco@2025#Secure'
+    
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      setAdmin({ username: ADMIN_USERNAME })
       Cookies.set('admin_token', 'admin_logged_in', { expires: 7 })
       toast.success('Welcome to Admin Panel!')
       return { success: true }

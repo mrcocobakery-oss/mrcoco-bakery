@@ -88,12 +88,6 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <div className="bg-pink-50 border border-pink-200 rounded-lg p-3 text-sm">
-              <p className="text-pink-900 font-medium mb-1">Demo Credentials:</p>
-              <p className="text-pink-700">Username: <code className="bg-pink-100 px-2 py-0.5 rounded">admin</code></p>
-              <p className="text-pink-700">Password: <code className="bg-pink-100 px-2 py-0.5 rounded">admin123</code></p>
-            </div>
-
             <Button
               type="submit"
               disabled={loading}
