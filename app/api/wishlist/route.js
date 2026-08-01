@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/mongodb'
-import Cookies from 'cookies'
+import { cookies } from 'next/headers'
 
 // Check if user is authenticated
-function getUserFromCookies(request) {
-  const cookieHeader = request.headers.get('cookie')
-  if (!cookieHeader) return null
-
-  const cookies = new Cookies(request)
-  const userEmail = cookies.get('user_email')
-  
-  return userEmail || null
+async function getUserFromCookies() {
+  try {
+    const cookieStore = await cookies()
+    const userEmail = cookieStore.get('user_email')?.value
+    return userEmail || null
+  } catch (error) {
+    return null
+  }
 }
 
 // GET - Fetch user's wishlist
 export async function GET(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const userEmail = await getUserFromCookies()
     
     if (!userEmail) {
       return NextResponse.json({ 
@@ -77,7 +77,7 @@ export async function GET(request) {
 // POST - Add product to wishlist
 export async function POST(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const userEmail = await getUserFromCookies()
     
     if (!userEmail) {
       return NextResponse.json({ 
@@ -124,7 +124,7 @@ export async function POST(request) {
 // DELETE - Remove product from wishlist
 export async function DELETE(request) {
   try {
-    const userEmail = getUserFromCookies(request)
+    const userEmail = await getUserFromCookies()
     
     if (!userEmail) {
       return NextResponse.json({ 
