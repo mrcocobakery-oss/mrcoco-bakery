@@ -57,11 +57,6 @@ export function Footer() {
             <h3 className="text-lg font-bold mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/faq" className="text-pink-100 hover:text-white transition text-sm">
-                  FAQ
-                </Link>
-              </li>
-              <li>
                 <Link href="/terms" className="text-pink-100 hover:text-white transition text-sm">
                   Terms & Conditions
                 </Link>
