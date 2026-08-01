@@ -67,8 +67,56 @@ export default function AdminDashboardPage() {
 
   if (!analytics) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">No data available</div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 p-8">
+        <div className="text-center space-y-4">
+          <Package className="w-20 h-20 text-pink-600 mx-auto" />
+          <h2 className="text-2xl font-bold text-gray-900">Welcome to Mr. COCO Bakery Admin!</h2>
+          <p className="text-gray-600 max-w-md">
+            Your dashboard is ready! Start by adding products to your store.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl w-full">
+          <Card className="border-pink-200 hover:border-pink-400 transition">
+            <CardContent className="pt-6 text-center">
+              <Package className="w-10 h-10 text-pink-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Add Products</h3>
+              <p className="text-sm text-gray-600 mb-4">Start by adding cakes, cookies, and other products</p>
+              <Link href="/admin/products">
+                <Button className="bg-pink-600 hover:bg-pink-700">Go to Products</Button>
+              </Link>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-pink-200 hover:border-pink-400 transition">
+            <CardContent className="pt-6 text-center">
+              <ShoppingCart className="w-10 h-10 text-pink-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">View Orders</h3>
+              <p className="text-sm text-gray-600 mb-4">Manage customer orders when they start coming in</p>
+              <Link href="/admin/orders">
+                <Button variant="outline" className="border-pink-600 text-pink-600">View Orders</Button>
+              </Link>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-pink-200 hover:border-pink-400 transition">
+            <CardContent className="pt-6 text-center">
+              <Users className="w-10 h-10 text-pink-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Manage Customers</h3>
+              <p className="text-sm text-gray-600 mb-4">Track customer information and orders</p>
+              <Link href="/admin/customers">
+                <Button variant="outline" className="border-pink-600 text-pink-600">View Customers</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="text-center">
+          <Button variant="ghost" onClick={fetchAnalytics} className="text-pink-600">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh Dashboard
+          </Button>
+        </div>
       </div>
     )
   }
