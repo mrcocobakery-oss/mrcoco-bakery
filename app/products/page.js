@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
@@ -21,7 +21,7 @@ import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 import { QuickViewModal } from '@/components/QuickViewModal'
 import { useAuth } from '@/contexts/AuthContext'
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const searchParams = useSearchParams()
   const { user } = useAuth()
   const [products, setProducts] = useState([])
@@ -727,5 +727,13 @@ export default function ProductsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div></div>}>
+      <ProductsPageContent />
+    </Suspense>
   )
 }
