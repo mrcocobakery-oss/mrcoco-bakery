@@ -67,14 +67,13 @@ export async function POST(request) {
     }
     
     const body = await request.json()
-    const { name, email, phone, address, birthdays } = body
+    const { name, email, phone, address, birthday } = body
     
     if (!name || !phone) {
       return Response.json({ success: false, error: 'Name and phone are required' }, { status: 400 })
     }
     
-    const client = await connectToDatabase()
-    const db = client.db('bakery')
+    const { db } = await connectToDatabase()
     
     // Check if customer already exists
     const existing = await db.collection('users').findOne({ phone })
@@ -126,8 +125,7 @@ export async function PUT(request) {
       return Response.json({ success: false, error: 'Customer ID is required' }, { status: 400 })
     }
     
-    const client = await connectToDatabase()
-    const db = client.db('bakery')
+    const { db } = await connectToDatabase()
     
     const updateData = {
       updatedAt: new Date()
