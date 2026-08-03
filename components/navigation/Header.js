@@ -132,29 +132,39 @@ export function Header({ cart = [], wishlist = [] }) {
                 <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50">
                   <div className="p-2">
                     {searchResults.map((product) => (
-                      <Link
-                        key={product.id}
-                        href={`/products/${product.slug || product.id}`}
-                        onClick={handleSearchSelect}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition"
-                      >
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-16 h-16 object-cover rounded-md flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
-                          <p className="text-sm text-gray-500 capitalize">{product.category}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-pink-600 font-semibold">₹{product.price}</span>
-                            {product.originalPrice && product.originalPrice > product.price && (
-                              <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
-                            )}
+                      <div key={product.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition">
+                        <Link href={`/products/${product.slug || product.id}`} onClick={handleSearchSelect} className="flex items-center gap-3 flex-1 min-w-0">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
+                            <p className="text-sm text-gray-500 capitalize">{product.category}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-pink-600 font-semibold">₹{product.price}</span>
+                              {product.originalPrice && product.originalPrice > product.price && (
+                                <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <ChevronDown className="w-5 h-5 text-gray-400 transform -rotate-90" />
-                      </Link>
+                        </Link>
+                        <Button
+                          size="sm"
+                          className="bg-pink-600 hover:bg-pink-700 text-white flex-shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const savedCart = JSON.parse(localStorage.getItem('cart') || '[]')
+                            savedCart.push(product)
+                            localStorage.setItem('cart', JSON.stringify(savedCart))
+                            window.dispatchEvent(new Event('storage'))
+                            handleSearchSelect()
+                          }}
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                        </Button>
+                      </div>
                     ))}
                   </div>
                   <div className="border-t border-gray-200 p-3">

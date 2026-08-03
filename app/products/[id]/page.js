@@ -52,16 +52,12 @@ export default function ProductDetailPage() {
         // Track this product in recently viewed
         trackRecentlyViewed(productData.product.id)
         
-        // Fetch all products to get related ones
-        const allProductsResponse = await fetch('/api/products')
-        const allProductsData = await allProductsResponse.json()
+        // Fetch related products using the smart API
+        const relatedResponse = await fetch(`/api/products/related?productId=${productData.product.id}&limit=5`)
+        const relatedData = await relatedResponse.json()
         
-        if (allProductsData.success && allProductsData.products) {
-          // Get related products (same category, excluding current)
-          const related = allProductsData.products
-            .filter(p => p.category === productData.product.category && p.id !== productData.product.id)
-            .slice(0, 4)
-          setRelatedProducts(related)
+        if (relatedData.success && relatedData.products) {
+          setRelatedProducts(relatedData.products)
         }
       } else {
         setProduct(null)
@@ -362,7 +358,7 @@ export default function ProductDetailPage() {
         {relatedProducts.length > 0 && (
           <div>
             <h2 className="text-3xl font-bold font-serif text-pink-900 mb-6">You May Also Like</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <Card key={relatedProduct.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                   <Link href={`/products/${relatedProduct.id}`}>
@@ -371,7 +367,7 @@ export default function ProductDetailPage() {
                         src={relatedProduct.image}
                         alt={relatedProduct.name}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       {relatedProduct.discount && (
@@ -383,18 +379,32 @@ export default function ProductDetailPage() {
                   </Link>
                   <CardContent className="p-4">
                     <Link href={`/products/${relatedProduct.id}`}>
-                      <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2">
+                      <h3 className="font-semibold text-pink-900 mb-3 hover:text-pink-600 transition line-clamp-2 text-sm">
                         {relatedProduct.name}
                       </h3>
                     </Link>
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="mb-3">
+                      <div className="flex items-center gap-2">
                         <span className="text-lg font-bold text-pink-900">₹{relatedProduct.price}</span>
                         {relatedProduct.originalPrice && (
-                          <span className="text-sm text-gray-400 line-through ml-2">₹{relatedProduct.originalPrice}</span>
+                          <span className="text-xs text-gray-400 line-through">₹{relatedProduct.originalPrice}</span>
                         )}
                       </div>
                     </div>
+                    <Button
+                      size="sm"
+                      className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        const newCart = [...cart, relatedProduct]
+                        setCart(newCart)
+                        localStorage.setItem('cart', JSON.stringify(newCart))
+                        toast.success('Added to cart!')
+                      }}
+                    >
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      Add to Cart
+                    </Button>
                   </CardContent>
                 </Card>
               ))}

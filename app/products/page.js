@@ -33,6 +33,9 @@ function ProductsPageContent() {
   const [selectedOccasion, setSelectedOccasion] = useState(searchParams.get('occasion') || 'all')
   const [selectedSpecialDay, setSelectedSpecialDay] = useState(searchParams.get('special') || 'all')
   const [selectedTheme, setSelectedTheme] = useState(searchParams.get('theme') || 'all')
+  const [priceRange, setPriceRange] = useState([0, 5000])
+  const [selectedPriceFilter, setSelectedPriceFilter] = useState('all')
+  const [showInStockOnly, setShowInStockOnly] = useState(true)
   const [sortBy, setSortBy] = useState('popular')
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
@@ -112,17 +115,25 @@ function ProductsPageContent() {
       filtered = filtered.filter(p => p.theme === selectedTheme)
     }
 
+    // Filter by price range
+    filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1])
+
+    // Filter by availability
+    if (showInStockOnly) {
+      filtered = filtered.filter(p => p.inStock)
+    }
+
     // Sort
     if (sortBy === 'price-low') {
       filtered.sort((a, b) => a.price - b.price)
     } else if (sortBy === 'price-high') {
       filtered.sort((a, b) => b.price - a.price)
     } else if (sortBy === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating)
+      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
     }
 
     setFilteredProducts(filtered)
-  }, [searchQuery, selectedCategory, selectedCakeType, selectedOccasion, selectedSpecialDay, selectedTheme, sortBy, products])
+  }, [searchQuery, selectedCategory, selectedCakeType, selectedOccasion, selectedSpecialDay, selectedTheme, priceRange, showInStockOnly, sortBy, products])
 
   const addToCart = (product, deliveryInfo = null) => {
     // For cakes, require delivery time selection first
@@ -224,6 +235,38 @@ function ProductsPageContent() {
     return wishlist.some(item => item.id === productId)
   }
 
+  const handlePriceFilterSelect = (filter) => {
+    setSelectedPriceFilter(filter)
+    switch(filter) {
+      case 'under500':
+        setPriceRange([0, 500])
+        break
+      case '500-1000':
+        setPriceRange([500, 1000])
+        break
+      case '1000-2000':
+        setPriceRange([1000, 2000])
+        break
+      case 'above2000':
+        setPriceRange([2000, 5000])
+        break
+      default:
+        setPriceRange([0, 5000])
+    }
+  }
+
+  const clearAllFilters = () => {
+    setSelectedCategory('all')
+    setSelectedCakeType('all')
+    setSelectedOccasion('all')
+    setSelectedSpecialDay('all')
+    setSelectedTheme('all')
+    setSearchQuery('')
+    setPriceRange([0, 5000])
+    setSelectedPriceFilter('all')
+    setShowInStockOnly(true)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
       <Header cart={cart} wishlist={wishlist} />
@@ -252,14 +295,7 @@ function ProductsPageContent() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      setSelectedCategory('all')
-                      setSelectedCakeType('all')
-                      setSelectedOccasion('all')
-                      setSelectedSpecialDay('all')
-                      setSelectedTheme('all')
-                      setSearchQuery('')
-                    }}
+                    onClick={clearAllFilters}
                   >
                     Clear All
                   </Button>
@@ -385,6 +421,65 @@ function ProductsPageContent() {
                     </div>
                   </>
                 )}
+
+                {/* Price Range Filter */}
+                <div className="mb-6 pb-6 border-b border-gray-200">
+                  <Label className="mb-3 block font-bold">Price Range</Label>
+                  <div className="space-y-2">
+                    <Button
+                      variant={selectedPriceFilter === 'under500' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`w-full justify-start ${selectedPriceFilter === 'under500' ? 'bg-pink-600' : ''}`}
+                      onClick={() => handlePriceFilterSelect('under500')}
+                    >
+                      Under ₹500
+                    </Button>
+                    <Button
+                      variant={selectedPriceFilter === '500-1000' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`w-full justify-start ${selectedPriceFilter === '500-1000' ? 'bg-pink-600' : ''}`}
+                      onClick={() => handlePriceFilterSelect('500-1000')}
+                    >
+                      ₹500 - ₹1,000
+                    </Button>
+                    <Button
+                      variant={selectedPriceFilter === '1000-2000' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`w-full justify-start ${selectedPriceFilter === '1000-2000' ? 'bg-pink-600' : ''}`}
+                      onClick={() => handlePriceFilterSelect('1000-2000')}
+                    >
+                      ₹1,000 - ₹2,000
+                    </Button>
+                    <Button
+                      variant={selectedPriceFilter === 'above2000' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`w-full justify-start ${selectedPriceFilter === 'above2000' ? 'bg-pink-600' : ''}`}
+                      onClick={() => handlePriceFilterSelect('above2000')}
+                    >
+                      Above ₹2,000
+                    </Button>
+                  </div>
+                  <div className="mt-4 text-sm text-gray-600 text-center">
+                    ₹{priceRange[0]} - ₹{priceRange[1]}
+                  </div>
+                </div>
+
+                {/* Availability Filter */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between">
+                    <Label className="font-bold">Availability</Label>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="instock"
+                        checked={showInStockOnly}
+                        onCheckedChange={setShowInStockOnly}
+                      />
+                      <Label htmlFor="instock" className="text-sm cursor-pointer">
+                        In Stock Only
+                      </Label>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
