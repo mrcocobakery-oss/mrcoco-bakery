@@ -43,13 +43,13 @@ export default function InquiriesPage() {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'decoration':
-        return <Package className="w-5 h-5\" />
+        return <Package className="w-5 h-5" />
       case 'baking-course':
-        return <GraduationCap className="w-5 h-5\" />
+        return <GraduationCap className="w-5 h-5" />
       case 'partnership':
-        return <Handshake className="w-5 h-5\" />
+        return <Handshake className="w-5 h-5" />
       default:
-        return <MessageCircle className="w-5 h-5\" />
+        return <MessageCircle className="w-5 h-5" />
     }
   }
 
@@ -94,9 +94,9 @@ export default function InquiriesPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Link href=\"/admin/dashboard">
-              <Button variant=\"outline\" size=\"icon">
-                <ArrowLeft className="w-4 h-4\" />
+            <Link href="/admin/dashboard">
+              <Button variant="outline" size="icon">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
             <div>
@@ -104,7 +104,7 @@ export default function InquiriesPage() {
               <p className="text-gray-600">Manage all customer inquiries</p>
             </div>
           </div>
-          <Button onClick={fetchInquiries} variant=\"outline">
+          <Button onClick={fetchInquiries} variant="outline">
             Refresh
           </Button>
         </div>
@@ -112,20 +112,20 @@ export default function InquiriesPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-            <TabsTrigger value=\"all\" className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4\" />
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" />
               All ({counts.all})
             </TabsTrigger>
-            <TabsTrigger value=\"decoration\" className="flex items-center gap-2">
-              <Package className="w-4 h-4\" />
+            <TabsTrigger value="decoration" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
               Decoration ({counts.decoration})
             </TabsTrigger>
-            <TabsTrigger value=\"baking-course\" className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4\" />
+            <TabsTrigger value="baking-course" className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4" />
               Baking ({counts.bakingCourse})
             </TabsTrigger>
-            <TabsTrigger value=\"partnership\" className="flex items-center gap-2">
-              <Handshake className="w-4 h-4\" />
+            <TabsTrigger value="partnership" className="flex items-center gap-2">
+              <Handshake className="w-4 h-4" />
               Partnership ({counts.partnership})
             </TabsTrigger>
           </TabsList>
@@ -134,7 +134,7 @@ export default function InquiriesPage() {
             {filteredInquiries.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
-                  <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4\" />
+                  <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-700 mb-2">No inquiries yet</h3>
                   <p className="text-gray-500">New inquiries will appear here</p>
                 </CardContent>
@@ -156,7 +156,7 @@ export default function InquiriesPage() {
                         </div>
                         <div className="text-right text-sm text-gray-500">
                           <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3\" />
+                            <Calendar className="w-3 h-3" />
                             {new Date(inquiry.createdAt).toLocaleDateString()}
                           </div>
                           <div>{new Date(inquiry.createdAt).toLocaleTimeString()}</div>
@@ -166,14 +166,14 @@ export default function InquiriesPage() {
                     <CardContent className="space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex items-center gap-2 text-sm">
-                          <Phone className="w-4 h-4 text-pink-600\" />
+                          <Phone className="w-4 h-4 text-pink-600" />
                           <a href={`tel:${inquiry.phone}`} className="text-blue-600 hover:underline">
                             {inquiry.phone}
                           </a>
                         </div>
                         {inquiry.email && (
                           <div className="flex items-center gap-2 text-sm">
-                            <Mail className="w-4 h-4 text-pink-600\" />
+                            <Mail className="w-4 h-4 text-pink-600" />
                             <a href={`mailto:${inquiry.email}`} className="text-blue-600 hover:underline">
                               {inquiry.email}
                             </a>
@@ -212,29 +212,29 @@ export default function InquiriesPage() {
                       {/* Action Buttons */}
                       <div className="flex gap-2 pt-2">
                         <Button 
-                          size=\"sm\"
+                          size="sm"
                           onClick={() => window.open(`tel:${inquiry.phone}`)}
-                          className="bg-pink-600 hover:bg-pink-700\"
+                          className="bg-pink-600 hover:bg-pink-700"
                         >
-                          <Phone className="w-3 h-3 mr-1\" />
+                          <Phone className="w-3 h-3 mr-1" />
                           Call
                         </Button>
                         <Button 
-                          size=\"sm\"
-                          variant=\"outline\"
+                          size="sm"
+                          variant="outline"
                           onClick={() => window.open(`https://wa.me/${inquiry.phone.replace(/[^0-9]/g, '')}`, '_blank')}
-                          className="text-green-600 border-green-600 hover:bg-green-50\"
+                          className="text-green-600 border-green-600 hover:bg-green-50"
                         >
-                          <MessageCircle className="w-3 h-3 mr-1\" />
+                          <MessageCircle className="w-3 h-3 mr-1" />
                           WhatsApp
                         </Button>
                         {inquiry.email && (
                           <Button 
-                            size=\"sm\"
-                            variant=\"outline\"
+                            size="sm"
+                            variant="outline"
                             onClick={() => window.open(`mailto:${inquiry.email}`)}
                           >
-                            <Mail className="w-3 h-3 mr-1\" />
+                            <Mail className="w-3 h-3 mr-1" />
                             Email
                           </Button>
                         )}

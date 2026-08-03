@@ -97,9 +97,9 @@ export default function DecorationGalleryAdmin() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link href=\"/admin/dashboard">
-            <Button variant=\"outline\" size=\"icon">
-              <ArrowLeft className="w-4 h-4\" />
+          <Link href="/admin/dashboard">
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
           <div>
@@ -112,20 +112,20 @@ export default function DecorationGalleryAdmin() {
         <Card className="mb-8 border-2 border-pink-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Plus className="w-5 h-5\" />
+              <Plus className="w-5 h-5" />
               Add New Image
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAddImage} className="space-y-4">
               <div>
-                <Label htmlFor=\"imageUrl">Image URL *</Label>
+                <Label htmlFor="imageUrl">Image URL *</Label>
                 <Input
-                  id=\"imageUrl\"
+                  id="imageUrl"
                   required
                   value={newImage.imageUrl}
                   onChange={(e) => setNewImage({ ...newImage, imageUrl: e.target.value })}
-                  placeholder=\"https://example.com/image.jpg or upload to a service\"
+                  placeholder="https://example.com/image.jpg or upload to a service"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Upload image to Imgur, Cloudinary, or any image hosting service and paste URL here
@@ -133,26 +133,26 @@ export default function DecorationGalleryAdmin() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor=\"title">Title (Optional)</Label>
+                  <Label htmlFor="title">Title (Optional)</Label>
                   <Input
-                    id=\"title\"
+                    id="title"
                     value={newImage.title}
                     onChange={(e) => setNewImage({ ...newImage, title: e.target.value })}
-                    placeholder=\"e.g., Birthday Decoration\"
+                    placeholder="e.g., Birthday Decoration"
                   />
                 </div>
                 <div>
-                  <Label htmlFor=\"description">Description (Optional)</Label>
+                  <Label htmlFor="description">Description (Optional)</Label>
                   <Input
-                    id=\"description\"
+                    id="description"
                     value={newImage.description}
                     onChange={(e) => setNewImage({ ...newImage, description: e.target.value })}
-                    placeholder=\"Brief description\"
+                    placeholder="Brief description"
                   />
                 </div>
               </div>
-              <Button type=\"submit\" className="bg-pink-600 hover:bg-pink-700">
-                <Plus className="w-4 h-4 mr-2\" />
+              <Button type="submit" className="bg-pink-600 hover:bg-pink-700">
+                <Plus className="w-4 h-4 mr-2" />
                 Add Image
               </Button>
             </form>
@@ -165,7 +165,7 @@ export default function DecorationGalleryAdmin() {
           {gallery.length === 0 ? (
             <Card>
               <CardContent className="p-12 text-center">
-                <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4\" />
+                <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">No images yet</h3>
                 <p className="text-gray-500">Add your first image using the form above</p>
               </CardContent>
@@ -178,9 +178,9 @@ export default function DecorationGalleryAdmin() {
                     <img
                       src={item.imageUrl}
                       alt={item.title || 'Decoration'}
-                      className="w-full h-full object-cover\"
+                      className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"400\"%3E%3Crect fill=\"%23ddd\" width=\"400\" height=\"400\"/%3E%3Ctext fill=\"%23999\" x=\"50%25\" y=\"50%25\" text-anchor=\"middle\" dy=\".3em\"%3EImage not found%3C/text%3E%3C/svg%3E'
+                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23ddd" width="400" height="400"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E'
                       }}
                     />
                   </div>
@@ -189,11 +189,11 @@ export default function DecorationGalleryAdmin() {
                     {item.description && <p className="text-sm text-gray-600 mb-3">{item.description}</p>}
                     <Button
                       onClick={() => handleDelete(item._id)}
-                      variant=\"destructive\"
-                      size=\"sm\"
-                      className="w-full\"
+                      variant="destructive"
+                      size="sm"
+                      className="w-full"
                     >
-                      <Trash2 className="w-3 h-3 mr-1\" />
+                      <Trash2 className="w-3 h-3 mr-1" />
                       Delete
                     </Button>
                   </CardContent>

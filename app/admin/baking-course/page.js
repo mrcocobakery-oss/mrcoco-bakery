@@ -123,9 +123,9 @@ export default function BakingCourseAdmin() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Link href=\"/admin/dashboard">
-              <Button variant=\"outline\" size=\"icon">
-                <ArrowLeft className="w-4 h-4\" />
+            <Link href="/admin/dashboard">
+              <Button variant="outline" size="icon">
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
             <div>
@@ -134,7 +134,7 @@ export default function BakingCourseAdmin() {
             </div>
           </div>
           <Button onClick={handleSave} disabled={saving} className="bg-pink-600 hover:bg-pink-700">
-            <Save className="w-4 h-4 mr-2\" />
+            <Save className="w-4 h-4 mr-2" />
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
@@ -146,12 +146,12 @@ export default function BakingCourseAdmin() {
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor=\"bannerImage">Banner Image URL</Label>
+              <Label htmlFor="bannerImage">Banner Image URL</Label>
               <Input
-                id=\"bannerImage\"
+                id="bannerImage"
                 value={courseData.bannerImage}
                 onChange={(e) => setCourseData({ ...courseData, bannerImage: e.target.value })}
-                placeholder=\"https://example.com/banner.jpg\"
+                placeholder="https://example.com/banner.jpg"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Upload banner image to image hosting service and paste URL here
@@ -161,10 +161,10 @@ export default function BakingCourseAdmin() {
               <div className="mt-4">
                 <img
                   src={courseData.bannerImage}
-                  alt=\"Banner preview\"
-                  className="w-full h-48 object-cover rounded-lg\"
+                  alt="Banner preview"
+                  className="w-full h-48 object-cover rounded-lg"
                   onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"800\" height=\"200\"%3E%3Crect fill=\"%23ddd\" width=\"800\" height=\"200\"/%3E%3Ctext fill=\"%23999\" x=\"50%25\" y=\"50%25\" text-anchor=\"middle\" dy=\".3em\"%3EBanner Preview%3C/text%3E%3C/svg%3E'
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="200"%3E%3Crect fill="%23ddd" width="800" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EBanner Preview%3C/text%3E%3C/svg%3E'
                   }}
                 />
               </div>
@@ -176,8 +176,8 @@ export default function BakingCourseAdmin() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Courses</h2>
-            <Button onClick={addCourse} variant=\"outline">
-              <Plus className="w-4 h-4 mr-2\" />
+            <Button onClick={addCourse} variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
               Add Course
             </Button>
           </div>
@@ -189,10 +189,10 @@ export default function BakingCourseAdmin() {
                   <CardTitle>Course {courseIndex + 1}</CardTitle>
                   <Button
                     onClick={() => removeCourse(courseIndex)}
-                    variant=\"destructive\"
-                    size=\"sm\"
+                    variant="destructive"
+                    size="sm"
                   >
-                    <Trash2 className="w-3 h-3 mr-1\" />
+                    <Trash2 className="w-3 h-3 mr-1" />
                     Remove
                   </Button>
                 </div>
@@ -203,7 +203,7 @@ export default function BakingCourseAdmin() {
                   <Input
                     value={course.name}
                     onChange={(e) => updateCourse(courseIndex, 'name', e.target.value)}
-                    placeholder=\"e.g., Beginner Baking Course\"
+                    placeholder="e.g., Beginner Baking Course"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -212,13 +212,13 @@ export default function BakingCourseAdmin() {
                     <Input
                       value={course.duration}
                       onChange={(e) => updateCourse(courseIndex, 'duration', e.target.value)}
-                      placeholder=\"e.g., 4 Weeks (12 Sessions)\"
+                      placeholder="e.g., 4 Weeks (12 Sessions)"
                     />
                   </div>
                   <div>
                     <Label>Next Batch Date</Label>
                     <Input
-                      type=\"date\"
+                      type="date"
                       value={course.nextBatch}
                       onChange={(e) => updateCourse(courseIndex, 'nextBatch', e.target.value)}
                     />
@@ -229,10 +229,10 @@ export default function BakingCourseAdmin() {
                     <Label>Course Content</Label>
                     <Button
                       onClick={() => addContentItem(courseIndex)}
-                      variant=\"outline\"
-                      size=\"sm\"
+                      variant="outline"
+                      size="sm"
                     >
-                      <Plus className="w-3 h-3 mr-1\" />
+                      <Plus className="w-3 h-3 mr-1" />
                       Add Item
                     </Button>
                   </div>
@@ -242,14 +242,14 @@ export default function BakingCourseAdmin() {
                         <Input
                           value={item}
                           onChange={(e) => updateContentItem(courseIndex, contentIndex, e.target.value)}
-                          placeholder=\"Content item\"
+                          placeholder="Content item"
                         />
                         <Button
                           onClick={() => removeContentItem(courseIndex, contentIndex)}
-                          variant=\"ghost\"
-                          size=\"icon\"
+                          variant="ghost"
+                          size="icon"
                         >
-                          <Trash2 className="w-4 h-4 text-red-600\" />
+                          <Trash2 className="w-4 h-4 text-red-600" />
                         </Button>
                       </div>
                     ))}
