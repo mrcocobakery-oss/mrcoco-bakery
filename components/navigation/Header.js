@@ -191,7 +191,7 @@ export function Header({ cart = [], wishlist = [] }) {
 
           {/* PIN Code Delivery Checker */}
           <div className="hidden lg:flex flex-col gap-1">
-            <div className="bg-purple-700 text-white px-4 py-1 rounded-t-md text-xs font-semibold text-center">
+            <div className="bg-pink-500 text-white px-4 py-1 rounded-t-md text-xs font-semibold text-center">
               Check cake delivery availability
             </div>
             <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-b-md px-2 py-1.5">
@@ -199,9 +199,23 @@ export function Header({ cart = [], wishlist = [] }) {
                 type="text"
                 placeholder="Enter PIN Code"
                 maxLength="6"
+                value={deliveryLocation}
+                onChange={(e) => setDeliveryLocation(e.target.value)}
                 className="w-28 h-7 text-sm border-gray-300"
               />
-              <Button size="sm" className="bg-pink-600 hover:bg-pink-700 h-7 px-3 text-xs">
+              <Button 
+                size="sm" 
+                className="bg-pink-600 hover:bg-pink-700 h-7 px-3 text-xs"
+                onClick={() => {
+                  if (deliveryLocation === '263139') {
+                    toast.success('✅ Cake delivery available in your area!')
+                  } else if (deliveryLocation.length === 6) {
+                    toast.info('🍪 Cakes not available, but Cookies, Namkeen & Gifts deliver to your area!')
+                  } else {
+                    toast.error('Please enter a valid 6-digit PIN code')
+                  }
+                }}
+              >
                 Check
               </Button>
             </div>
@@ -368,10 +382,6 @@ export function Header({ cart = [], wishlist = [] }) {
             <Link href="/products?category=gifts" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Gift Packs
             </Link>
-            <Link href="/track-order" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
-              <PackageSearch className="w-4 h-4" />
-              Track Order
-            </Link>
             <Link href="/decoration-services" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Decoration Services
             </Link>
@@ -380,6 +390,13 @@ export function Header({ cart = [], wishlist = [] }) {
             </Link>
             <Link href="/become-partner" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Become Our Partner
+            </Link>
+            <Link href="/contact" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
+              Help
+            </Link>
+            <Link href="/track-order" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
+              <PackageSearch className="w-4 h-4" />
+              Track Order
             </Link>
           </nav>
 

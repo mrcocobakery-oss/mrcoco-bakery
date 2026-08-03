@@ -42,6 +42,8 @@ export default function InquiriesPage() {
 
   const getTypeIcon = (type) => {
     switch (type) {
+      case 'contact':
+        return <Mail className="w-5 h-5" />
       case 'decoration':
         return <Package className="w-5 h-5" />
       case 'baking-course':
@@ -55,6 +57,7 @@ export default function InquiriesPage() {
 
   const getTypeBadge = (type) => {
     const badges = {
+      'contact': { label: 'Contact', color: 'bg-green-100 text-green-800' },
       'decoration': { label: 'Decoration', color: 'bg-pink-100 text-pink-800' },
       'baking-course': { label: 'Baking Course', color: 'bg-orange-100 text-orange-800' },
       'partnership': { label: 'Partnership', color: 'bg-blue-100 text-blue-800' }
@@ -71,6 +74,7 @@ export default function InquiriesPage() {
   const getInquiryCounts = () => {
     return {
       all: inquiries.length,
+      contact: inquiries.filter(i => i.type === 'contact').length,
       decoration: inquiries.filter(i => i.type === 'decoration').length,
       bakingCourse: inquiries.filter(i => i.type === 'baking-course').length,
       partnership: inquiries.filter(i => i.type === 'partnership').length
@@ -111,10 +115,14 @@ export default function InquiriesPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="all" className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
               All ({counts.all})
+            </TabsTrigger>
+            <TabsTrigger value="contact" className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Contact ({counts.contact})
             </TabsTrigger>
             <TabsTrigger value="decoration" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
