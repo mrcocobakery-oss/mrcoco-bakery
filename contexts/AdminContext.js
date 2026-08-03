@@ -27,6 +27,17 @@ export function AdminProvider({ children }) {
     const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'mrcocoadmin'
     const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'MrCoco@2025#Secure'
     
+    // Debug logging
+    console.log('Login attempt:', { username, passwordLength: password.length })
+    console.log('Expected credentials:', { 
+      username: ADMIN_USERNAME, 
+      passwordLength: ADMIN_PASSWORD.length,
+      envUsername: process.env.NEXT_PUBLIC_ADMIN_USERNAME,
+      envPassword: process.env.NEXT_PUBLIC_ADMIN_PASSWORD,
+      usernameMatch: username === ADMIN_USERNAME,
+      passwordMatch: password === ADMIN_PASSWORD
+    })
+    
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setAdmin({ username: ADMIN_USERNAME })
       Cookies.set('admin_token', 'admin_logged_in', { expires: 7 })

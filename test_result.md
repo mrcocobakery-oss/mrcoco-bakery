@@ -457,6 +457,45 @@ backend:
           comment: "FIXED: Updated all three API files (/app/app/api/admin/products/route.js, /app/app/api/admin/orders/route.js, /app/app/api/orders/route.js) to use correct import pattern: 'import { connectToDatabase } from @/lib/mongodb' and 'const { db } = await connectToDatabase()'. MongoDB integration now fully functional. Products collection: 2 documents verified. Orders collection: 3 documents verified (2 from current tests, 1 from previous Razorpay test). Sample product verified with all fields: _id (UUID), name, price, category, stock, slug, timestamps. Sample order verified with all fields: _id (UUID), customerName, customerEmail, total, status, items, paymentMethod, deliveryDate, timestamps."
 
 frontend:
+  - task: "Admin Login Functionality"
+    implemented: true
+    working: true
+    file: "/app/app/admin/login/page.js, /app/contexts/AdminContext.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "CRITICAL ISSUE: Admin login credentials not working. Environment variable NEXT_PUBLIC_ADMIN_PASSWORD was being truncated at '#' character because '#' is treated as a comment in .env files. Password 'MrCoco@2025#Secure' was being read as 'MrCoco@2025' (11 chars instead of 18). Root cause: .env file had unquoted password value."
+        - working: true
+          agent: "testing"
+          comment: "FIXED: Wrapped password in quotes in .env file (NEXT_PUBLIC_ADMIN_PASSWORD=\"MrCoco@2025#Secure\"). Admin login now working correctly with credentials: mrcocoadmin / MrCoco@2025#Secure. Successfully redirects to /admin/dashboard after login. Admin cookie (admin_token=admin_logged_in) set correctly with 7-day expiry. Toast message 'Welcome to Admin Panel!' displays correctly. Dashboard loads with sidebar menu and all admin features accessible."
+
+  - task: "Admin Settings Page"
+    implemented: true
+    working: false
+    file: "/app/app/admin/settings/page.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "CRITICAL ISSUE: Settings page (/admin/settings) returns 502 Bad Gateway error. Root cause: router.push() being called during component render (lines 25-28) causes server-side rendering error 'ReferenceError: location is not defined'. The authentication check 'if (!admin) { router.push('/admin/login'); return null }' executes during SSR before useEffect runs, causing the error. Fixed by moving router.push() into useEffect hook, but page still redirects to dashboard even when logged in, suggesting admin state timing issue."
+
+  - task: "Header Design Verification"
+    implemented: true
+    working: true
+    file: "/app/components/navigation/Header.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Header design fully verified and working correctly. Navigation menu bar has light gray background (bg-gray-100 class, computed color: rgb(243, 244, 246)). PIN code checker visible with text 'Check cake delivery availability' and input field for PIN code entry. All menu items properly displayed: Home, Cakes (with mega menu dropdown), Cookies, Namkeen, Gift Packs, Decoration Services, Baking Course, Become Our Partner. Menu structure and styling correct."
+
   - task: "Home Page Implementation"
     implemented: true
     working: true
@@ -688,6 +727,9 @@ frontend:
     needs_retesting: false
     status_history:
         - working: true
+    - agent: "testing"
+      message: "Admin Login and Header Design Testing Completed. CRITICAL FIX APPLIED: Admin login credentials were failing because .env file password (MrCoco@2025#Secure) was being truncated at '#' character (read as 'MrCoco@2025'). Fixed by wrapping password in quotes. Admin login NOW WORKING with credentials mrcocoadmin / MrCoco@2025#Secure. Dashboard accessible after login. Header design verified: light gray navigation bar (bg-gray-100), PIN code checker visible, all menu items displayed correctly. ISSUE REMAINING: Admin settings page (/admin/settings) has SSR error causing 502 or redirect to dashboard. Settings page calls router.push() during render instead of in useEffect, causing 'location is not defined' error. Moved to useEffect but page still redirects even when logged in - needs investigation of admin state timing."
+
           agent: "testing"
           comment: "Inquiries API endpoint verified. POST /api/inquiries accepts inquiries from all 3 new pages (decoration, baking-course, partnership). Validates required fields (type, name, phone). Stores inquiries in MongoDB 'inquiries' collection with fields: type, name, email, phone, message, status='new', createdAt, updatedAt, plus any additional fields from form. Returns success response with inquiryId. GET endpoint also available for fetching inquiries with optional type filter. API integration working correctly with all 3 forms."
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -22,8 +22,15 @@ export default function AdminSettingsPage() {
     confirmPassword: ''
   })
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!admin) {
+      router.push('/admin/login')
+    }
+  }, [admin, router])
+
+  // Don't render anything while checking auth
   if (!admin) {
-    router.push('/admin/login')
     return null
   }
 
