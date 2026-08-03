@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { 
   ShoppingCart, Heart, Menu, X, ChevronDown, User, 
-  MapPin, Search, Phone, MessageCircle, PackageSearch
+  MapPin, Search, Phone, MessageCircle, PackageSearch, Loader2
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -16,7 +16,55 @@ export function Header({ cart = [], wishlist = [] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showCakesMenu, setShowCakesMenu] = useState(false)
   const [deliveryLocation, setDeliveryLocation] = useState('263139')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const searchRef = useRef(null)
   const { user } = useAuth()
+
+  // Debounced search
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults([])
+      setShowSearchDropdown(false)
+      return
+    }
+
+    setSearchLoading(true)
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery)}&limit=8`)
+        const data = await response.json()
+        if (data.success) {
+          setSearchResults(data.products)
+          setShowSearchDropdown(true)
+        }
+      } catch (error) {
+        console.error('Search error:', error)
+      } finally {
+        setSearchLoading(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleSearchSelect = () => {
+    setShowSearchDropdown(false)
+    setSearchQuery('')
+  }
 
   const cakesByType = [
     'Regular Cakes', 'Mini Cakes', 'Photo Cakes', 'Jar Cake',
@@ -63,15 +111,71 @@ export function Header({ cart = [], wishlist = [] }) {
             </div>
           </Link>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-xl">
+          {/* Search Bar with Dropdown */}
+          <div className="hidden md:flex flex-1 max-w-xl" ref={searchRef}>
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
               <Input
                 type="search"
                 placeholder="Search 5000+ Cakes, Cookies, Gifts and many more..."
                 className="pl-10 pr-4 py-2 w-full border-gray-300 rounded-lg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchResults.length > 0 && setShowSearchDropdown(true)}
               />
+              {searchLoading && (
+                <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+              )}
+
+              {/* Search Dropdown */}
+              {showSearchDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+                  <div className="p-2">
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/products/${product.slug || product.id}`}
+                        onClick={handleSearchSelect}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition"
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
+                          <p className="text-sm text-gray-500 capitalize">{product.category}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-pink-600 font-semibold">₹{product.price}</span>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-gray-400 transform -rotate-90" />
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="border-t border-gray-200 p-3">
+                    <Link
+                      href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                      onClick={handleSearchSelect}
+                      className="block text-center text-pink-600 hover:text-pink-700 font-medium"
+                    >
+                      View All Results →
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* No Results */}
+              {showSearchDropdown && searchQuery.length >= 2 && searchResults.length === 0 && !searchLoading && (
+                <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 p-6 z-50">
+                  <p className="text-center text-gray-500">No products found for "{searchQuery}"</p>
+                  <p className="text-center text-sm text-gray-400 mt-2">Try searching for cakes, cookies, or gifts</p>
+                </div>
+              )}
             </div>
           </div>
 

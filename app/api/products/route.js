@@ -9,12 +9,25 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const search = searchParams.get('search')
+    const minPrice = parseFloat(searchParams.get('minPrice') || '0')
+    const maxPrice = parseFloat(searchParams.get('maxPrice') || '999999')
+    const minRating = parseFloat(searchParams.get('minRating') || '0')
+    const availability = searchParams.get('availability') // 'instock' or 'all'
+    const sortBy = searchParams.get('sortBy') || 'newest' // 'price-asc', 'price-desc', 'rating', 'newest'
     
-    let query = { inStock: true } // Only show in-stock products to public
+    let query = {}
     
+    // Availability filter
+    if (availability === 'instock' || !availability) {
+      query.inStock = true
+    }
+    
+    // Category filter
     if (category && category !== 'all') {
       query.category = category
     }
+    
+    // Search filter
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -22,9 +35,36 @@ export async function GET(request) {
       ]
     }
     
+    // Price range filter
+    if (minPrice > 0 || maxPrice < 999999) {
+      query.price = { $gte: minPrice, $lte: maxPrice }
+    }
+    
+    // Rating filter
+    if (minRating > 0) {
+      query.rating = { $gte: minRating }
+    }
+    
+    // Determine sort order
+    let sortOptions = { createdAt: -1 } // Default: newest first
+    switch (sortBy) {
+      case 'price-asc':
+        sortOptions = { price: 1 }
+        break
+      case 'price-desc':
+        sortOptions = { price: -1 }
+        break
+      case 'rating':
+        sortOptions = { rating: -1 }
+        break
+      case 'newest':
+        sortOptions = { createdAt: -1 }
+        break
+    }
+    
     const products = await db.collection('products')
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .toArray()
     
     // Map database fields to frontend format
