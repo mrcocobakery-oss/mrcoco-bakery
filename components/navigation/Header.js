@@ -51,9 +51,9 @@ export function Header({ cart = [], wishlist = [] }) {
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center">
-              <div className="w-20 h-20 relative">
+              <div className="w-16 h-16 md:w-20 md:h-20 relative">
                 <Image
-                  src="/logo.png"
+                  src="/images/mrcoco-logo.png"
                   alt="Mr. COCO Bakery"
                   fill
                   className="object-contain"
@@ -75,23 +75,26 @@ export function Header({ cart = [], wishlist = [] }) {
             </div>
           </div>
 
-          {/* Country & Location */}
-          <div className="hidden lg:flex items-center gap-3">
-            {/* Country Selector */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
-              <span className="text-2xl">🇮🇳</span>
-              <span className="font-semibold text-sm">IND</span>
+          {/* PIN Code Delivery Checker */}
+          <div className="hidden lg:flex flex-col">
+            <div className="bg-purple-800 text-white px-4 py-1 rounded-t-lg text-xs font-semibold">
+              Check cake delivery availability
             </div>
-
-            {/* Delivery Location */}
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 hover:border-pink-300 transition">
-              <MapPin className="w-4 h-4 text-pink-600" />
-              <div className="text-left">
-                <div className="text-xs text-gray-500">Delivery to</div>
-                <div className="text-sm font-semibold">{deliveryLocation}</div>
-              </div>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            </button>
+            <div className="flex items-center gap-2 bg-gray-50 rounded-b-lg border border-gray-200 px-3 py-2">
+              <Input
+                type="text"
+                placeholder="Enter PIN Code"
+                maxLength="6"
+                className="w-32 h-8 text-sm"
+              />
+              <Button size="sm" className="bg-pink-600 hover:bg-pink-700 h-8 px-4">
+                Check
+              </Button>
+            </div>
+            <div className="text-xs text-gray-600 mt-1">
+              <div>🎂 Cake delivery: Haldwani (263139) only</div>
+              <div>🍪 Cookies, Namkeen & Gifts: All India</div>
+            </div>
           </div>
 
           {/* Right Icons */}
@@ -148,10 +151,10 @@ export function Header({ cart = [], wishlist = [] }) {
         </div>
 
         {/* Navigation Row */}
-        <div className="hidden lg:flex items-center justify-between py-2 border-t border-gray-100">
+        <div className="hidden lg:flex items-center justify-between py-3 border-t border-gray-100">
           {/* Main Navigation */}
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+          <nav className="flex items-center gap-8">
+            <Link href="/" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Home
             </Link>
 
@@ -161,9 +164,9 @@ export function Header({ cart = [], wishlist = [] }) {
               onMouseEnter={() => setShowCakesMenu(true)}
               onMouseLeave={() => setShowCakesMenu(false)}
             >
-              <button className="text-sm font-medium text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
+              <button className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
                 Cakes
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-4 h-4" />
               </button>
 
               {/* Mega Menu Dropdown */}
@@ -242,22 +245,22 @@ export function Header({ cart = [], wishlist = [] }) {
               )}
             </div>
 
-            <Link href="/products?category=cookies" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/products?category=cookies" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Cookies
             </Link>
-            <Link href="/products?category=namkeen" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/products?category=namkeen" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Namkeen
             </Link>
-            <Link href="/products?category=gifts" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/products?category=gifts" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Gift Packs
             </Link>
-            <Link href="/decoration-services" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/decoration-services" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Decoration Services
             </Link>
-            <Link href="/baking-course" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/baking-course" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Baking Course
             </Link>
-            <Link href="/become-partner" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
+            <Link href="/become-partner" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Become Our Partner
             </Link>
           </nav>
