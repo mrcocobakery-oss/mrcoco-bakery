@@ -46,12 +46,12 @@ export function Header({ cart = [], wishlist = [] }) {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        {/* Top Row: Logo, Search, Location, Icons */}
+        {/* Top Row: Logo, Search, PIN Checker, Icons */}
         <div className="flex items-center justify-between py-3 gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 relative">
+              <div className="w-14 h-14 relative">
                 <Image
                   src="/images/mrcoco-logo.png"
                   alt="Mr. COCO Bakery"
@@ -64,36 +64,36 @@ export function Header({ cart = [], wishlist = [] }) {
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md">
+          <div className="hidden md:flex flex-1 max-w-xl">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="search"
-                placeholder="Search 5000+ flowers, cakes, gifts etc"
+                placeholder="Search 5000+ Cakes, Cookies, Gifts and many more..."
                 className="pl-10 pr-4 py-2 w-full border-gray-300 rounded-lg"
               />
             </div>
           </div>
 
           {/* PIN Code Delivery Checker */}
-          <div className="hidden lg:flex flex-col">
-            <div className="bg-purple-800 text-white px-4 py-1 rounded-t-lg text-xs font-semibold">
+          <div className="hidden lg:flex flex-col gap-1">
+            <div className="bg-purple-700 text-white px-4 py-1 rounded-t-md text-xs font-semibold text-center">
               Check cake delivery availability
             </div>
-            <div className="flex items-center gap-2 bg-gray-50 rounded-b-lg border border-gray-200 px-3 py-2">
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-b-md px-2 py-1.5">
               <Input
                 type="text"
                 placeholder="Enter PIN Code"
                 maxLength="6"
-                className="w-32 h-8 text-sm"
+                className="w-28 h-7 text-sm border-gray-300"
               />
-              <Button size="sm" className="bg-pink-600 hover:bg-pink-700 h-8 px-4">
+              <Button size="sm" className="bg-pink-600 hover:bg-pink-700 h-7 px-3 text-xs">
                 Check
               </Button>
             </div>
-            <div className="text-xs text-gray-600 mt-1">
-              <div>🎂 Cake delivery: Haldwani (263139) only</div>
-              <div>🍪 Cookies, Namkeen & Gifts: All India</div>
+            <div className="text-[10px] mt-0.5">
+              <div className="text-gray-700">🎂 Cake delivery: Haldwani (263139) only</div>
+              <div className="text-gray-700">🍪 Cookies, Namkeen & Gifts: All India</div>
             </div>
           </div>
 
@@ -150,8 +150,8 @@ export function Header({ cart = [], wishlist = [] }) {
           </div>
         </div>
 
-        {/* Navigation Row */}
-        <div className="hidden lg:flex items-center justify-between py-3 border-t border-gray-100">
+        {/* Navigation Row - Light Gray Background */}
+        <div className="hidden lg:flex items-center justify-between py-3 bg-gray-100 -mx-4 px-4 border-t border-gray-200">
           {/* Main Navigation */}
           <nav className="flex items-center gap-8">
             <Link href="/" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
