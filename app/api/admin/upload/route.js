@@ -3,23 +3,8 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
-// Admin authentication check
-function checkAdminAuth(request) {
-  const authHeader = request.headers.get('authorization')
-  const adminToken = request.cookies.get('admin_token')?.value
-  
-  if (adminToken !== 'admin_logged_in' && authHeader !== 'Bearer admin_logged_in') {
-    return false
-  }
-  return true
-}
-
 export async function POST(request) {
   try {
-    if (!checkAdminAuth(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const formData = await request.formData()
     const files = formData.getAll('images')
 
