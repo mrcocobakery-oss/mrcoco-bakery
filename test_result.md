@@ -643,11 +643,59 @@ frontend:
           agent: "testing"
           comment: "Minor: Mobile responsiveness mostly working. Mobile menu opens correctly with hamburger icon, mobile navigation visible, Filters toggle button working on products page. Minor issue: Mobile cakes accordion has visibility issue when trying to expand (element not visible error), but this is a minor UI issue that doesn't affect core functionality. Desktop mega menu and filters working perfectly. Mobile users can still access all categories through direct links."
 
+  - task: "Decoration Services Page"
+    implemented: true
+    working: true
+    file: "/app/app/decoration-services/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Decoration Services page fully functional. Page loads successfully without 404 errors. Form present with all required fields: name, phone, email, eventType, eventDate, message. All 3 contact numbers displayed correctly (+91 8447655399, +91 8979751914, +91 7455065399). WhatsApp buttons working with proper URLs (wa.me format) and encoded messages. Form submits to /api/inquiries with type='decoration'. Navigation menu includes link to this page. Hero section with pink-purple gradient, work gallery section, experience section, contact section, and inquiry form all rendering correctly."
+
+  - task: "Baking Course Page"
+    implemented: true
+    working: true
+    file: "/app/app/baking-course/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Baking Course page fully functional. Page loads successfully without 404 errors (user reported 404 but issue resolved). Form present with all required fields: name, phone, email, courseInterest (dropdown with Beginner/Advanced/Both options), message. All 3 contact numbers displayed correctly (+91 8447655399, +91 8979751914, +91 7455065399). WhatsApp buttons working with proper URLs and encoded messages. Form submits to /api/inquiries with type='baking-course'. Navigation menu includes link to this page. Hero banner with orange-pink gradient, course highlights section (4 cards: Expert Instructors, Hands-on Training, Flexible Batches, Certificate), available courses section (Beginner: 4 weeks/12 sessions, Advanced: 6 weeks/18 sessions), contact section, and query form all rendering correctly."
+
+  - task: "Become Partner Page"
+    implemented: true
+    working: true
+    file: "/app/app/become-partner/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Become Partner page fully functional. Page loads successfully without 404 errors. Form present with all required fields: businessName, name (contact person), phone, email, city, businessType (dropdown with 7 partnership options: Franchise, Bulk Supply, Ingredient Supplier, Decoration, Technology, Marketing, Other), message. All 3 contact numbers displayed correctly (+91 8447655399, +91 8979751914, +91 7455065399). WhatsApp buttons working with proper URLs and encoded messages. Form submits to /api/inquiries with type='partnership'. Navigation menu includes link to this page. Hero banner with blue-purple gradient, 'Why Partner With Us' section (4 cards: Proven Business Model, Brand Recognition, Complete Support, High ROI), partnership benefits section (6 benefit types listed), contact section, and partnership inquiry form all rendering correctly."
+
+  - task: "Inquiries API - POST /api/inquiries"
+    implemented: true
+    working: true
+    file: "/app/app/api/inquiries/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Inquiries API endpoint verified. POST /api/inquiries accepts inquiries from all 3 new pages (decoration, baking-course, partnership). Validates required fields (type, name, phone). Stores inquiries in MongoDB 'inquiries' collection with fields: type, name, email, phone, message, status='new', createdAt, updatedAt, plus any additional fields from form. Returns success response with inquiryId. GET endpoint also available for fetching inquiries with optional type filter. API integration working correctly with all 3 forms."
+
 metadata:
   created_by: "testing_agent"
-  version: "1.5"
-  test_sequence: 6
-  last_tested: "2026-07-30"
+  version: "1.6"
+  test_sequence: 7
+  last_tested: "2026-08-03"
   test_environment: "Production (https://coco-premium-bakes.preview.emergentagent.com)"
 
 test_plan:
@@ -674,3 +722,5 @@ agent_communication:
       message: "Admin Frontend & Enhanced Checkout Testing - CRITICAL BUGS FOUND: (1) FIXED: Missing Ticket icon import in /app/app/admin/dashboard/page.js causing dashboard crash - added Ticket to lucide-react imports. (2) CRITICAL: Admin Products and Orders pages not accessible via sidebar navigation - clicking Products/Orders buttons stays on dashboard, console shows 404/ERR_ABORTED errors for /admin/products and /admin/orders routes. (3) CRITICAL: Checkout page not loading properly - 502/ERR_ABORTED errors, form fields not rendering. (4) WORKING: Admin login successful with admin/admin123 credentials, dashboard loads without errors after fix, sidebar navigation visible. (5) WORKING: Customer-facing products page displays correctly with 12 WhatsApp 'Chat & Order' buttons on cake products. (6) WORKING: Cart functionality working, items added successfully. (7) MINOR: WhatsApp URL uses api.whatsapp.com format instead of wa.me, but phone number 918447655399 is correct and message properly formatted. TESTING INCOMPLETE: Unable to fully test admin CRUD operations, order management, and checkout flow due to page loading failures. Recommend investigating Next.js routing configuration and checking for runtime errors in admin pages and checkout page."
     - agent: "testing"
       message: "Mega Menu Positioning Fix Verified - Tested positioning fix for Cakes mega menu that was overflowing on left side. Fix changed positioning from centered (left-1/2 transform -translate-x-1/2) to left-aligned (left-0) with max-w-[90vw]. RESULTS: Desktop (1920x1080) - Mega menu positioned at X=499px, width=800px, right edge at 1299px, fully within viewport with no left overflow. Tablet (1024x768) - Mega menu positioned at X=139px, width=800px, right edge at 939px, fully within viewport and respects max-w-[90vw] constraint (800px < 921.6px max). All 3 columns visible and readable (Cake By Type: 11 items, Cake By Occasion: 10 items, Cake By Special Days: 13 items). No horizontal scrolling required. Mega menu properly aligned under 'Cakes' link. Screenshots captured showing proper positioning on both viewports. CONCLUSION: Positioning fix working perfectly - mega menu no longer overflows screen on left side and stays within viewport boundaries on all tested screen sizes."
+    - agent: "testing"
+      message: "New Pages Testing Completed - Tested 3 new pages as requested: Decoration Services, Baking Course, and Become Partner. ALL TESTS PASSED: (1) Decoration Services (/decoration-services) - Page loads successfully without 404, form present with all fields (name, phone, email, eventType, eventDate, message), all 3 contact numbers displayed (+91 8447655399, +91 8979751914, +91 7455065399), WhatsApp buttons working with proper wa.me URLs. (2) Baking Course (/baking-course) - Page loads successfully (user reported 404 but now working), form present with all fields (name, phone, email, courseInterest dropdown, message), all 3 contact numbers displayed, WhatsApp buttons working. (3) Become Partner (/become-partner) - Page loads successfully, form present with all fields (businessName, name, phone, email, city, businessType dropdown, message), all 3 contact numbers displayed, WhatsApp buttons working. (4) Inquiries API (/api/inquiries) - POST endpoint verified working, accepts inquiries from all 3 pages with proper validation. All pages have consistent design, proper navigation links in header, and functional forms. No critical issues found. All 3 new pages are production-ready."
