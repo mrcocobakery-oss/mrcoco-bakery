@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Star, Phone, Mail, MapPin, Instagram, Facebook, Twitter, ChevronRight, Award, Clock, Shield, ShoppingCart, Cake, Cookie, Gift, Heart } from 'lucide-react'
+import { Star, Phone, Mail, MapPin, Instagram, Facebook, Twitter, ChevronRight, Award, Clock, Shield, ShoppingCart, Cake, Cookie, Gift, Heart, ChevronLeft, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 
@@ -15,13 +15,67 @@ export default function Home() {
   const [pinCode, setPinCode] = useState('')
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
+  const [sliders, setSliders] = useState([])
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [decorationGallery, setDecorationGallery] = useState([])
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart')
     const savedWishlist = localStorage.getItem('wishlist')
     if (savedCart) setCart(JSON.parse(savedCart))
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
+    
+    // Fetch homepage sliders
+    fetchSliders()
+    // Fetch decoration gallery
+    fetchDecorationGallery()
   }, [])
+
+  // Auto-play slider every 3 seconds
+  useEffect(() => {
+    if (sliders.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % sliders.length)
+      }, 3000)
+      return () => clearInterval(timer)
+    }
+  }, [sliders])
+
+  const fetchSliders = async () => {
+    try {
+      const response = await fetch('/api/admin/homepage-slider')
+      const data = await response.json()
+      if (data.success && data.sliders.length > 0) {
+        setSliders(data.sliders)
+      }
+    } catch (error) {
+      console.error('Error fetching sliders:', error)
+    }
+  }
+
+  const fetchDecorationGallery = async () => {
+    try {
+      const response = await fetch('/api/admin/decoration-gallery')
+      const data = await response.json()
+      if (data.success) {
+        setDecorationGallery(data.gallery || [])
+      }
+    } catch (error) {
+      console.error('Error fetching decoration gallery:', error)
+    }
+  }
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index)
+  }
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % sliders.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + sliders.length) % sliders.length)
+  }
 
   const checkPinCode = () => {
     if (pinCode.length !== 6) {
@@ -46,6 +100,7 @@ export default function Home() {
   const featuredCategories = [
     { name: 'Cakes', icon: Cake, image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwzfHxwcmVtaXVtJTIwY2FrZXN8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85', count: '50+' },
     { name: 'Cookies', icon: Cookie, image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', count: '30+' },
+    { name: 'Namkeen', icon: Sparkles, image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=500', count: '25+' },
     { name: 'Gift Packs', icon: Gift, image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHw0fHxwcmVtaXVtJTIwY2FrZXN8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85', count: '20+' }
   ]
 
@@ -74,53 +129,80 @@ export default function Home() {
       {/* Header */}
       <Header cart={cart} wishlist={wishlist} />
 
-      {/* Hero Section */}
-      <section className="relative h-[600px] bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img src="https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Bakery" className="w-full h-full object-cover" />
-        </div>
-        <div className="relative container mx-auto px-4 h-full flex items-center">
-          <div className="max-w-2xl text-white">
-            <Badge className="mb-4 bg-pink-600 hover:bg-pink-700 text-white border-0">Premium Bakery</Badge>
-            <h1 className="text-5xl md:text-7xl font-bold font-serif mb-6 leading-tight">Keep It Simple,<br />Keep It Tasty</h1>
-            <p className="text-xl mb-8 text-pink-100">Indulge in premium cakes, cookies, and pastries crafted with love and the finest ingredients.</p>
-            
-            {/* PIN Code Check */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-6 max-w-md">
-              <p className="text-sm mb-3 text-pink-100">Check cake delivery availability</p>
-              <div className="flex gap-2 mb-3">
-                <Input 
-                  placeholder="Enter PIN Code" 
-                  value={pinCode}
-                  onChange={(e) => setPinCode(e.target.value)}
-                  maxLength={6}
-                  className="bg-white text-gray-900 border-0"
+      {/* Hero Image Slider */}
+      {sliders.length > 0 ? (
+        <section className="relative h-[400px] overflow-hidden bg-gray-900">
+          {/* Slider Images */}
+          <div className="relative h-full">
+            {sliders.map((slider, index) => (
+              <div
+                key={slider._id}
+                className={`absolute inset-0 transition-opacity duration-1000 ${
+                  index === currentSlide ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <img
+                  src={slider.imageUrl}
+                  alt={slider.altText || `Slide ${index + 1}`}
+                  className="w-full h-full object-cover"
                 />
-                <Button onClick={checkPinCode} className="bg-pink-600 hover:bg-pink-700 text-white">
-                  Check
-                </Button>
+                <div className="absolute inset-0 bg-black/20" />
               </div>
-              <p className="text-xs text-pink-200">
-                🎂 Cake delivery: Haldwani (263139) only<br />
-                📦 Cookies, Namkeen & Gifts: All India delivery
-              </p>
-            </div>
+            ))}
+          </div>
 
-            <div className="flex flex-wrap gap-4">
-              <Link href="/products">
-                <Button size="lg" className="bg-white text-pink-900 hover:bg-pink-50 shadow-lg">
-                  Shop Now <ChevronRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="/products?category=cakes">
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-pink-900">
-                  Browse Cakes
-                </Button>
-              </Link>
+          {/* Navigation Arrows */}
+          {sliders.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all z-10"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-800" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all z-10"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-800" />
+              </button>
+            </>
+          )}
+
+          {/* Dots Indicator */}
+          {sliders.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {sliders.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === currentSlide
+                      ? 'bg-white w-8'
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
+        // Fallback banner if no sliders
+        <section className="relative h-[400px] bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <img src="https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Bakery" className="w-full h-full object-cover" />
+          </div>
+          <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
+            <div className="text-center text-white">
+              <h1 className="text-5xl md:text-6xl font-bold font-serif mb-4">Mr. COCO Bakery</h1>
+              <p className="text-xl text-pink-100">Premium Cakes, Cookies & More</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Categories */}
       <section className="py-16 bg-white">
@@ -129,7 +211,7 @@ export default function Home() {
             <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">Shop by Category</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Explore our premium selection of freshly baked delights</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredCategories.map((category, index) => (
               <Link key={index} href={`/products?category=${category.name.toLowerCase()}`}>
                 <Card className="group cursor-pointer overflow-hidden border-2 border-pink-100 hover:border-pink-400 transition-all duration-300 hover:shadow-2xl">
@@ -151,6 +233,89 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Decoration Service Section */}
+      <section className="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+              Premium Service
+            </Badge>
+            <h2 className="text-4xl font-bold font-serif text-pink-900 mb-4">
+              Transform Your Events with Premium Decoration Services
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              From intimate gatherings to grand celebrations, we create magical moments with stunning decorations
+            </p>
+            <Link href="/decoration-services">
+              <Button className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                Explore Decoration Services <ChevronRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* Decoration Gallery Slider */}
+          {decorationGallery.length > 0 && (
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                {decorationGallery.map((item, index) => (
+                  <div
+                    key={item._id || index}
+                    className="flex-shrink-0 w-80 snap-start"
+                  >
+                    <div className="relative aspect-square overflow-hidden rounded-xl shadow-lg group">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title || `Decoration ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="text-white font-semibold text-lg">
+                            {item.title || 'Decoration Setup'}
+                          </h3>
+                          {item.description && (
+                            <p className="text-white/90 text-sm mt-1">{item.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Scroll Hint */}
+              <div className="text-center mt-6">
+                <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+                  <ChevronLeft className="w-4 h-4" />
+                  Scroll to explore more
+                  <ChevronRight className="w-4 h-4" />
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Fallback if no gallery items */}
+          {decorationGallery.length === 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[
+                'https://images.unsplash.com/photo-1519167758481-83f29da8c8d0?w=500',
+                'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=500',
+                'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=500',
+                'https://images.unsplash.com/photo-1530103043960-ef38714abb15?w=500'
+              ].map((img, idx) => (
+                <div key={idx} className="relative aspect-square overflow-hidden rounded-lg group">
+                  <img
+                    src={img}
+                    alt={`Decoration ${idx + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

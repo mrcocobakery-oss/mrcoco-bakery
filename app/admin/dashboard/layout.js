@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, Bell, LogOut, Menu, X, MessageSquare, FileText, GraduationCap, Image as ImageIcon, Settings } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, Bell, LogOut, Menu, X, MessageSquare, FileText, GraduationCap, Image as ImageIcon, Settings, Monitor } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function AdminLayout({ children }) {
@@ -49,6 +49,7 @@ export default function AdminLayout({ children }) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
+    { icon: Monitor, label: 'Homepage Slider', href: '/admin/homepage-slider' },
     { icon: Package, label: 'Products', href: '/admin/products' },
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
     { icon: Users, label: 'Customers', href: '/admin/customers' },
