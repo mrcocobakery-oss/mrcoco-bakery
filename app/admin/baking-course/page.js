@@ -111,58 +111,58 @@ export default function BakingCourseAdmin() {
 
   if (loading) {
     return (
-      <div className=\"flex items-center justify-center min-h-screen\">
-        <div className=\"animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600\"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
       </div>
     )
   }
 
   return (
-    <div className=\"min-h-screen bg-gray-50 p-6\">
-      <div className=\"max-w-5xl mx-auto\">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className=\"flex items-center justify-between mb-6\">
-          <div className=\"flex items-center gap-4\">
-            <Link href=\"/admin/dashboard\">
-              <Button variant=\"outline\" size=\"icon\">
-                <ArrowLeft className=\"w-4 h-4\" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link href=\"/admin/dashboard">
+              <Button variant=\"outline\" size=\"icon">
+                <ArrowLeft className="w-4 h-4\" />
               </Button>
             </Link>
             <div>
-              <h1 className=\"text-3xl font-bold text-gray-800\">Baking Course Management</h1>
-              <p className=\"text-gray-600\">Manage course details, banners, and content</p>
+              <h1 className="text-3xl font-bold text-gray-800">Baking Course Management</h1>
+              <p className="text-gray-600">Manage course details, banners, and content</p>
             </div>
           </div>
-          <Button onClick={handleSave} disabled={saving} className=\"bg-pink-600 hover:bg-pink-700\">
-            <Save className=\"w-4 h-4 mr-2\" />
+          <Button onClick={handleSave} disabled={saving} className="bg-pink-600 hover:bg-pink-700">
+            <Save className="w-4 h-4 mr-2\" />
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
 
         {/* Banner Image */}
-        <Card className=\"mb-6 border-2 border-pink-200\">
+        <Card className="mb-6 border-2 border-pink-200">
           <CardHeader>
             <CardTitle>Banner Image</CardTitle>
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor=\"bannerImage\">Banner Image URL</Label>
+              <Label htmlFor=\"bannerImage">Banner Image URL</Label>
               <Input
                 id=\"bannerImage\"
                 value={courseData.bannerImage}
                 onChange={(e) => setCourseData({ ...courseData, bannerImage: e.target.value })}
                 placeholder=\"https://example.com/banner.jpg\"
               />
-              <p className=\"text-xs text-gray-500 mt-1\">
+              <p className="text-xs text-gray-500 mt-1">
                 Upload banner image to image hosting service and paste URL here
               </p>
             </div>
             {courseData.bannerImage && (
-              <div className=\"mt-4\">
+              <div className="mt-4">
                 <img
                   src={courseData.bannerImage}
                   alt=\"Banner preview\"
-                  className=\"w-full h-48 object-cover rounded-lg\"
+                  className="w-full h-48 object-cover rounded-lg\"
                   onError={(e) => {
                     e.target.src = 'data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"800\" height=\"200\"%3E%3Crect fill=\"%23ddd\" width=\"800\" height=\"200\"/%3E%3Ctext fill=\"%23999\" x=\"50%25\" y=\"50%25\" text-anchor=\"middle\" dy=\".3em\"%3EBanner Preview%3C/text%3E%3C/svg%3E'
                   }}
@@ -173,31 +173,31 @@ export default function BakingCourseAdmin() {
         </Card>
 
         {/* Courses */}
-        <div className=\"space-y-6\">
-          <div className=\"flex items-center justify-between\">
-            <h2 className=\"text-2xl font-bold\">Courses</h2>
-            <Button onClick={addCourse} variant=\"outline\">
-              <Plus className=\"w-4 h-4 mr-2\" />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Courses</h2>
+            <Button onClick={addCourse} variant=\"outline">
+              <Plus className="w-4 h-4 mr-2\" />
               Add Course
             </Button>
           </div>
 
           {courseData.courses.map((course, courseIndex) => (
-            <Card key={course.id} className=\"border-2 border-gray-200\">
-              <CardHeader className=\"bg-gray-50\">
-                <div className=\"flex items-center justify-between\">
+            <Card key={course.id} className="border-2 border-gray-200">
+              <CardHeader className="bg-gray-50">
+                <div className="flex items-center justify-between">
                   <CardTitle>Course {courseIndex + 1}</CardTitle>
                   <Button
                     onClick={() => removeCourse(courseIndex)}
                     variant=\"destructive\"
                     size=\"sm\"
                   >
-                    <Trash2 className=\"w-3 h-3 mr-1\" />
+                    <Trash2 className="w-3 h-3 mr-1\" />
                     Remove
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className=\"p-6 space-y-4\">
+              <CardContent className="p-6 space-y-4">
                 <div>
                   <Label>Course Name</Label>
                   <Input
@@ -206,7 +206,7 @@ export default function BakingCourseAdmin() {
                     placeholder=\"e.g., Beginner Baking Course\"
                   />
                 </div>
-                <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Duration</Label>
                     <Input
@@ -225,20 +225,20 @@ export default function BakingCourseAdmin() {
                   </div>
                 </div>
                 <div>
-                  <div className=\"flex items-center justify-between mb-2\">
+                  <div className="flex items-center justify-between mb-2">
                     <Label>Course Content</Label>
                     <Button
                       onClick={() => addContentItem(courseIndex)}
                       variant=\"outline\"
                       size=\"sm\"
                     >
-                      <Plus className=\"w-3 h-3 mr-1\" />
+                      <Plus className="w-3 h-3 mr-1\" />
                       Add Item
                     </Button>
                   </div>
-                  <div className=\"space-y-2\">
+                  <div className="space-y-2">
                     {course.content.map((item, contentIndex) => (
-                      <div key={contentIndex} className=\"flex gap-2\">
+                      <div key={contentIndex} className="flex gap-2">
                         <Input
                           value={item}
                           onChange={(e) => updateContentItem(courseIndex, contentIndex, e.target.value)}
@@ -249,7 +249,7 @@ export default function BakingCourseAdmin() {
                           variant=\"ghost\"
                           size=\"icon\"
                         >
-                          <Trash2 className=\"w-4 h-4 text-red-600\" />
+                          <Trash2 className="w-4 h-4 text-red-600\" />
                         </Button>
                       </div>
                     ))}
@@ -261,9 +261,9 @@ export default function BakingCourseAdmin() {
 
           {courseData.courses.length === 0 && (
             <Card>
-              <CardContent className=\"p-12 text-center\">
-                <h3 className=\"text-xl font-semibold text-gray-700 mb-2\">No courses added yet</h3>
-                <p className=\"text-gray-500 mb-4\">Add your first course using the button above</p>
+              <CardContent className="p-12 text-center">
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No courses added yet</h3>
+                <p className="text-gray-500 mb-4">Add your first course using the button above</p>
               </CardContent>
             </Card>
           )}
