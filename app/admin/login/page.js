@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '@/contexts/AdminContext'
 import { Button } from '@/components/ui/button'
@@ -14,15 +14,26 @@ export default function AdminLoginPage() {
   const router = useRouter()
   const { loginAdmin, admin } = useAdmin()
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   })
 
   // Redirect if already logged in
-  if (admin) {
-    router.push('/admin/dashboard')
-    return null
+  useEffect(() => {
+    setMounted(true)
+    if (admin) {
+      router.push('/admin/dashboard')
+    }
+  }, [admin, router])
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e) => {

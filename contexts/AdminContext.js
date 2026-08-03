@@ -17,7 +17,8 @@ export function AdminProvider({ children }) {
   const checkAdminAuth = () => {
     const adminToken = Cookies.get('admin_token')
     if (adminToken === 'admin_logged_in') {
-      setAdmin({ username: 'admin' })
+      const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'mrcocoadmin'
+      setAdmin({ username: ADMIN_USERNAME })
     }
     setLoading(false)
   }

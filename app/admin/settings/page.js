@@ -12,7 +12,7 @@ import { toast } from 'sonner'
 import { useAdmin } from '@/contexts/AdminContext'
 
 export default function AdminSettingsPage() {
-  const { admin } = useAdmin()
+  const { admin, loading: authLoading } = useAdmin()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -26,14 +26,15 @@ export default function AdminSettingsPage() {
   // Redirect to login if not authenticated
   useEffect(() => {
     setMounted(true)
-    if (!admin) {
+    if (!authLoading && !admin) {
       router.push('/admin/login')
-    } else {
+    } else if (admin) {
       setFormData(prev => ({ ...prev, newUsername: admin.username }))
     }
-  }, [admin, router])
+  }, [admin, authLoading, router])
 
-  if (!mounted || !admin) {
+  // Show loading spinner while checking auth
+  if (!mounted || authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
@@ -41,7 +42,7 @@ export default function AdminSettingsPage() {
     )
   }
 
-  // Don't render anything while checking auth
+  // Don't render anything if not authenticated
   if (!admin) {
     return null
   }
