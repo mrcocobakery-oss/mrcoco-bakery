@@ -51,7 +51,7 @@ export function Header({ cart = [], wishlist = [] }) {
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center">
-              <div className="w-14 h-14 relative">
+              <div className="w-20 h-20 md:w-24 md:h-24 relative">
                 <Image
                   src="/images/mrcoco-logo.png"
                   alt="Mr. COCO Bakery"

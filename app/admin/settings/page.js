@@ -15,19 +15,31 @@ export default function AdminSettingsPage() {
   const { admin } = useAdmin()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     currentPassword: '',
-    newUsername: admin?.username || 'mrcocoadmin',
+    newUsername: '',
     newPassword: '',
     confirmPassword: ''
   })
 
   // Redirect to login if not authenticated
   useEffect(() => {
+    setMounted(true)
     if (!admin) {
       router.push('/admin/login')
+    } else {
+      setFormData(prev => ({ ...prev, newUsername: admin.username }))
     }
   }, [admin, router])
+
+  if (!mounted || !admin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+      </div>
+    )
+  }
 
   // Don't render anything while checking auth
   if (!admin) {
