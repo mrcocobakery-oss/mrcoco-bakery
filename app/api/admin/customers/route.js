@@ -41,8 +41,7 @@ export async function GET(request) {
       return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
     
-    const client = await connectToDatabase()
-    const db = client.db('bakery')
+    const { db } = await connectToDatabase()
     
     const customers = await db.collection('users')
       .find({ role: { $ne: 'admin' } })

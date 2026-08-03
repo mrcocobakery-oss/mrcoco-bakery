@@ -16,8 +16,7 @@ async function connectToDatabase() {
 // GET - Get today's birthdays
 export async function GET(request) {
   try {
-    const client = await connectToDatabase()
-    const db = client.db('bakery')
+    const { db } = await connectToDatabase()
     
     const today = new Date()
     const todayMonth = String(today.getMonth() + 1).padStart(2, '0')

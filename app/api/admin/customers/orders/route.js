@@ -49,8 +49,7 @@ export async function GET(request) {
       return Response.json({ success: false, error: 'Customer ID or email is required' }, { status: 400 })
     }
     
-    const client = await connectToDatabase()
-    const db = client.db('bakery')
+    const { db } = await connectToDatabase()
     
     // Find customer first to get email if only ID is provided
     let customerEmail = email
