@@ -20,6 +20,8 @@ import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 import { QuickViewModal } from '@/components/QuickViewModal'
 import { useAuth } from '@/contexts/AuthContext'
+import { RecentlyViewed } from '@/components/RecentlyViewed'
+import { ProductRecommendations } from '@/components/ProductRecommendations'
 
 function ProductsPageContent() {
   const searchParams = useSearchParams()
@@ -744,6 +746,14 @@ function ProductsPageContent() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Product Recommendations */}
+      <ProductRecommendations limit={6} />
+
+      {/* Recently Viewed */}
+      <div className="container mx-auto px-4 py-12">
+        <RecentlyViewed currentProductId={null} />
       </div>
 
       {/* Quick View Modal */}

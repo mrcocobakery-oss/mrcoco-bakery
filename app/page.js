@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Star, Phone, Mail, MapPin, Instagram, Facebook, Twitter, ChevronRight, Award, Clock, Shield, ShoppingCart, Cake, Cookie, Gift, Heart, ChevronLeft, Sparkles } from 'lucide-react'
+import { RecentlyViewed } from '@/components/RecentlyViewed'
+import { ProductRecommendations } from '@/components/ProductRecommendations'
 import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 
@@ -514,6 +516,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Product Recommendations */}
+      <ProductRecommendations limit={6} />
+
+      {/* Recently Viewed */}
+      <div className="container mx-auto px-4">
+        <RecentlyViewed currentProductId={null} />
+      </div>
 
       {/* Footer */}
       <footer className="bg-pink-950 text-pink-100 pt-16 pb-8">
