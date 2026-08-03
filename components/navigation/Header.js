@@ -173,14 +173,14 @@ export function Header({ cart = [], wishlist = [] }) {
             <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">
               Gift Packs
             </Link>
-            <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">
-              Bulk Orders
+            <Link href="/decoration-services" className="text-pink-900 font-medium hover:text-pink-600 transition">
+              Decoration Services
             </Link>
-            <Link href="/about" className="text-pink-900 font-medium hover:text-pink-600 transition">
-              About Us
+            <Link href="/baking-course" className="text-pink-900 font-medium hover:text-pink-600 transition">
+              Baking Course
             </Link>
-            <Link href="/contact" className="text-pink-900 font-medium hover:text-pink-600 transition">
-              Contact Us
+            <Link href="/become-partner" className="text-pink-900 font-medium hover:text-pink-600 transition">
+              Become Our Partner
             </Link>
           </nav>
 
@@ -247,37 +247,46 @@ export function Header({ cart = [], wishlist = [] }) {
                   <ChevronDown className={`w-4 h-4 transition-transform ${showCakesMenu ? 'rotate-180' : ''}`} />
                 </button>
                 {showCakesMenu && (
-                  <div className="mt-2 ml-4 space-y-3 pb-3">
-                    <div>
-                      <p className="font-semibold text-sm text-pink-800 mb-2">By Type</p>
-                      <div className="space-y-1">
-                        {cakesByType.slice(0, 5).map((cake) => (
-                          <Link key={cake} href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase().replace(' cakes', ''))}`} className="block text-sm text-gray-700">
-                            {cake}
-                          </Link>
-                        ))}
-                      </div>
+                  <div className="mt-2 ml-4 space-y-2 pb-2 max-h-60 overflow-y-auto">
+                    <Link href="/products?category=cakes" className="block text-sm font-semibold text-pink-800">
+                      View All Cakes →
+                    </Link>
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold text-pink-700 mb-1">By Type</p>
+                      {cakesByType.slice(0, 3).map((cake) => (
+                        <Link 
+                          key={cake} 
+                          href={`/products?category=cakes&type=${encodeURIComponent(cake.toLowerCase())}`} 
+                          className="block text-xs text-gray-600 hover:text-pink-600 pl-2"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {cake}
+                        </Link>
+                      ))}
                     </div>
-                    <div>
-                      <p className="font-semibold text-sm text-pink-800 mb-2">By Occasion</p>
-                      <div className="space-y-1">
-                        {cakesByOccasion.slice(0, 5).map((occasion) => (
-                          <Link key={occasion} href={`/products?category=cakes&occasion=${encodeURIComponent(occasion.toLowerCase())}`} className="block text-sm text-gray-700">
-                            {occasion}
-                          </Link>
-                        ))}
-                      </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold text-pink-700 mb-1">By Occasion</p>
+                      {cakesByOccasion.slice(0, 3).map((occasion) => (
+                        <Link 
+                          key={occasion} 
+                          href={`/products?category=cakes&occasion=${encodeURIComponent(occasion.toLowerCase())}`} 
+                          className="block text-xs text-gray-600 hover:text-pink-600 pl-2"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {occasion}
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 )}
               </div>
 
-              <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition">Cookies</Link>
-              <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition">Namkeen</Link>
-              <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition">Gift Packs</Link>
-              <Link href="/bulk-order" className="text-pink-900 font-medium hover:text-pink-600 transition">Bulk Orders</Link>
-              <Link href="/about" className="text-pink-900 font-medium hover:text-pink-600 transition">About Us</Link>
-              <Link href="/contact" className="text-pink-900 font-medium hover:text-pink-600 transition">Contact Us</Link>
+              <Link href="/products?category=cookies" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Cookies</Link>
+              <Link href="/products?category=namkeen" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Namkeen</Link>
+              <Link href="/products?category=gifts" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Gift Packs</Link>
+              <Link href="/decoration-services" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Decoration Services</Link>
+              <Link href="/baking-course" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Baking Course</Link>
+              <Link href="/become-partner" className="text-pink-900 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>Become Our Partner</Link>
               
               {!user && (
                 <Link href="/login">
