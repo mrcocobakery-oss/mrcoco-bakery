@@ -20,14 +20,13 @@ export function RazorpayCheckout({ amount, customerInfo, cartItems, onSuccess, o
 
     try {
       // Create order on server
-      const orderResponse = await fetch('/api/razorpay/order', {
+      const orderResponse = await fetch('/api/payments/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: amount,
-          currency: 'INR',
-          customerInfo: customerInfo,
-          cartItems: cartItems
+          cart: cartItems,
+          customer: customerInfo,
+          deliveryDetails: customerInfo.deliveryDetails
         })
       })
 
@@ -50,14 +49,14 @@ export function RazorpayCheckout({ amount, customerInfo, cartItems, onSuccess, o
         handler: async function (response) {
           try {
             // Verify payment on server
-            const verifyResponse = await fetch('/api/razorpay/verify', {
+            const verifyResponse = await fetch('/api/payments/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                customerInfo: customerInfo
+                internalOrderId: orderData.internalOrderId
               })
             })
 
