@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, Bell, LogOut, Menu, X, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, Users, MapPin, Ticket, Briefcase, Bell, LogOut, Menu, X, MessageSquare, FileText, GraduationCap, Image as ImageIcon, Settings } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function AdminLayout({ children }) {
@@ -54,9 +54,13 @@ export default function AdminLayout({ children }) {
     { icon: Users, label: 'Customers', href: '/admin/customers' },
     { icon: Briefcase, label: 'Bulk Orders', href: '/admin/bulk-orders' },
     { icon: MessageSquare, label: 'Contact Inquiries', href: '/admin/contact-inquiries', badge: newInquiriesCount },
+    { icon: FileText, label: 'Inquiries', href: '/admin/inquiries' },
+    { icon: GraduationCap, label: 'Baking Course', href: '/admin/baking-course' },
+    { icon: ImageIcon, label: 'Decoration Gallery', href: '/admin/decoration-gallery' },
     { icon: MapPin, label: 'Delivery Areas', href: '/admin/delivery-areas' },
     { icon: Ticket, label: 'Coupons', href: '/admin/coupons' },
     { icon: Bell, label: 'Notifications', href: '/admin/notifications' },
+    { icon: Settings, label: 'Settings', href: '/admin/settings' },
   ]
 
   return (

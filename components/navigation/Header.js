@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { 
   ShoppingCart, Heart, Menu, X, ChevronDown, User, 
-  MapPin, Search, Phone, MessageCircle 
+  MapPin, Search, Phone, MessageCircle, PackageSearch
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -254,6 +254,10 @@ export function Header({ cart = [], wishlist = [] }) {
             <Link href="/products?category=gifts" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Gift Packs
             </Link>
+            <Link href="/track-order" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
+              <PackageSearch className="w-4 h-4" />
+              Track Order
+            </Link>
             <Link href="/decoration-services" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Decoration Services
             </Link>
@@ -341,6 +345,10 @@ export function Header({ cart = [], wishlist = [] }) {
               </Link>
               <Link href="/products?category=gifts" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
                 Gift Packs
+              </Link>
+              <Link href="/track-order" className="text-gray-700 font-medium hover:text-pink-600 transition flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
+                <PackageSearch className="w-5 h-5" />
+                Track Order
               </Link>
               <Link href="/decoration-services" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
                 Decoration Services
