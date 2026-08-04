@@ -10,6 +10,7 @@ import { ArrowLeft, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget'
 import { useAdmin } from '@/contexts/AdminContext'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function DecorationGalleryAdmin() {
   const { admin } = useAdmin()

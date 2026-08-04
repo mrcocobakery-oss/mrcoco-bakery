@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Plus, Image as ImageIcon, MoveUp, MoveDown } from 'lucide-react'
 import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget'
+import { toast } from 'sonner'
 
 export default function HomepageSliderManagement() {
   const [sliders, setSliders] = useState([])
@@ -188,7 +189,6 @@ export default function HomepageSliderManagement() {
                   value={newSlider.altText}
                   onChange={(e) => setNewSlider({ ...newSlider, altText: e.target.value })}
                   placeholder="Image description"
-                  disabled={uploading}
                 />
               </div>
 
@@ -201,11 +201,10 @@ export default function HomepageSliderManagement() {
                   value={newSlider.order}
                   onChange={(e) => setNewSlider({ ...newSlider, order: parseInt(e.target.value) || 0 })}
                   placeholder="0"
-                  disabled={uploading}
                 />
               </div>
             </div>
-            <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={uploading || !newSlider.imageUrl}>
+            <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={!newSlider.imageUrl}>
               <Plus className="w-4 h-4 mr-2" />
               Add Slider Image
             </Button>

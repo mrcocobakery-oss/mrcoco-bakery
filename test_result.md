@@ -801,20 +801,26 @@ frontend:
 
 
 metadata:
-  created_by: "testing_agent"
-  version: "1.8"
-  test_sequence: 9
-  last_tested: "2026-08-03"
-  test_environment: "Production (https://coco-premium-bakes.preview.emergentagent.com)"
+  created_by: "main_agent"
+  version: "1.9"
+  test_sequence: 10
+  last_tested: "2026-08-04"
+  test_environment: "Preview (localhost:3000)"
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Admin Homepage Slider - Cloudinary Integration Fix"
+    - "Admin Decoration Gallery - Cloudinary Integration Fix"
+    - "Admin Products - Verify Cloudinary Integration"
+    - "Baking Course Page - Verify Loading"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  completed: true
+  completed: false
 
 agent_communication:
+    - agent: "main"
+      message: "FIXED CLIENT-SIDE EXCEPTIONS: (1) Added missing 'toast' import from 'sonner' to /app/app/admin/homepage-slider/page.js - was using toast.error/success without importing it. (2) Removed references to non-existent 'uploading' variable on lines 191 and 204 in homepage-slider page - the uploading state is internal to CloudinaryUploadWidget component. (3) Added missing 'toast' import to /app/app/admin/decoration-gallery/page.js. (4) Verified /app/app/admin/products/page.js already has correct imports. (5) Verified /app/app/baking-course/page.js has correct structure. Screenshots confirm both /admin/homepage-slider and /baking-course now load successfully without client-side exceptions. Ready for frontend testing agent verification."
     - agent: "testing"
       message: "Comprehensive Phase 1 MVP testing completed. All 8 major features tested successfully. Home page, products page, shopping cart, wishlist, checkout flow, bulk order form, navigation/UI, and localStorage persistence all working correctly. No critical issues found. Application is production-ready for Phase 1 MVP launch. Minor script errors in Playwright test were related to test code syntax, not application functionality. All user-facing features verified and working as expected."
     - agent: "testing"
