@@ -34,7 +34,13 @@ export function CloudinaryUploadWidget({
         onSuccess={(result) => {
           setUploading(false)
           if (result?.info?.secure_url) {
-            const url = result.info.secure_url
+            let url = result.info.secure_url
+            
+            // Cloudinary auto-optimization: WebP format + quality optimization
+            if (url.includes('cloudinary.com')) {
+              url = url.replace('/upload/', '/upload/f_auto,q_auto:good/')
+            }
+            
             setUploadedUrl(url)
             onUploadSuccess(url, result.info)
             toast.success('Image uploaded successfully!')
