@@ -57,7 +57,13 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error adding slider:', error)
     return NextResponse.json(
-      { error: 'Failed to add slider image' },
+      { 
+        error: 'Failed to add slider image',
+        details: error.message,
+        errorName: error.name,
+        mongoUrl: process.env.MONGO_URL ? 'SET' : 'NOT SET',
+        dbName: process.env.DB_NAME || 'NOT SET'
+      },
       { status: 500 }
     )
   }
