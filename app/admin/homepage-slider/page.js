@@ -12,7 +12,6 @@ import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget'
 export default function HomepageSliderManagement() {
   const [sliders, setSliders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
   const [newSlider, setNewSlider] = useState({
     imageUrl: '',
     altText: '',
@@ -37,42 +36,11 @@ export default function HomepageSliderManagement() {
     }
   }
 
-  const handleFileUpload = async (e) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      for (let i = 0; i < files.length; i++) {
-        formData.append('images', files[i])
-      }
-
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData
-      })
-
-      const data = await response.json()
-      
-      if (data.success && data.urls.length > 0) {
-        setNewSlider({ ...newSlider, imageUrl: data.urls[0] })
-        toast.success('Image uploaded successfully!')
-      } else {
-        toast.error(data.error || 'Failed to upload image')
-      }
-    } catch (error) {
-      toast.error('Failed to upload image')
-    } finally {
-      setUploading(false)
-    }
-  }
-
   const handleAddSlider = async (e) => {
     e.preventDefault()
     
     if (!newSlider.imageUrl) {
-      toast.error('Please enter an image URL')
+      toast.error('Please upload an image or enter an image URL')
       return
     }
 
@@ -174,58 +142,43 @@ export default function HomepageSliderManagement() {
         </CardHeader>
         <CardContent className="p-6">
           <form onSubmit={handleAddSlider} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              {/* File Upload Option */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Label htmlFor="fileUpload" className="cursor-pointer">
-                  <div className="space-y-2">
-                    <ImageIcon className="w-12 h-12 text-gray-400 mx-auto" />
-                    <div className="text-sm text-gray-600">
-                      <span className="text-pink-600 font-semibold">Click to upload</span> or drag and drop
-                    </div>
-                    <p className="text-xs text-gray-500">Recommended: 1920x400px (PNG, JPG, WEBP)</p>
-                  </div>
-                  <Input
-                    id="fileUpload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    disabled={uploading}
-                  />
-                </Label>
-                {uploading && (
-                  <div className="mt-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600 mx-auto"></div>
-                    <p className="text-sm text-gray-600 mt-2">Uploading...</p>
-                  </div>
-                )}
+            <div className="space-y-4">
+              {/* Cloudinary Upload */}
+              <div>
+                <Label className="mb-2 block font-semibold">Upload Image</Label>
+                <CloudinaryUploadWidget
+                  onUploadSuccess={(url) => {
+                    setNewSlider({ ...newSlider, imageUrl: url })
+                  }}
+                  folder="homepage-slider"
+                  buttonText="Upload Slider Image (1920x400px recommended)"
+                />
               </div>
 
               {/* OR Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">OR</span>
-                </div>
-              </div>
+              {!newSlider.imageUrl && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-500">OR</span>
+                    </div>
+                  </div>
 
-              {/* URL Input Option */}
-              <div>
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  value={newSlider.imageUrl}
-                  onChange={(e) => setNewSlider({ ...newSlider, imageUrl: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  disabled={uploading}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter image URL or upload a file above
-                </p>
-              </div>
+                  {/* URL Input Option */}
+                  <div>
+                    <Label htmlFor="imageUrl">Or Paste Image URL</Label>
+                    <Input
+                      id="imageUrl"
+                      value={newSlider.imageUrl}
+                      onChange={(e) => setNewSlider({ ...newSlider, imageUrl: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Alt Text */}
               <div>
