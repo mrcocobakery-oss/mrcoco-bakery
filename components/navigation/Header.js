@@ -191,7 +191,7 @@ export function Header({ cart = [], wishlist = [] }) {
           </div>
 
           {/* PIN Code Delivery Checker */}
-          <div className="hidden lg:flex flex-col gap-1">
+          <div className="hidden md:flex flex-col gap-1">
             <div className="bg-pink-100 text-pink-800 px-4 py-1 rounded-t-md text-xs font-semibold text-center">
               Check cake delivery availability
             </div>
