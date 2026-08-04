@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Plus, Edit, Trash2, Search, Package, Eye } from 'lucide-react'
 import { toast } from 'sonner'
+import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget'
 import Cookies from 'js-cookie'
 
 export default function AdminProductsPage() {
@@ -105,39 +106,8 @@ export default function AdminProductsPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files)
-    if (files.length === 0) return
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      files.forEach(file => {
-        formData.append('images', file)
-      })
-
-      const adminToken = Cookies.get('admin_token')
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`
-        },
-        body: formData
-      })
-
-      const data = await response.json()
-      if (response.ok) {
-        setUploadedImages([...uploadedImages, ...data.urls])
-        toast.success(`${files.length} image(s) uploaded successfully!`)
-      } else {
-        toast.error(data.error || 'Failed to upload images')
-      }
-    } catch (error) {
-      console.error('Upload error:', error)
-      toast.error('Failed to upload images')
-    } finally {
-      setUploading(false)
-    }
+  const handleImageUpload = (url) => {
+    setUploadedImages([...uploadedImages, url])
   }
 
   const removeImage = (index) => {
@@ -688,28 +658,15 @@ export default function AdminProductsPage() {
             <div className="space-y-3">
               <Label>Product Images</Label>
               
-              {/* Upload Button */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  id="imageUpload"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  disabled={uploading}
+              {/* Cloudinary Upload */}
+              <div>
+                <Label className="mb-2 block font-semibold">Product Images</Label>
+                <CloudinaryUploadWidget
+                  onUploadSuccess={(url) => handleImageUpload(url)}
+                  folder="products"
+                  buttonText={`Upload Product Image (${uploadedImages.length} uploaded)`}
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('imageUpload').click()}
-                  disabled={uploading}
-                >
-                  {uploading ? 'Uploading...' : 'Upload Images'}
-                </Button>
-                <span className="text-xs text-gray-500">
-                  {uploadedImages.length} image(s) uploaded
-                </span>
+                <p className="text-xs text-gray-500 mt-1">You can upload multiple images one by one</p>
               </div>
 
               {/* Preview Uploaded Images */}

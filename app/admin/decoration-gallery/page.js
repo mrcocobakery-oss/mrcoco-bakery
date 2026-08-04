@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowLeft, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
-import { toast } from 'sonner'
+import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget'
 import { useAdmin } from '@/contexts/AdminContext'
 import { useRouter } from 'next/navigation'
 
@@ -16,7 +16,6 @@ export default function DecorationGalleryAdmin() {
   const router = useRouter()
   const [gallery, setGallery] = useState([])
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
   const [newImage, setNewImage] = useState({ imageUrl: '', title: '', description: '' })
 
   useEffect(() => {
@@ -40,41 +39,10 @@ export default function DecorationGalleryAdmin() {
     }
   }
 
-  const handleFileUpload = async (e) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      for (let i = 0; i < files.length; i++) {
-        formData.append('images', files[i])
-      }
-
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData
-      })
-
-      const data = await response.json()
-      
-      if (data.success && data.urls.length > 0) {
-        setNewImage({ ...newImage, imageUrl: data.urls[0] })
-        toast.success('Image uploaded successfully!')
-      } else {
-        toast.error(data.error || 'Failed to upload image')
-      }
-    } catch (error) {
-      toast.error('Failed to upload image')
-    } finally {
-      setUploading(false)
-    }
-  }
-
   const handleAddImage = async (e) => {
     e.preventDefault()
     if (!newImage.imageUrl) {
-      toast.error('Image URL is required')
+      toast.error('Please upload an image or enter an image URL')
       return
     }
 
@@ -150,56 +118,42 @@ export default function DecorationGalleryAdmin() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAddImage} className="space-y-4">
-              {/* File Upload Option */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Label htmlFor="fileUpload" className="cursor-pointer">
-                  <div className="space-y-2">
-                    <ImageIcon className="w-12 h-12 text-gray-400 mx-auto" />
-                    <div className="text-sm text-gray-600">
-                      <span className="text-pink-600 font-semibold">Click to upload</span> or drag and drop
-                    </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, WEBP up to 10MB</p>
-                  </div>
-                  <Input
-                    id="fileUpload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    disabled={uploading}
-                  />
-                </Label>
-                {uploading && (
-                  <div className="mt-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600 mx-auto"></div>
-                    <p className="text-sm text-gray-600 mt-2">Uploading...</p>
-                  </div>
-                )}
+              {/* Cloudinary Upload */}
+              <div>
+                <Label className="mb-2 block font-semibold">Upload Image</Label>
+                <CloudinaryUploadWidget
+                  onUploadSuccess={(url) => {
+                    setNewImage({ ...newImage, imageUrl: url })
+                  }}
+                  folder="decoration-gallery"
+                  buttonText="Upload Decoration Image"
+                />
               </div>
 
               {/* OR Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">OR</span>
-                </div>
-              </div>
+              {!newImage.imageUrl && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-500">OR</span>
+                    </div>
+                  </div>
 
-              <div>
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  value={newImage.imageUrl}
-                  onChange={(e) => setNewImage({ ...newImage, imageUrl: e.target.value })}
-                  placeholder="https://example.com/image.jpg or upload to a service"
-                  disabled={uploading}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Upload image to Imgur, Cloudinary, or any image hosting service and paste URL here
-                </p>
-              </div>
+                  <div>
+                    <Label htmlFor="imageUrl">Or Paste Image URL</Label>
+                    <Input
+                      id="imageUrl"
+                      value={newImage.imageUrl}
+                      onChange={(e) => setNewImage({ ...newImage, imageUrl: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                </>
+              )}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="title">Title (Optional)</Label>
@@ -208,7 +162,6 @@ export default function DecorationGalleryAdmin() {
                     value={newImage.title}
                     onChange={(e) => setNewImage({ ...newImage, title: e.target.value })}
                     placeholder="e.g., Birthday Decoration"
-                    disabled={uploading}
                   />
                 </div>
                 <div>
@@ -218,11 +171,10 @@ export default function DecorationGalleryAdmin() {
                     value={newImage.description}
                     onChange={(e) => setNewImage({ ...newImage, description: e.target.value })}
                     placeholder="Brief description"
-                    disabled={uploading}
                   />
                 </div>
               </div>
-              <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={uploading || !newImage.imageUrl}>
+              <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={!newImage.imageUrl}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Image
               </Button>
