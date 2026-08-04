@@ -33,12 +33,12 @@ export default function Home() {
     fetchDecorationGallery()
   }, [])
 
-  // Auto-play slider every 3 seconds
+  // Auto-play slider every 5 seconds
   useEffect(() => {
     if (sliders.length > 0) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % sliders.length)
-      }, 3000)
+      }, 5000)
       return () => clearInterval(timer)
     }
   }, [sliders])
@@ -147,6 +147,7 @@ export default function Home() {
                   src={slider.imageUrl}
                   alt={slider.altText || `Slide ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading={index === 0 ? 'eager' : 'lazy'}
                 />
                 <div className="absolute inset-0 bg-black/20" />
               </div>
@@ -195,7 +196,7 @@ export default function Home() {
         // Fallback banner if no sliders
         <section className="relative h-[400px] bg-gradient-to-r from-pink-900 via-pink-800 to-pink-900 overflow-hidden">
           <div className="absolute inset-0 opacity-20">
-            <img src="https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Bakery" className="w-full h-full object-cover" />
+            <img src="https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Bakery" className="w-full h-full object-cover" loading="lazy" />
           </div>
           <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
             <div className="text-center text-white">
@@ -218,7 +219,7 @@ export default function Home() {
               <Link key={index} href={`/products?category=${category.name.toLowerCase()}`}>
                 <Card className="group cursor-pointer overflow-hidden border-2 border-pink-100 hover:border-pink-400 transition-all duration-300 hover:shadow-2xl">
                   <div className="relative h-64 overflow-hidden">
-                    <img src={category.image} alt={category.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={category.image} alt={category.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <Badge className="absolute top-4 right-4 bg-pink-600 text-white border-0">{category.count} Items</Badge>
                   </div>
@@ -272,6 +273,7 @@ export default function Home() {
                         src={item.imageUrl}
                         alt={item.title || `Decoration ${index + 1}`}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="absolute bottom-4 left-4 right-4">
@@ -334,7 +336,7 @@ export default function Home() {
               <Card key={product.id} className="group overflow-hidden border-2 border-pink-100 hover:border-pink-400 hover:shadow-xl transition-all">
                 <Link href={`/products/${product.id}`}>
                   <div className="relative h-64 overflow-hidden bg-gray-100">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
                     {product.discount && (
                       <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0">{product.discount}% OFF</Badge>
                     )}
@@ -452,6 +454,7 @@ export default function Home() {
                 src="https://images.unsplash.com/photo-1654703109300-e924e52b091a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBiYWtlcnl8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85" 
                 alt="Our Bakery" 
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
           </div>
@@ -501,6 +504,7 @@ export default function Home() {
                   src={img} 
                   alt={`Instagram post ${idx + 1}`}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
                   <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
