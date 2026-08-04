@@ -191,7 +191,7 @@ export function Header({ cart = [], wishlist = [] }) {
 
           {/* PIN Code Delivery Checker */}
           <div className="hidden lg:flex flex-col gap-1">
-            <div className="bg-pink-500 text-white px-4 py-1 rounded-t-md text-xs font-semibold text-center">
+            <div className="bg-pink-100 text-pink-800 px-4 py-1 rounded-t-md text-xs font-semibold text-center">
               Check cake delivery availability
             </div>
             <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-b-md px-2 py-1.5">
@@ -391,19 +391,16 @@ export function Header({ cart = [], wishlist = [] }) {
             <Link href="/become-partner" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
               Become Our Partner
             </Link>
-            <Link href="/contact" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition">
-              Help
-            </Link>
-            <Link href="/track-order" className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
-              <PackageSearch className="w-4 h-4" />
-              Track Order
-            </Link>
           </nav>
 
           {/* Help & WhatsApp */}
           <div className="flex items-center gap-4">
             <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition">
               Help
+            </Link>
+            <Link href="/track-order" className="text-sm font-medium text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
+              <PackageSearch className="w-4 h-4" />
+              Track Order
             </Link>
             <a
               href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`}
@@ -477,10 +474,6 @@ export function Header({ cart = [], wishlist = [] }) {
               <Link href="/products?category=gifts" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
                 Gift Packs
               </Link>
-              <Link href="/track-order" className="text-gray-700 font-medium hover:text-pink-600 transition flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
-                <PackageSearch className="w-5 h-5" />
-                Track Order
-              </Link>
               <Link href="/decoration-services" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
                 Decoration Services
               </Link>
@@ -489,6 +482,13 @@ export function Header({ cart = [], wishlist = [] }) {
               </Link>
               <Link href="/become-partner" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
                 Become Our Partner
+              </Link>
+              <Link href="/contact" className="text-gray-700 font-medium hover:text-pink-600 transition" onClick={() => setIsMenuOpen(false)}>
+                Help
+              </Link>
+              <Link href="/track-order" className="text-gray-700 font-medium hover:text-pink-600 transition flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
+                <PackageSearch className="w-5 h-5" />
+                Track Order
               </Link>
               
               <div className="pt-3 border-t border-gray-200">
