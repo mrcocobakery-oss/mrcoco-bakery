@@ -662,6 +662,9 @@ function ProductsPageContent() {
                           {product.originalPrice && (
                             <span className="text-sm text-gray-400 line-through ml-2">₹{product.originalPrice}</span>
                           )}
+                          {product.size && (
+                            <span className="text-sm text-gray-600 ml-2">• {product.size}</span>
+                          )}
                         </div>
                       </div>
                       
