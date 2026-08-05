@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Header } from '@/components/navigation/Header'
 import { Footer } from '@/components/navigation/Footer'
@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 
 export default function DecorationServicesPage() {
   const [loading, setLoading] = useState(false)
+  const [gallery, setGallery] = useState([])
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,6 +23,23 @@ export default function DecorationServicesPage() {
     eventDate: '',
     message: ''
   })
+
+  // Fetch gallery images
+  useEffect(() => {
+    fetchGallery()
+  }, [])
+
+  const fetchGallery = async () => {
+    try {
+      const response = await fetch('/api/admin/decoration-gallery')
+      const data = await response.json()
+      if (data.gallery) {
+        setGallery(data.gallery)
+      }
+    } catch (error) {
+      console.error('Failed to fetch gallery:', error)
+    }
+  }
 
   const contactNumbers = [
     { number: '+91 8447655399', display: '84476 55399' },
@@ -75,20 +93,33 @@ export default function DecorationServicesPage() {
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Our Work Gallery</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((item) => (
-                <Card key={item} className="overflow-hidden hover:shadow-xl transition">
-                  <div className="aspect-square relative bg-gradient-to-br from-pink-100 to-purple-100">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                      <span className="text-sm">Decoration Sample {item}</span>
+            
+            {gallery.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {gallery.map((item) => (
+                  <Card key={item._id} className="overflow-hidden hover:shadow-xl transition group">
+                    <div className="relative h-64">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title || 'Decoration'}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      {item.title && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                          <h3 className="text-white font-semibold">{item.title}</h3>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-            <p className="text-center text-gray-500 mt-8 text-sm">
-              Gallery photos can be managed from admin panel
-            </p>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 mb-4">Gallery images will appear here soon!</p>
+                <p className="text-sm text-gray-400">Add images from admin panel → Decoration Gallery</p>
+              </div>
+            )}
           </div>
         </section>
 
