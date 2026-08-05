@@ -40,6 +40,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/our-menu" className="text-pink-100 hover:text-white transition text-sm">
+                  Our Menu
+                </Link>
+              </li>
+              <li>
                 <Link href="/bulk-order" className="text-pink-100 hover:text-white transition text-sm">
                   Bulk Orders
                 </Link>
