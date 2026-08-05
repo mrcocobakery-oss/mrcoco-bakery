@@ -395,7 +395,7 @@ export default function AdminProductsPage() {
       </Card>
 
       {/* Add/Edit Product Dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <Dialog open={showDialog} onOpenChange={setShowDialog} modal={false}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editMode ? 'Edit Product' : 'Add New Product'}</DialogTitle>
