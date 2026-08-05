@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 
 // GET - Fetch menu image
 export async function GET() {
   try {
-    const client = await clientPromise
-    const db = client.db('mrcoco_bakery')
+    const { db } = await connectToDatabase()
     
     const menu = await db.collection('menu').findOne({})
     

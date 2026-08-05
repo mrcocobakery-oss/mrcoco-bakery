@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 
 // Helper to verify admin
@@ -36,8 +36,7 @@ export async function POST(request) {
       )
     }
 
-    const client = await clientPromise
-    const db = client.db('mrcoco_bakery')
+    const { db } = await connectToDatabase()
     
     const menuData = {
       imageUrl,
@@ -77,8 +76,7 @@ export async function DELETE(request) {
       )
     }
 
-    const client = await clientPromise
-    const db = client.db('mrcoco_bakery')
+    const { db } = await connectToDatabase()
     
     await db.collection('menu').deleteMany({})
 
