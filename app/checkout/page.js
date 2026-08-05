@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, CreditCard, Truck, Calendar, MapPin, Plus, Check } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Calendar, MapPin, Plus, Check, Shield } from 'lucide-react'
 import { toast } from 'sonner'
 import { RazorpayCheckout } from '@/components/razorpay/RazorpayCheckout'
 import { useAuth } from '@/contexts/AuthContext'
@@ -672,21 +672,21 @@ export default function CheckoutPage() {
                       </CardContent>
                     </Card>
                     
-                    {/* Online Payment (Razorpay) - Coming Soon Badge */}
-                    <Card className="border-2 border-gray-200 opacity-60">
+                    {/* Online Payment (Razorpay) */}
+                    <Card className={`border-2 cursor-pointer transition ${formData.paymentMethod === 'online' ? 'border-pink-600 bg-pink-50' : 'border-gray-200 hover:border-pink-300'}`}>
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="online" id="online" disabled />
-                          <Label htmlFor="online" className="flex-1 font-normal">
+                          <RadioGroupItem value="online" id="online" />
+                          <Label htmlFor="online" className="flex-1 font-normal cursor-pointer">
                             <div className="flex items-center justify-between">
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <p className="font-semibold text-gray-500">Online Payment (Card/UPI/Net Banking)</p>
-                                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Coming Soon</span>
+                                  <p className="font-semibold">Online Payment (Card/UPI/Net Banking)</p>
+                                  <Badge className="bg-green-500">Secure</Badge>
                                 </div>
-                                <p className="text-sm text-gray-500">Razorpay integration - Available in 24-48 hours</p>
+                                <p className="text-sm text-gray-500">Powered by Razorpay - Safe & Secure</p>
                               </div>
-                              <CreditCard className="w-6 h-6 text-gray-400" />
+                              <CreditCard className="w-6 h-6 text-pink-600" />
                             </div>
                           </Label>
                         </div>
@@ -713,6 +713,44 @@ export default function CheckoutPage() {
                           Place Order (COD)
                         </Button>
                       </div>
+                    </div>
+                  )}
+                  
+                  {formData.paymentMethod === 'online' && (
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <p className="font-semibold text-blue-900 mb-2">💳 Online Payment</p>
+                        <p className="text-sm text-blue-800 mb-3">
+                          Pay securely using Credit/Debit Card, UPI, Net Banking, or Wallets via Razorpay
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <Shield className="w-4 h-4" />
+                          <span>256-bit SSL Encryption • 100% Secure</span>
+                        </div>
+                      </div>
+                      
+                      <RazorpayCheckout
+                        amount={total}
+                        orderData={{
+                          ...formData,
+                          cart: cart,
+                          subtotal: subtotal,
+                          deliveryCharges: deliveryCharges,
+                          total: total
+                        }}
+                        onSuccess={(paymentId) => {
+                          toast.success('Payment successful! Your order is being processed.')
+                          router.push(`/order-confirmation?orderId=${paymentId}`)
+                        }}
+                        onError={(error) => {
+                          toast.error('Payment failed. Please try again.')
+                          console.error('Payment error:', error)
+                        }}
+                      />
+                      
+                      <Button onClick={() => setStep(2)} variant="outline" className="w-full">
+                        Back
+                      </Button>
                     </div>
                   )}
                   
