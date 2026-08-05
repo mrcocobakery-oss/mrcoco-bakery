@@ -559,6 +559,7 @@ export default function Home() {
                 <li><Link href="/products" className="hover:text-pink-400 transition">All Products</Link></li>
                 <li><Link href="/products?category=cakes" className="hover:text-pink-400 transition">Cakes</Link></li>
                 <li><Link href="/products?category=cookies" className="hover:text-pink-400 transition">Cookies</Link></li>
+                <li><Link href="/our-menu" className="hover:text-pink-400 transition">Our Menu</Link></li>
                 <li><Link href="/bulk-order" className="hover:text-pink-400 transition">Bulk Orders</Link></li>
                 <li><Link href="/about" className="hover:text-pink-400 transition">About Us</Link></li>
               </ul>
