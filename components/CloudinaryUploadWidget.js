@@ -18,7 +18,7 @@ export function CloudinaryUploadWidget({
   return (
     <div className="space-y-3">
       <CldUploadWidget
-        uploadPreset="ml_default"
+        signatureEndpoint="/api/cloudinary/sign"
         options={{
           cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'ueofrveh',
           sources: ['local', 'camera'],
@@ -106,6 +106,7 @@ export function CloudinaryUploadWidget({
                   src={uploadedUrl} 
                   alt="Uploaded preview" 
                   className="w-full h-32 object-cover rounded"
+                  loading="lazy"
                 />
               </div>
             )}
