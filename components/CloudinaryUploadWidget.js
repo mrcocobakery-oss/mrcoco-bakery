@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { CldUploadWidget } from 'next-cloudinary'
 import { Button } from '@/components/ui/button'
-import { Upload, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function CloudinaryUploadWidget({ 
   onUploadSuccess, 
   folder = 'admin-media',
-  buttonText = 'Upload Image'
+  buttonText = 'Upload Image',
+  multiple = false
 }) {
   const [uploading, setUploading] = useState(false)
   const [uploadedUrl, setUploadedUrl] = useState(null)
@@ -17,15 +18,35 @@ export function CloudinaryUploadWidget({
   return (
     <div className="space-y-3">
       <CldUploadWidget
-        signatureEndpoint="/api/cloudinary/sign"
+        uploadPreset="ml_default"
         options={{
-          sources: ['local'],
-          multiple: false,
-          maxFiles: 1,
-          maxFileSize: 5000000, // 5MB
-          clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'ueofrveh',
+          sources: ['local', 'camera'],
+          multiple: multiple,
+          maxFiles: multiple ? 5 : 1,
+          maxFileSize: 10000000, // 10MB
+          clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
           resourceType: 'image',
           folder: folder,
+          cropping: false,
+          showSkipCropButton: true,
+          styles: {
+            palette: {
+              window: "#FFFFFF",
+              windowBorder: "#90A0B3",
+              tabIcon: "#ec4899",
+              menuIcons: "#5A616A",
+              textDark: "#000000",
+              textLight: "#FFFFFF",
+              link: "#ec4899",
+              action: "#FF620C",
+              inactiveTabIcon: "#0E2F5A",
+              error: "#F44235",
+              inProgress: "#ec4899",
+              complete: "#20B832",
+              sourceBg: "#E4EBF1"
+            }
+          }
         }}
         onQueuesStart={() => {
           setUploading(true)
@@ -43,13 +64,13 @@ export function CloudinaryUploadWidget({
             
             setUploadedUrl(url)
             onUploadSuccess(url, result.info)
-            toast.success('Image uploaded successfully!')
+            toast.success('✓ Image uploaded successfully!')
           }
         }}
         onError={(error) => {
           setUploading(false)
           console.error('Upload error:', error)
-          toast.error('Failed to upload image')
+          toast.error('Failed to upload image. Please try again.')
         }}
       >
         {({ open }) => (
@@ -58,7 +79,7 @@ export function CloudinaryUploadWidget({
               type="button"
               onClick={() => open()}
               disabled={uploading}
-              className="w-full bg-pink-600 hover:bg-pink-700"
+              className="w-full bg-pink-600 hover:bg-pink-700 text-white"
             >
               {uploading ? (
                 <>

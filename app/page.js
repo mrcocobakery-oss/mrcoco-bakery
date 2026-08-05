@@ -131,9 +131,9 @@ export default function Home() {
       {/* Header */}
       <Header cart={cart} wishlist={wishlist} />
 
-      {/* Hero Image Slider */}
+      {/* Hero Image Slider - Mobile Optimized */}
       {sliders.length > 0 ? (
-        <section className="relative h-[400px] overflow-hidden bg-gray-900">
+        <section className="relative h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-gray-900">
           {/* Slider Images */}
           <div className="relative h-full">
             {sliders.map((slider, index) => (
@@ -154,36 +154,36 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows - Hidden on mobile, visible on tablet+ */}
           {sliders.length > 1 && (
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all z-10"
+                className="hidden md:block absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-lg transition-all z-10"
                 aria-label="Previous slide"
               >
-                <ChevronLeft className="w-6 h-6 text-gray-800" />
+                <ChevronLeft className="w-4 h-4 md:w-6 md:h-6 text-gray-800" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all z-10"
+                className="hidden md:block absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 md:p-3 rounded-full shadow-lg transition-all z-10"
                 aria-label="Next slide"
               >
-                <ChevronRight className="w-6 h-6 text-gray-800" />
+                <ChevronRight className="w-4 h-4 md:w-6 md:h-6 text-gray-800" />
               </button>
             </>
           )}
 
-          {/* Dots Indicator */}
+          {/* Dots Indicator - Smaller on mobile */}
           {sliders.length > 1 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <div className="absolute bottom-3 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 z-10">
               {sliders.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
+                  className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all ${
                     index === currentSlide
-                      ? 'bg-white w-8'
+                      ? 'bg-white w-6 md:w-8'
                       : 'bg-white/50 hover:bg-white/75'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
