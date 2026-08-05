@@ -1,0 +1,23 @@
+{
+  "name": "Mr. COCO Bakery",
+  "short_name": "Mr. COCO",
+  "description": "Premium Cakes, Cookies & Gifts in Haldwani",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/images/mrcoco-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/mrcoco-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
