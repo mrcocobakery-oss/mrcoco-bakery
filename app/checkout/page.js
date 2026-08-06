@@ -47,7 +47,7 @@ export default function CheckoutPage() {
     giftMessage: '',
     specialInstructions: '',
     // Payment
-    paymentMethod: 'cod' // Changed default to COD
+    paymentMethod: 'partial' // Default to partial payment (25% advance)
   })
   
   const [showUpiQr, setShowUpiQr] = useState(false)
@@ -600,18 +600,18 @@ export default function CheckoutPage() {
                     setShowUpiQr(false)
                     setShowBankDetails(false)
                   }}>
-                    {/* Cash on Delivery */}
-                    <Card className="border-2 hover:border-pink-400 transition cursor-pointer">
+                    {/* Partial Payment (25% Advance) */}
+                    <Card className={`border-2 cursor-pointer transition ${formData.paymentMethod === 'partial' ? 'border-pink-600 bg-pink-50' : 'border-gray-200 hover:border-pink-300'}`}>
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="cod" id="cod" />
-                          <Label htmlFor="cod" className="flex-1 font-normal cursor-pointer">
+                          <RadioGroupItem value="partial" id="partial" />
+                          <Label htmlFor="partial" className="flex-1 font-normal cursor-pointer">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="font-semibold">💵 Cash on Delivery</p>
-                                <p className="text-sm text-gray-600">Pay when you receive (Available for PIN 263139)</p>
+                                <p className="font-semibold">💰 Partial Payment (25% Advance)</p>
+                                <p className="text-sm text-gray-600">Pay ₹{Math.ceil(total * 0.25)} now + ₹{Math.ceil(total * 0.75)} on delivery</p>
                               </div>
-                              <Truck className="w-6 h-6 text-green-600" />
+                              <Truck className="w-6 h-6 text-orange-600" />
                             </div>
                           </Label>
                         </div>
@@ -695,24 +695,64 @@ export default function CheckoutPage() {
                   </RadioGroup>
                   
                   {/* Payment Instructions & Actions based on selected method */}
-                  {formData.paymentMethod === 'cod' && (
+                  {formData.paymentMethod === 'partial' && (
                     <div className="space-y-4">
-                      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-                        <p className="font-semibold text-green-900 mb-2">✅ Cash on Delivery</p>
-                        <ul className="text-sm text-green-800 space-y-1 list-disc pl-5">
-                          <li>Pay in cash when you receive your order</li>
-                          <li>Keep exact change ready for smooth delivery</li>
+                      <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+                        <p className="font-semibold text-orange-900 mb-3">💰 Partial Payment (25% Advance)</p>
+                        <div className="bg-white rounded-lg p-4 border border-orange-300 mb-3">
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700">Total Order Amount:</span>
+                              <span className="font-bold text-lg">₹{total}</span>
+                            </div>
+                            <div className="h-px bg-orange-200"></div>
+                            <div className="flex justify-between items-center text-orange-700">
+                              <span className="text-sm font-semibold">Advance Payment (25%):</span>
+                              <span className="font-bold text-xl">₹{Math.ceil(total * 0.25)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-gray-600">
+                              <span className="text-sm">Pay on Delivery (75%):</span>
+                              <span className="font-semibold">₹{Math.ceil(total * 0.75)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <ul className="text-sm text-orange-800 space-y-1 list-disc pl-5">
+                          <li>Pay 25% advance now via Razorpay (secure online payment)</li>
+                          <li>Remaining 75% to be paid in cash on delivery</li>
                           <li>Available for PIN code 263139 only</li>
                         </ul>
                       </div>
-                      <div className="flex gap-4">
-                        <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
-                          Back
-                        </Button>
-                        <Button onClick={placeOrderCOD} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-                          Place Order (COD)
-                        </Button>
-                      </div>
+                      
+                      <RazorpayCheckout
+                        amount={Math.ceil(total * 0.25)}
+                        customerInfo={{
+                          name: formData.name,
+                          email: formData.email,
+                          phone: formData.phone,
+                          address: formData.address,
+                          deliveryDetails: {
+                            deliveryDate: formData.deliveryDate,
+                            deliveryTime: formData.deliveryTime,
+                            pinCode: formData.pinCode
+                          }
+                        }}
+                        cartItems={cart}
+                        onSuccess={(data) => {
+                          toast.success('Advance payment successful! Your order is confirmed.')
+                          // Clear cart
+                          localStorage.removeItem('cart')
+                          // Redirect to order confirmation
+                          router.push(`/order-confirmation?orderId=${data.orderId}&type=partial`)
+                        }}
+                        onFailure={(error) => {
+                          toast.error('Payment failed. Please try again.')
+                          console.error('Payment error:', error)
+                        }}
+                      />
+                      
+                      <Button onClick={() => setStep(2)} variant="outline" className="w-full">
+                        Back
+                      </Button>
                     </div>
                   )}
                   
