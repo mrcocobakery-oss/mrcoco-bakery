@@ -731,18 +731,26 @@ export default function CheckoutPage() {
                       
                       <RazorpayCheckout
                         amount={total}
-                        orderData={{
-                          ...formData,
-                          cart: cart,
-                          subtotal: subtotal,
-                          deliveryCharges: deliveryCharges,
-                          total: total
+                        customerInfo={{
+                          name: formData.name,
+                          email: formData.email,
+                          phone: formData.phone,
+                          address: formData.address,
+                          deliveryDetails: {
+                            deliveryDate: formData.deliveryDate,
+                            deliveryTime: formData.deliveryTime,
+                            pinCode: formData.pinCode
+                          }
                         }}
-                        onSuccess={(paymentId) => {
+                        cartItems={cart}
+                        onSuccess={(data) => {
                           toast.success('Payment successful! Your order is being processed.')
-                          router.push(`/order-confirmation?orderId=${paymentId}`)
+                          // Clear cart
+                          localStorage.removeItem('cart')
+                          // Redirect to order confirmation
+                          router.push(`/order-confirmation?orderId=${data.orderId}`)
                         }}
-                        onError={(error) => {
+                        onFailure={(error) => {
                           toast.error('Payment failed. Please try again.')
                           console.error('Payment error:', error)
                         }}
