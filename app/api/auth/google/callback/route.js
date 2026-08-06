@@ -65,18 +65,23 @@ export async function GET(request) {
 
     if (!user) throw new Error('Unable to create or locate user')
 
-    // Create session token
-    const sessionToken = Buffer.from(
-      JSON.stringify({
+    // Create JWT session token
+    const jwt = require('jsonwebtoken')
+    const JWT_SECRET = process.env.JWT_SECRET || 'mrcoco-bakery-secret-key-change-in-production'
+    
+    const sessionToken = jwt.sign(
+      {
         userId: user._id.toString(),
         email: user.email,
         name: user.name,
-        exp: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
-      })
-    ).toString('base64')
+      },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    )
 
-    const response = NextResponse.redirect(new URL('/dashboard', request.url))
-    response.cookies.set('auth_token', sessionToken, {
+    // Redirect to homepage after successful login
+    const response = NextResponse.redirect(new URL('/', request.url))
+    response.cookies.set('token', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
