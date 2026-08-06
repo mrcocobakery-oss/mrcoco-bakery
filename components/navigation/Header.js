@@ -22,7 +22,22 @@ export function Header({ cart = [], wishlist = [] }) {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
   const searchRef = useRef(null)
+  const cakesMenuTimeout = useRef(null)
   const { user } = useAuth()
+
+  // Handle cakes menu with delay
+  const handleCakesMenuEnter = () => {
+    if (cakesMenuTimeout.current) {
+      clearTimeout(cakesMenuTimeout.current)
+    }
+    setShowCakesMenu(true)
+  }
+
+  const handleCakesMenuLeave = () => {
+    cakesMenuTimeout.current = setTimeout(() => {
+      setShowCakesMenu(false)
+    }, 300) // 300ms delay before closing
+  }
 
   // Debounced search
   useEffect(() => {
@@ -290,8 +305,8 @@ export function Header({ cart = [], wishlist = [] }) {
             {/* Cakes Mega Menu */}
             <div 
               className="relative"
-              onMouseEnter={() => setShowCakesMenu(true)}
-              onMouseLeave={() => setShowCakesMenu(false)}
+              onMouseEnter={handleCakesMenuEnter}
+              onMouseLeave={handleCakesMenuLeave}
             >
               <button className="text-sm font-semibold text-gray-700 hover:text-pink-600 transition flex items-center gap-1">
                 Cakes
@@ -300,7 +315,7 @@ export function Header({ cart = [], wishlist = [] }) {
 
               {/* Mega Menu Dropdown */}
               {showCakesMenu && (
-                <div className="absolute top-full left-0 mt-2 w-[1000px] max-w-[90vw] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6 z-50">
+                <div className="absolute top-full left-0 mt-0 w-[1000px] max-w-[90vw] bg-white rounded-xl shadow-2xl border-2 border-pink-200 p-6 z-50">
                   <div className="grid grid-cols-4 gap-6">
                     {/* Column 1 */}
                     <div>
