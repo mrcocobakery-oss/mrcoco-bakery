@@ -506,43 +506,47 @@ export default function CheckoutPage() {
                     </>
                   )}
                   
-                  <div>
-                    <Label htmlFor="deliveryDate">Preferred Delivery Date {cart.some(item => item.category === 'cakes') && '*'}</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <Input 
-                        id="deliveryDate" 
-                        name="deliveryDate" 
-                        type="date" 
-                        value={formData.deliveryDate} 
-                        onChange={handleInputChange} 
-                        min={new Date().toISOString().split('T')[0]}
-                        className="pl-10" 
-                      />
-                    </div>
-                    {cart.some(item => item.category === 'cakes') && (
-                      <p className="text-xs text-pink-600 mt-1">Delivery date is required for cake orders</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <Label>Preferred Delivery Time</Label>
-                    <p className="text-xs text-gray-500 mb-2">Available: 10:00 AM - 8:00 PM</p>
-                    <RadioGroup value={formData.deliveryTime} onValueChange={(value) => setFormData({...formData, deliveryTime: value})}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="10am-12pm" id="morning" />
-                        <Label htmlFor="morning" className="font-normal cursor-pointer">Morning (10 AM - 12 PM)</Label>
+                  {/* Delivery Date and Time - ONLY for Cakes */}
+                  {cart.some(item => item.category === 'cakes') && (
+                    <>
+                      <div>
+                        <Label htmlFor="deliveryDate">Preferred Delivery Date *</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <Input 
+                            id="deliveryDate" 
+                            name="deliveryDate" 
+                            type="date" 
+                            value={formData.deliveryDate} 
+                            onChange={handleInputChange} 
+                            min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                            className="pl-10" 
+                            required
+                          />
+                        </div>
+                        <p className="text-xs text-pink-600 mt-1">* Cakes require minimum 24 hours advance order</p>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="12pm-4pm" id="afternoon" />
-                        <Label htmlFor="afternoon" className="font-normal cursor-pointer">Afternoon (12 PM - 4 PM)</Label>
+                      
+                      <div>
+                        <Label>Preferred Delivery Time *</Label>
+                        <p className="text-xs text-gray-500 mb-2">Available: 10:00 AM - 8:00 PM</p>
+                        <RadioGroup value={formData.deliveryTime} onValueChange={(value) => setFormData({...formData, deliveryTime: value})} required>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="10am-12pm" id="morning" />
+                            <Label htmlFor="morning" className="font-normal cursor-pointer">Morning (10 AM - 12 PM)</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="12pm-4pm" id="afternoon" />
+                            <Label htmlFor="afternoon" className="font-normal cursor-pointer">Afternoon (12 PM - 4 PM)</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="4pm-8pm" id="evening" />
+                            <Label htmlFor="evening" className="font-normal cursor-pointer">Evening (4 PM - 8 PM)</Label>
+                          </div>
+                        </RadioGroup>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="4pm-8pm" id="evening" />
-                        <Label htmlFor="evening" className="font-normal cursor-pointer">Evening (4 PM - 8 PM)</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
+                    </>
+                  )}
                   
                   {/* Express Delivery Option */}
                   <Card className="border-2 border-pink-200 bg-pink-50">
