@@ -301,23 +301,21 @@ export default function Home() {
             </div>
           )}
 
-          {/* Fallback if no gallery items */}
+          {/* Message when no images uploaded yet */}
           {decorationGallery.length === 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[
-                'https://images.unsplash.com/photo-1519167758481-83f29da8c8d0?w=500',
-                'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=500',
-                'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=500',
-                'https://images.unsplash.com/photo-1530103043960-ef38714abb15?w=500'
-              ].map((img, idx) => (
-                <div key={idx} className="relative aspect-square overflow-hidden rounded-lg group">
-                  <img
-                    src={img}
-                    alt={`Decoration ${idx + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </div>
-              ))}
+            <div className="text-center py-16">
+              <div className="bg-white rounded-xl p-8 max-w-md mx-auto border-2 border-dashed border-pink-300">
+                <Sparkles className="w-12 h-12 text-pink-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-pink-900 mb-2">Decoration Gallery Coming Soon!</h3>
+                <p className="text-gray-600 mb-4">
+                  Upload stunning decoration images from your admin panel to showcase your work here.
+                </p>
+                <Link href="/admin/decoration-gallery">
+                  <Button className="bg-pink-600 hover:bg-pink-700">
+                    Go to Admin Panel
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
         </div>
