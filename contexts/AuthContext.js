@@ -16,18 +16,15 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const token = Cookies.get('token')
-      if (!token) {
-        setLoading(false)
-        return
-      }
-
-      const response = await fetch('/api/auth/me')
+      // Don't check for cookie client-side since it's httpOnly
+      // Just call the API which will read the cookie server-side
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include' // Important: include cookies in request
+      })
+      
       if (response.ok) {
         const data = await response.json()
         setUser(data.user)
-      } else {
-        Cookies.remove('token')
       }
     } catch (error) {
       console.error('Auth check error:', error)
@@ -41,7 +38,8 @@ export function AuthProvider({ children }) {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'include' // Include cookies
       })
 
       const data = await response.json()
@@ -64,7 +62,8 @@ export function AuthProvider({ children }) {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, phone })
+        body: JSON.stringify({ name, email, password, phone }),
+        credentials: 'include' // Include cookies
       })
 
       const data = await response.json()
