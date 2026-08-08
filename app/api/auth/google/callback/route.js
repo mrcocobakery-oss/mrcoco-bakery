@@ -79,8 +79,8 @@ export async function GET(request) {
       { expiresIn: '30d' }
     )
 
-    // Redirect to homepage after successful login
-    const response = NextResponse.redirect(new URL('/', request.url))
+    // Redirect to dashboard after successful login
+    const response = NextResponse.redirect(new URL('/dashboard', request.url))
     response.cookies.set('token', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
