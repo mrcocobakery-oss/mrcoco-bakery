@@ -80,6 +80,12 @@ export default function CheckoutPage() {
         email: user.email || '',
         phone: user.phone || ''
       }))
+      // Set loyalty points
+      setLoyaltyPoints(user.loyaltyPoints || 0)
+    }
+  }, [user])
+        phone: user.phone || ''
+      }))
     }
   }, [user])
   
@@ -244,6 +250,11 @@ export default function CheckoutPage() {
       return
     }
 
+    if (points % 100 !== 0) {
+      toast.error('Points must be in multiples of 100')
+      return
+    }
+
     if (points > loyaltyPoints) {
       toast.error('Insufficient loyalty points')
       return
@@ -254,10 +265,9 @@ export default function CheckoutPage() {
       const response = await fetch('/api/loyalty/apply-points', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          userId: 'current-user-id', // Replace with actual user ID from context
-          pointsToRedeem: points,
-          orderTotal: subtotal + deliveryCharge + expressDeliveryFee
+          pointsToRedeem: points
         })
       })
 

@@ -71,6 +71,24 @@ export async function POST(request) {
       // Don't fail the payment verification if email fails
     }
 
+    // Auto-credit loyalty points after successful payment
+    if (order.userId) {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order._id,
+            userId: order.userId,
+            loyaltyPointsUsed: order.loyaltyPointsUsed || 0
+          })
+        })
+      } catch (loyaltyError) {
+        console.error('Error crediting loyalty points:', loyaltyError)
+        // Don't fail the payment verification if loyalty points fail
+      }
+    }
+
     return NextResponse.json({
       success: true,
       orderId: order._id,

@@ -1,44 +1,77 @@
 import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/mongodb'
-import { v4 as uuidv4 } from 'uuid'
+import { connectDB } from '@/lib/mongodb'
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
-// POST - Apply loyalty points at checkout
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+
 export async function POST(request) {
   try {
-    const body = await request.json()
-    const { userId, pointsToRedeem, orderTotal } = body
+    const cookieStore = await cookies()
+    const token = cookieStore.get('token')?.value
 
-    if (!userId || !pointsToRedeem) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { db } = await connectToDatabase()
+    const decoded = jwt.verify(token, JWT_SECRET)
+    const userId = decoded.userId
 
-    // Get user's current points
-    const user = await db.collection('users').findOne({ _id: userId })
+    const { pointsToRedeem } = await request.json()
+
+    if (!pointsToRedeem || pointsToRedeem <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid points amount' },
+        { status: 400 }
+      )
+    }
+
+    // Points are in multiples of 100
+    if (pointsToRedeem % 100 !== 0) {
+      return NextResponse.json(
+        { error: 'Points must be in multiples of 100' },
+        { status: 400 }
+      )
+    }
+
+    const { db } = await connectDB()
+
+    // Get user's loyalty points
+    const user = await db.collection('users').findOne(
+      { _id: userId },
+      { projection: { loyaltyPoints: 1 } }
+    )
+
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
     }
 
-    const currentPoints = user.loyaltyPoints || 0
-    if (currentPoints < pointsToRedeem) {
-      return NextResponse.json({ error: 'Insufficient points' }, { status: 400 })
+    if (user.loyaltyPoints < pointsToRedeem) {
+      return NextResponse.json(
+        { error: 'Insufficient loyalty points' },
+        { status: 400 }
+      )
     }
 
-    // Calculate discount (1 point = ₹1)
+    // Calculate discount (100 points = ₹100)
     const discount = pointsToRedeem
 
-    // Ensure discount doesn't exceed order total
-    const finalDiscount = Math.min(discount, orderTotal)
+    // Note: Points will be deducted only after successful order completion
+    // This endpoint just validates and returns the discount amount
 
     return NextResponse.json({
       success: true,
-      pointsToRedeem,
-      discount: finalDiscount,
-      remainingPoints: currentPoints - pointsToRedeem
+      discount,
+      pointsToRedeem
     })
   } catch (error) {
     console.error('Error applying loyalty points:', error)
-    return NextResponse.json({ error: 'Failed to apply points' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to apply loyalty points' },
+      { status: 500 }
+    )
   }
 }
