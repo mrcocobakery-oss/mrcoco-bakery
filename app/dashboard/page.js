@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ShoppingBag, Wallet, Award, Gift, Heart, Package, TrendingUp, ArrowRight } from 'lucide-react'
+import { ShoppingBag, Wallet, Award, Gift, Heart, Package, TrendingUp, ArrowRight, MapPin } from 'lucide-react'
 
 export default function DashboardPage() {
   const { user } = useAuth()
