@@ -246,7 +246,8 @@ export default function AdminCataloguePage() {
             <div className="bg-white rounded-lg p-4 border border-blue-200">
               <h4 className="font-semibold text-blue-900 mb-2">📋 Upload Instructions</h4>
               <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                <li>Only PDF files are accepted</n                <li>Maximum file size is 10MB</li>
+                <li>Only PDF files are accepted</li>
+                <li>Maximum file size is 10MB</li>
                 <li>Uploading a new catalogue will replace the existing one</li>
                 <li>Catalogue will be available on "Become Our Partner" page</li>
               </ul>

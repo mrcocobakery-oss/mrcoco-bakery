@@ -1,511 +1,413 @@
 #!/usr/bin/env python3
 """
-Backend API Test Suite for Mr. COCO Bakery - Authentication Flow
-Tests customer authentication including signup, login, session management, and Google OAuth setup
+Backend API Testing Script for Mr. COCO Bakery - Catalogue Management
+Tests all catalogue-related endpoints with authentication and database validation
 """
 
 import requests
 import json
-import os
+import sys
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://coco-premium-bakes.preview.emergentagent.com')
-API_BASE = f"{BASE_URL}/api"
+# Base URL from environment
+BASE_URL = "https://coco-premium-bakes.preview.emergentagent.com/api"
 
-# Test data
-TEST_USER = {
-    "name": "Test Customer",
-    "email": "test@mrcocobakery.com",
-    "password": "Test123!@#",
-    "phone": "9876543210"
-}
+# Admin credentials
+ADMIN_TOKEN = "admin_logged_in"
+
+# Color codes for output
+GREEN = '\033[92m'
+RED = '\033[91m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+RESET = '\033[0m'
 
 def print_test_header(test_name):
-    print(f"\n{'='*80}")
-    print(f"TEST: {test_name}")
-    print(f"{'='*80}")
+    print(f"\n{BLUE}{'='*80}{RESET}")
+    print(f"{BLUE}TEST: {test_name}{RESET}")
+    print(f"{BLUE}{'='*80}{RESET}")
 
-def print_result(success, message):
-    status = "✅ PASS" if success else "❌ FAIL"
-    print(f"{status}: {message}")
+def print_success(message):
+    print(f"{GREEN}✅ SUCCESS: {message}{RESET}")
 
-def test_signup():
-    """Test 1: User Signup - Create test account if doesn't exist"""
-    print_test_header("User Signup (POST /api/auth/signup)")
+def print_error(message):
+    print(f"{RED}❌ FAILED: {message}{RESET}")
+
+def print_info(message):
+    print(f"{YELLOW}ℹ️  INFO: {message}{RESET}")
+
+# Test counters
+tests_passed = 0
+tests_failed = 0
+test_results = []
+
+def record_test(test_name, passed, message):
+    global tests_passed, tests_failed
+    if passed:
+        tests_passed += 1
+        print_success(f"{test_name}: {message}")
+    else:
+        tests_failed += 1
+        print_error(f"{test_name}: {message}")
+    test_results.append({
+        'test': test_name,
+        'passed': passed,
+        'message': message
+    })
+
+# ============================================================================
+# TEST 1: GET /api/catalogue - Public Endpoint (No Auth Required)
+# ============================================================================
+def test_get_catalogue_public():
+    print_test_header("GET /api/catalogue - Public Catalogue Fetch")
     
     try:
-        response = requests.post(
-            f"{API_BASE}/auth/signup",
-            json=TEST_USER,
-            timeout=10
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
+        response = requests.get(f"{BASE_URL}/catalogue", timeout=10)
+        print_info(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
             
             # Check response structure
-            if not data.get('success'):
-                print_result(False, "Response missing 'success' field")
-                return None
-            
-            if 'user' not in data:
-                print_result(False, "Response missing 'user' field")
-                return None
-            
-            if 'token' not in data:
-                print_result(False, "Response missing 'token' field")
-                return None
-            
-            user = data['user']
-            
-            # Verify user data
-            if 'password' in user:
-                print_result(False, "User object contains password field (security issue)")
-                return None
-            
-            if user.get('email') != TEST_USER['email'].lower():
-                print_result(False, f"Email mismatch: expected {TEST_USER['email'].lower()}, got {user.get('email')}")
-                return None
-            
-            if user.get('name') != TEST_USER['name']:
-                print_result(False, f"Name mismatch: expected {TEST_USER['name']}, got {user.get('name')}")
-                return None
-            
-            # Check for httpOnly cookie
-            cookies = response.cookies
-            if 'token' not in cookies:
-                print_result(False, "No 'token' cookie set in response")
-                return None
-            
-            print(f"Cookie 'token' set: {cookies['token'][:20]}...")
-            
-            print_result(True, f"User created successfully with ID: {user.get('_id')}")
-            return data['token']
-            
-        elif response.status_code == 400 and 'already registered' in response.text.lower():
-            print_result(True, "User already exists (expected for existing test account)")
-            return "USER_EXISTS"
-        else:
-            print_result(False, f"Unexpected status code: {response.status_code}")
-            return None
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return None
-
-def test_login():
-    """Test 2: User Login - Authenticate with email/password"""
-    print_test_header("User Login (POST /api/auth/login)")
-    
-    try:
-        response = requests.post(
-            f"{API_BASE}/auth/login",
-            json={
-                "email": TEST_USER['email'],
-                "password": TEST_USER['password']
-            },
-            timeout=10
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        
-        if response.status_code == 200:
-            data = response.json()
-            
-            # Check response structure
-            if not data.get('success'):
-                print_result(False, "Response missing 'success' field")
-                return None
-            
-            if 'user' not in data:
-                print_result(False, "Response missing 'user' field")
-                return None
-            
-            if 'token' not in data:
-                print_result(False, "Response missing 'token' field")
-                return None
-            
-            user = data['user']
-            token = data['token']
-            
-            # Verify user data
-            if 'password' in user:
-                print_result(False, "User object contains password field (security issue)")
-                return None
-            
-            if user.get('email') != TEST_USER['email'].lower():
-                print_result(False, f"Email mismatch: expected {TEST_USER['email'].lower()}, got {user.get('email')}")
-                return None
-            
-            # Check for httpOnly cookie
-            cookies = response.cookies
-            if 'token' not in cookies:
-                print_result(False, "No 'token' cookie set in response")
-                return None
-            
-            # Verify cookie attributes (from Set-Cookie header)
-            set_cookie_header = response.headers.get('Set-Cookie', '')
-            print(f"Set-Cookie header: {set_cookie_header}")
-            
-            if 'HttpOnly' not in set_cookie_header:
-                print_result(False, "Cookie is not HttpOnly")
-                return None
-            
-            if 'SameSite=Lax' not in set_cookie_header and 'SameSite=lax' not in set_cookie_header:
-                print_result(False, "Cookie SameSite attribute not set to 'lax'")
-                return None
-            
-            if 'Path=/' not in set_cookie_header:
-                print_result(False, "Cookie Path not set to '/'")
-                return None
-            
-            print_result(True, f"Login successful. Token: {token[:20]}...")
-            print(f"✅ Cookie is HttpOnly: True")
-            print(f"✅ Cookie SameSite: lax")
-            print(f"✅ Cookie Path: /")
-            
-            return token
-            
-        else:
-            print_result(False, f"Login failed with status: {response.status_code}")
-            return None
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return None
-
-def test_get_current_user_with_cookie(token):
-    """Test 3: Get Current User with Cookie - Verify session with httpOnly cookie"""
-    print_test_header("Get Current User with Cookie (GET /api/auth/me)")
-    
-    try:
-        # Simulate cookie being sent by browser
-        cookies = {'token': token}
-        
-        response = requests.get(
-            f"{API_BASE}/auth/me",
-            cookies=cookies,
-            timeout=10
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        
-        if response.status_code == 200:
-            data = response.json()
-            
-            if not data.get('success'):
-                print_result(False, "Response missing 'success' field")
-                return False
-            
-            if 'user' not in data:
-                print_result(False, "Response missing 'user' field")
-                return False
-            
-            user = data['user']
-            
-            # Verify user data
-            if 'password' in user:
-                print_result(False, "User object contains password field (security issue)")
-                return False
-            
-            if '_id' not in user:
-                print_result(False, "User object missing '_id' field")
-                return False
-            
-            if user.get('email') != TEST_USER['email'].lower():
-                print_result(False, f"Email mismatch: expected {TEST_USER['email'].lower()}, got {user.get('email')}")
-                return False
-            
-            print_result(True, f"User data retrieved successfully. User ID: {user.get('_id')}")
-            print(f"✅ User email: {user.get('email')}")
-            print(f"✅ User name: {user.get('name')}")
-            print(f"✅ Password field excluded: True")
-            
-            return True
-            
-        else:
-            print_result(False, f"Failed to get user with status: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
-
-def test_get_current_user_without_token():
-    """Test 4: Get Current User without Token - Should return 401"""
-    print_test_header("Get Current User without Token (GET /api/auth/me)")
-    
-    try:
-        response = requests.get(
-            f"{API_BASE}/auth/me",
-            timeout=10
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        
-        if response.status_code == 401:
-            data = response.json()
-            if 'error' in data:
-                print_result(True, f"Correctly returned 401 Unauthorized: {data['error']}")
-                return True
+            if 'success' in data and data['success'] == True:
+                if 'catalogue' in data:
+                    if data['catalogue'] is None:
+                        record_test("GET /api/catalogue", True, "No catalogue uploaded yet (returns null as expected)")
+                    else:
+                        # Validate catalogue structure
+                        catalogue = data['catalogue']
+                        required_fields = ['fileUrl', 'fileName', 'uploadedAt']
+                        missing_fields = [f for f in required_fields if f not in catalogue]
+                        
+                        if missing_fields:
+                            record_test("GET /api/catalogue", False, f"Missing fields in catalogue: {missing_fields}")
+                        else:
+                            record_test("GET /api/catalogue", True, f"Catalogue fetched successfully: {catalogue['fileName']}")
+                else:
+                    record_test("GET /api/catalogue", False, "Response missing 'catalogue' field")
             else:
-                print_result(False, "401 response missing 'error' field")
-                return False
+                record_test("GET /api/catalogue", False, "Response missing 'success' field or success is false")
         else:
-            print_result(False, f"Expected 401, got {response.status_code}")
-            return False
+            record_test("GET /api/catalogue", False, f"Unexpected status code: {response.status_code}")
             
     except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
+        record_test("GET /api/catalogue", False, f"Exception occurred: {str(e)}")
 
-def test_login_wrong_password():
-    """Test 5: Login with Wrong Password - Should return 401"""
-    print_test_header("Login with Wrong Password (POST /api/auth/login)")
+# ============================================================================
+# TEST 2: POST /api/admin/catalogue - Unauthorized (No Token)
+# ============================================================================
+def test_post_catalogue_unauthorized():
+    print_test_header("POST /api/admin/catalogue - Unauthorized Access")
     
     try:
-        response = requests.post(
-            f"{API_BASE}/auth/login",
-            json={
-                "email": TEST_USER['email'],
-                "password": "WrongPassword123"
-            },
-            timeout=10
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        
-        if response.status_code == 401:
-            data = response.json()
-            if 'error' in data:
-                print_result(True, f"Correctly rejected wrong password: {data['error']}")
-                return True
-            else:
-                print_result(False, "401 response missing 'error' field")
-                return False
-        else:
-            print_result(False, f"Expected 401, got {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
-
-def test_google_oauth_callback_endpoint():
-    """Test 6: Google OAuth Callback Endpoint - Verify endpoint exists and configuration"""
-    print_test_header("Google OAuth Callback Endpoint (GET /api/auth/google/callback)")
-    
-    try:
-        # We can't test the full OAuth flow, but we can verify the endpoint exists
-        # and returns appropriate error for missing parameters
-        response = requests.get(
-            f"{API_BASE}/auth/google/callback",
-            timeout=10,
-            allow_redirects=False
-        )
-        
-        print(f"Status Code: {response.status_code}")
-        print(f"Response Headers: {dict(response.headers)}")
-        
-        # Should redirect (302/307) due to missing OAuth parameters
-        if response.status_code in [302, 307, 308]:
-            location = response.headers.get('Location', '')
-            print(f"Redirect Location: {location}")
-            
-            if 'error=oauth_state' in location or 'error=oauth_failed' in location:
-                print_result(True, "Google OAuth callback endpoint exists and handles missing parameters correctly")
-                print(f"✅ Endpoint redirects to login with error parameter")
-                return True
-            else:
-                print_result(True, "Google OAuth callback endpoint exists (redirects)")
-                return True
-        else:
-            print_result(False, f"Unexpected status code: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
-
-def test_cookie_configuration():
-    """Test 7: Verify Cookie Configuration"""
-    print_test_header("Cookie Configuration Verification")
-    
-    try:
-        # Login to get cookie
-        response = requests.post(
-            f"{API_BASE}/auth/login",
-            json={
-                "email": TEST_USER['email'],
-                "password": TEST_USER['password']
-            },
-            timeout=10
-        )
-        
-        if response.status_code != 200:
-            print_result(False, "Login failed, cannot test cookie configuration")
-            return False
-        
-        set_cookie_header = response.headers.get('Set-Cookie', '')
-        print(f"Set-Cookie header: {set_cookie_header}")
-        
-        checks = {
-            "Cookie name is 'token'": 'token=' in set_cookie_header,
-            "HttpOnly": 'HttpOnly' in set_cookie_header,
-            "SameSite=lax": 'SameSite=Lax' in set_cookie_header or 'SameSite=lax' in set_cookie_header,
-            "Path=/": 'Path=/' in set_cookie_header,
-            "Max-Age set": 'Max-Age=' in set_cookie_header
+        payload = {
+            "fileUrl": "https://example.com/test-catalogue.pdf",
+            "fileName": "test-catalogue.pdf",
+            "fileSize": 1024000
         }
         
-        all_passed = True
-        for check_name, passed in checks.items():
-            status = "✅" if passed else "❌"
-            print(f"{status} {check_name}: {passed}")
-            if not passed:
-                all_passed = False
-        
-        # Check Max-Age value (should be 30 days = 2592000 seconds or 7 days = 604800 seconds)
-        if 'Max-Age=' in set_cookie_header:
-            max_age_str = set_cookie_header.split('Max-Age=')[1].split(';')[0]
-            max_age = int(max_age_str)
-            days = max_age / (24 * 60 * 60)
-            print(f"✅ Max-Age: {max_age} seconds ({days:.0f} days)")
-            
-            if days >= 7 and days <= 30:
-                print(f"✅ Max-Age is within acceptable range (7-30 days)")
-            else:
-                print(f"⚠️  Max-Age is {days:.0f} days (expected 7-30 days)")
-        
-        if all_passed:
-            print_result(True, "All cookie configuration checks passed")
-            return True
-        else:
-            print_result(False, "Some cookie configuration checks failed")
-            return False
-            
-    except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
-
-def test_session_persistence():
-    """Test 8: Session Persistence - Verify token works across multiple requests"""
-    print_test_header("Session Persistence Verification")
-    
-    try:
-        # Login to get token
-        login_response = requests.post(
-            f"{API_BASE}/auth/login",
-            json={
-                "email": TEST_USER['email'],
-                "password": TEST_USER['password']
-            },
+        response = requests.post(
+            f"{BASE_URL}/admin/catalogue",
+            json=payload,
             timeout=10
         )
         
-        if login_response.status_code != 200:
-            print_result(False, "Login failed")
-            return False
+        print_info(f"Status Code: {response.status_code}")
         
-        token = login_response.json()['token']
-        cookies = {'token': token}
-        
-        # Make multiple requests with the same token
-        print("Making 3 consecutive requests with same token...")
-        
-        for i in range(1, 4):
-            response = requests.get(
-                f"{API_BASE}/auth/me",
-                cookies=cookies,
-                timeout=10
-            )
+        if response.status_code == 401:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
             
-            if response.status_code == 200:
-                data = response.json()
-                user = data.get('user', {})
-                print(f"  Request {i}: ✅ Success - User: {user.get('email')}")
+            if 'error' in data and 'Unauthorized' in data['error']:
+                record_test("POST /api/admin/catalogue (No Auth)", True, "Correctly rejected unauthorized request with 401")
             else:
-                print(f"  Request {i}: ❌ Failed - Status: {response.status_code}")
-                print_result(False, f"Session persistence failed on request {i}")
-                return False
-        
-        print_result(True, "Session persists across multiple requests")
-        return True
+                record_test("POST /api/admin/catalogue (No Auth)", True, "Rejected with 401 but different error message")
+        else:
+            record_test("POST /api/admin/catalogue (No Auth)", False, f"Expected 401, got {response.status_code}")
             
     except Exception as e:
-        print_result(False, f"Exception occurred: {str(e)}")
-        return False
+        record_test("POST /api/admin/catalogue (No Auth)", False, f"Exception occurred: {str(e)}")
 
-def run_all_tests():
-    """Run all authentication tests"""
-    print("\n" + "="*80)
-    print("AUTHENTICATION FLOW TEST SUITE - Mr. COCO Bakery")
-    print(f"Base URL: {BASE_URL}")
-    print(f"API Base: {API_BASE}")
-    print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("="*80)
+# ============================================================================
+# TEST 3: POST /api/admin/catalogue - Missing Required Fields
+# ============================================================================
+def test_post_catalogue_missing_fields():
+    print_test_header("POST /api/admin/catalogue - Missing Required Fields")
     
-    results = {}
+    try:
+        # Missing fileName
+        payload = {
+            "fileUrl": "https://example.com/test-catalogue.pdf"
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/admin/catalogue",
+            json=payload,
+            headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+            timeout=10
+        )
+        
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 400:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            if 'error' in data:
+                record_test("POST /api/admin/catalogue (Missing Fields)", True, f"Correctly rejected with 400: {data['error']}")
+            else:
+                record_test("POST /api/admin/catalogue (Missing Fields)", True, "Rejected with 400")
+        else:
+            record_test("POST /api/admin/catalogue (Missing Fields)", False, f"Expected 400, got {response.status_code}")
+            
+    except Exception as e:
+        record_test("POST /api/admin/catalogue (Missing Fields)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# TEST 4: POST /api/admin/catalogue - Valid Upload with Admin Token
+# ============================================================================
+def test_post_catalogue_valid():
+    print_test_header("POST /api/admin/catalogue - Valid Catalogue Upload")
     
-    # Test 1: Signup
-    token = test_signup()
-    results['signup'] = token is not None or token == "USER_EXISTS"
+    try:
+        payload = {
+            "fileUrl": "https://res.cloudinary.com/demo/raw/upload/sample.pdf",
+            "fileName": "Mr-COCO-Product-Catalogue-2025.pdf",
+            "fileSize": 2048576
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/admin/catalogue",
+            json=payload,
+            headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+            timeout=10
+        )
+        
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            # Validate response structure
+            if data.get('success') == True:
+                if 'message' in data and 'catalogue' in data:
+                    catalogue = data['catalogue']
+                    
+                    # Validate catalogue fields
+                    if catalogue.get('fileUrl') == payload['fileUrl'] and \
+                       catalogue.get('fileName') == payload['fileName'] and \
+                       catalogue.get('fileSize') == payload['fileSize'] and \
+                       'uploadedAt' in catalogue:
+                        record_test("POST /api/admin/catalogue (Valid)", True, f"Catalogue uploaded successfully: {catalogue['fileName']}")
+                        return catalogue  # Return for use in other tests
+                    else:
+                        record_test("POST /api/admin/catalogue (Valid)", False, "Catalogue data doesn't match uploaded data")
+                else:
+                    record_test("POST /api/admin/catalogue (Valid)", False, "Response missing 'message' or 'catalogue' field")
+            else:
+                record_test("POST /api/admin/catalogue (Valid)", False, "Response success is false")
+        else:
+            data = response.json() if response.headers.get('content-type') == 'application/json' else {}
+            record_test("POST /api/admin/catalogue (Valid)", False, f"Expected 200, got {response.status_code}: {data}")
+            
+    except Exception as e:
+        record_test("POST /api/admin/catalogue (Valid)", False, f"Exception occurred: {str(e)}")
     
-    # Test 2: Login
-    token = test_login()
-    results['login'] = token is not None
+    return None
+
+# ============================================================================
+# TEST 5: GET /api/catalogue - Verify Uploaded Catalogue
+# ============================================================================
+def test_get_catalogue_after_upload():
+    print_test_header("GET /api/catalogue - Verify Uploaded Catalogue")
     
-    if token:
-        # Test 3: Get current user with cookie
-        results['get_user_with_cookie'] = test_get_current_user_with_cookie(token)
-    else:
-        results['get_user_with_cookie'] = False
-        print_result(False, "Skipping get_user_with_cookie test (no token)")
+    try:
+        response = requests.get(f"{BASE_URL}/catalogue", timeout=10)
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            if data.get('success') == True and data.get('catalogue') is not None:
+                catalogue = data['catalogue']
+                
+                # Verify it's the catalogue we just uploaded
+                if catalogue.get('fileName') == "Mr-COCO-Product-Catalogue-2025.pdf":
+                    record_test("GET /api/catalogue (After Upload)", True, f"Catalogue retrieved successfully: {catalogue['fileName']}")
+                else:
+                    record_test("GET /api/catalogue (After Upload)", True, f"Catalogue exists but different file: {catalogue.get('fileName')}")
+            else:
+                record_test("GET /api/catalogue (After Upload)", False, "No catalogue found after upload")
+        else:
+            record_test("GET /api/catalogue (After Upload)", False, f"Unexpected status code: {response.status_code}")
+            
+    except Exception as e:
+        record_test("GET /api/catalogue (After Upload)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# TEST 6: POST /api/admin/catalogue - Replace Existing Catalogue
+# ============================================================================
+def test_post_catalogue_replace():
+    print_test_header("POST /api/admin/catalogue - Replace Existing Catalogue")
     
-    # Test 4: Get current user without token
-    results['get_user_without_token'] = test_get_current_user_without_token()
+    try:
+        payload = {
+            "fileUrl": "https://res.cloudinary.com/demo/raw/upload/sample2.pdf",
+            "fileName": "Mr-COCO-Updated-Catalogue-2025.pdf",
+            "fileSize": 3145728
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/admin/catalogue",
+            json=payload,
+            headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+            timeout=10
+        )
+        
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            if data.get('success') == True and data.get('catalogue', {}).get('fileName') == payload['fileName']:
+                record_test("POST /api/admin/catalogue (Replace)", True, "Old catalogue replaced with new one successfully")
+                
+                # Verify only one catalogue exists
+                get_response = requests.get(f"{BASE_URL}/catalogue", timeout=10)
+                if get_response.status_code == 200:
+                    get_data = get_response.json()
+                    if get_data.get('catalogue', {}).get('fileName') == payload['fileName']:
+                        print_info("✓ Verified: Only new catalogue exists (old one was deleted)")
+                    else:
+                        print_info("⚠ Warning: Retrieved catalogue doesn't match uploaded one")
+            else:
+                record_test("POST /api/admin/catalogue (Replace)", False, "Failed to replace catalogue")
+        else:
+            record_test("POST /api/admin/catalogue (Replace)", False, f"Expected 200, got {response.status_code}")
+            
+    except Exception as e:
+        record_test("POST /api/admin/catalogue (Replace)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# TEST 7: DELETE /api/admin/catalogue - Unauthorized
+# ============================================================================
+def test_delete_catalogue_unauthorized():
+    print_test_header("DELETE /api/admin/catalogue - Unauthorized Access")
     
-    # Test 5: Login with wrong password
-    results['login_wrong_password'] = test_login_wrong_password()
+    try:
+        response = requests.delete(f"{BASE_URL}/admin/catalogue", timeout=10)
+        
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 401:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            record_test("DELETE /api/admin/catalogue (No Auth)", True, "Correctly rejected unauthorized delete with 401")
+        else:
+            record_test("DELETE /api/admin/catalogue (No Auth)", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        record_test("DELETE /api/admin/catalogue (No Auth)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# TEST 8: DELETE /api/admin/catalogue - Valid Delete with Admin Token
+# ============================================================================
+def test_delete_catalogue_valid():
+    print_test_header("DELETE /api/admin/catalogue - Valid Catalogue Delete")
     
-    # Test 6: Google OAuth callback endpoint
-    results['google_oauth_callback'] = test_google_oauth_callback_endpoint()
+    try:
+        response = requests.delete(
+            f"{BASE_URL}/admin/catalogue",
+            headers={"Authorization": f"Bearer {ADMIN_TOKEN}"},
+            timeout=10
+        )
+        
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            if data.get('success') == True and 'message' in data:
+                record_test("DELETE /api/admin/catalogue (Valid)", True, f"Catalogue deleted successfully: {data['message']}")
+                
+                # Verify catalogue is deleted
+                get_response = requests.get(f"{BASE_URL}/catalogue", timeout=10)
+                if get_response.status_code == 200:
+                    get_data = get_response.json()
+                    if get_data.get('catalogue') is None:
+                        print_info("✓ Verified: Catalogue is null after deletion")
+                    else:
+                        print_info("⚠ Warning: Catalogue still exists after deletion")
+            else:
+                record_test("DELETE /api/admin/catalogue (Valid)", False, "Response missing success or message")
+        else:
+            record_test("DELETE /api/admin/catalogue (Valid)", False, f"Expected 200, got {response.status_code}")
+            
+    except Exception as e:
+        record_test("DELETE /api/admin/catalogue (Valid)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# TEST 9: GET /api/catalogue - Verify Catalogue Deleted
+# ============================================================================
+def test_get_catalogue_after_delete():
+    print_test_header("GET /api/catalogue - Verify Catalogue Deleted")
     
-    # Test 7: Cookie configuration
-    results['cookie_configuration'] = test_cookie_configuration()
+    try:
+        response = requests.get(f"{BASE_URL}/catalogue", timeout=10)
+        print_info(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_info(f"Response: {json.dumps(data, indent=2)}")
+            
+            if data.get('success') == True and data.get('catalogue') is None:
+                record_test("GET /api/catalogue (After Delete)", True, "Catalogue is null as expected after deletion")
+            else:
+                record_test("GET /api/catalogue (After Delete)", False, "Catalogue still exists after deletion")
+        else:
+            record_test("GET /api/catalogue (After Delete)", False, f"Unexpected status code: {response.status_code}")
+            
+    except Exception as e:
+        record_test("GET /api/catalogue (After Delete)", False, f"Exception occurred: {str(e)}")
+
+# ============================================================================
+# MAIN TEST EXECUTION
+# ============================================================================
+def main():
+    print(f"\n{BLUE}{'='*80}{RESET}")
+    print(f"{BLUE}Mr. COCO Bakery - Catalogue Management API Testing{RESET}")
+    print(f"{BLUE}Base URL: {BASE_URL}{RESET}")
+    print(f"{BLUE}Test Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{RESET}")
+    print(f"{BLUE}{'='*80}{RESET}")
     
-    # Test 8: Session persistence
-    results['session_persistence'] = test_session_persistence()
+    # Run all tests in sequence
+    test_get_catalogue_public()
+    test_post_catalogue_unauthorized()
+    test_post_catalogue_missing_fields()
+    test_post_catalogue_valid()
+    test_get_catalogue_after_upload()
+    test_post_catalogue_replace()
+    test_delete_catalogue_unauthorized()
+    test_delete_catalogue_valid()
+    test_get_catalogue_after_delete()
     
-    # Summary
-    print("\n" + "="*80)
-    print("TEST SUMMARY")
-    print("="*80)
+    # Print summary
+    print(f"\n{BLUE}{'='*80}{RESET}")
+    print(f"{BLUE}TEST SUMMARY{RESET}")
+    print(f"{BLUE}{'='*80}{RESET}")
+    print(f"{GREEN}Tests Passed: {tests_passed}{RESET}")
+    print(f"{RED}Tests Failed: {tests_failed}{RESET}")
+    print(f"Total Tests: {tests_passed + tests_failed}")
+    print(f"Success Rate: {(tests_passed / (tests_passed + tests_failed) * 100):.1f}%")
+    print(f"{BLUE}{'='*80}{RESET}\n")
     
-    total_tests = len(results)
-    passed_tests = sum(1 for v in results.values() if v)
-    failed_tests = total_tests - passed_tests
-    
-    for test_name, passed in results.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
-        print(f"{status}: {test_name}")
-    
-    print("\n" + "-"*80)
-    print(f"Total Tests: {total_tests}")
-    print(f"Passed: {passed_tests}")
-    print(f"Failed: {failed_tests}")
-    print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
-    print("="*80 + "\n")
-    
-    return passed_tests == total_tests
+    # Exit with appropriate code
+    sys.exit(0 if tests_failed == 0 else 1)
 
 if __name__ == "__main__":
-    success = run_all_tests()
-    exit(0 if success else 1)
+    main()
