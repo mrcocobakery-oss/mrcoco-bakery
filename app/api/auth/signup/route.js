@@ -5,7 +5,7 @@ import { generateToken } from '@/lib/auth/jwt'
 
 export async function POST(request) {
   try {
-    const { name, email, password, phone } = await request.json()
+    const { name, email, password, phone, referralCode: inputReferralCode } = await request.json()
 
     // Validation
     if (!name || !email || !password) {
@@ -24,13 +24,27 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
     }
 
+    // Validate referral code if provided
+    let referrer = null
+    if (inputReferralCode && inputReferralCode.trim()) {
+      referrer = await db.collection('users').findOne({ 
+        referralCode: inputReferralCode.trim().toUpperCase() 
+      })
+      
+      if (!referrer) {
+        return NextResponse.json({ 
+          error: 'Invalid referral code' 
+        }, { status: 400 })
+      }
+    }
+
     // Generate unique referral code
     const referralCode = 'MRC' + Math.random().toString(36).substring(2, 8).toUpperCase()
 
     // Hash password
     const hashedPassword = await hashPassword(password)
 
-    // Create user
+    // Create user with initial wallet balance if referred
     const user = {
       name,
       email: email.toLowerCase(),
@@ -40,7 +54,9 @@ export async function POST(request) {
       walletBalance: 0,
       loyaltyPoints: 0,
       referralCode,
-      referredBy: '',
+      referredBy: referrer ? referrer.referralCode : '',
+      wishlist: [],
+      addresses: [],
       emailVerified: false,
       phoneVerified: false,
       status: 'active',
@@ -49,10 +65,38 @@ export async function POST(request) {
     }
 
     const result = await db.collection('users').insertOne(user)
+    const userId = result.insertedId.toString()
+
+    // If referred by someone, credit ₹50 to referrer's wallet
+    if (referrer) {
+      const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      // Credit referrer's wallet
+      await db.collection('users').updateOne(
+        { _id: referrer._id },
+        { 
+          $inc: { walletBalance: 50 },
+          $set: { updatedAt: new Date() }
+        }
+      )
+
+      // Create transaction record for referrer
+      await db.collection('transactions').insertOne({
+        _id: transactionId,
+        userId: referrer._id,
+        type: 'credit',
+        amount: 50,
+        description: `Referral bonus - ${name} joined using your code`,
+        status: 'completed',
+        category: 'referral_bonus',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+    }
 
     // Generate JWT token
     const token = generateToken({
-      userId: result.insertedId.toString(),
+      userId,
       email: user.email
     })
 
@@ -61,8 +105,9 @@ export async function POST(request) {
 
     const response = NextResponse.json({
       success: true,
-      user: { ...userWithoutPassword, _id: result.insertedId },
-      token
+      user: { ...userWithoutPassword, _id: userId },
+      token,
+      ...(referrer && { message: 'Account created! Your referrer earned ₹50!' })
     })
 
     // Set HTTP-only cookie

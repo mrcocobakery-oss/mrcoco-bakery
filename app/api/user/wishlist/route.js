@@ -50,6 +50,73 @@ export async function GET() {
   }
 }
 
+export async function POST(request) {
+  try {
+    const cookieStore = await cookies()
+    const token = cookieStore.get('token')?.value
+
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET)
+    const userId = decoded.userId
+
+    const { productId } = await request.json()
+
+    if (!productId) {
+      return NextResponse.json(
+        { error: 'Product ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const { db } = await connectDB()
+
+    // Check if product exists
+    const product = await db.collection('products').findOne({ _id: productId })
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+
+    // Check if already in wishlist
+    const user = await db.collection('users').findOne(
+      { _id: userId },
+      { projection: { wishlist: 1 } }
+    )
+
+    if (user?.wishlist?.includes(productId)) {
+      return NextResponse.json(
+        { error: 'Product already in wishlist' },
+        { status: 400 }
+      )
+    }
+
+    // Add to wishlist
+    await db.collection('users').updateOne(
+      { _id: userId },
+      { 
+        $push: { wishlist: productId },
+        $set: { updatedAt: new Date() }
+      }
+    )
+
+    return NextResponse.json({
+      success: true,
+      message: 'Added to wishlist'
+    })
+  } catch (error) {
+    console.error('Error adding to wishlist:', error)
+    return NextResponse.json(
+      { error: 'Failed to add to wishlist' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function DELETE(request) {
   try {
     const cookieStore = await cookies()

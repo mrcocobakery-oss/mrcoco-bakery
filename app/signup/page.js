@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, User, Mail, Phone, Lock, ArrowLeft } from 'lucide-react'
+import { Loader2, User, Mail, Phone, Lock, ArrowLeft, Gift } from 'lucide-react'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -19,7 +19,8 @@ export default function SignupPage() {
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    referralCode: ''
   })
 
   const handleChange = (e) => {
@@ -38,10 +39,19 @@ export default function SignupPage() {
     }
 
     setLoading(true)
-    const result = await signup(formData.name, formData.email, formData.password, formData.phone)
+    const result = await signup(
+      formData.name, 
+      formData.email, 
+      formData.password, 
+      formData.phone,
+      formData.referralCode
+    )
     setLoading(false)
 
     if (result.success) {
+      if (result.message) {
+        alert(result.message)
+      }
       router.push('/dashboard')
     }
   }
@@ -154,6 +164,24 @@ export default function SignupPage() {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="referralCode">Referral Code (Optional)</Label>
+                <div className="relative">
+                  <Input
+                    id="referralCode"
+                    name="referralCode"
+                    type="text"
+                    value={formData.referralCode}
+                    onChange={handleChange}
+                    placeholder="Enter referral code (if you have one)"
+                    className="uppercase"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Have a referral code? Your friend will earn ₹50!
+                </p>
               </div>
 
               <Button

@@ -57,12 +57,12 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const signup = async (name, email, password, phone) => {
+  const signup = async (name, email, password, phone, referralCode) => {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, phone }),
+        body: JSON.stringify({ name, email, password, phone, referralCode }),
         credentials: 'include' // Include cookies
       })
 
@@ -73,8 +73,8 @@ export function AuthProvider({ children }) {
       }
 
       setUser(data.user)
-      toast.success('Account created successfully!')
-      return { success: true }
+      toast.success(data.message || 'Account created successfully!')
+      return { success: true, message: data.message }
     } catch (error) {
       toast.error(error.message)
       return { success: false, error: error.message }
