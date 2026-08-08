@@ -22,6 +22,7 @@ import { QuickViewModal } from '@/components/QuickViewModal'
 import { useAuth } from '@/contexts/AuthContext'
 import { RecentlyViewed } from '@/components/RecentlyViewed'
 import { ProductRecommendations } from '@/components/ProductRecommendations'
+import WishlistButton from '@/components/WishlistButton'
 
 function ProductsPageContent() {
   const searchParams = useSearchParams()
@@ -517,8 +518,14 @@ function ProductsPageContent() {
                               title="100% Pure Veg & Eggless"
                             />
                           </div>
+                          
+                          {/* Wishlist Button */}
+                          <div className="absolute top-3 right-3 z-10">
+                            <WishlistButton productId={product._id || product.id} size="small" />
+                          </div>
+                          
                           {!product.inStock && (
-                            <Badge className="absolute top-3 right-3 bg-gray-900 text-white border-0 z-10">Out of Stock</Badge>
+                            <Badge className="absolute top-12 right-3 bg-gray-900 text-white border-0 z-10">Out of Stock</Badge>
                           )}
                         </div>
                       </Link>

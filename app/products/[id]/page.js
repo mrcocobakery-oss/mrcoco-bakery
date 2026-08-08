@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Header } from '@/components/navigation/Header'
 import { WhatsAppChatButton } from '@/components/WhatsAppChatButton'
 import { RecentlyViewed } from '@/components/RecentlyViewed'
+import WishlistButton from '@/components/WishlistButton'
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -326,13 +327,7 @@ export default function ProductDetailPage() {
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Add to Cart
               </Button>
-              <Button
-                onClick={toggleWishlist}
-                variant="outline"
-                className={`h-12 px-6 ${isInWishlist() ? 'border-red-500 text-red-500' : ''}`}
-              >
-                <Heart className={`w-5 h-5 ${isInWishlist() ? 'fill-red-500' : ''}`} />
-              </Button>
+              <WishlistButton productId={product._id || product.id} size="large" />
             </div>
 
             {/* Features */}

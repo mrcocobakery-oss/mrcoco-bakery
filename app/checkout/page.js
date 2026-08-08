@@ -224,18 +224,90 @@ export default function CheckoutPage() {
     console.error('Payment error:', error)
   }
 
-  const placeOrderCOD = () => {
-    // For COD orders
-    const orderId = 'MRC' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    
-    // Clear cart
-    localStorage.removeItem('cart')
-    
-    toast.success(`Order placed successfully! Order ID: ${orderId}`)
-    
-    setTimeout(() => {
-      router.push('/')
-    }, 2000)
+  const placeOrderCOD = async () => {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+      toast.error('Please fill all required fields')
+      return
+    }
+
+    try {
+      // Create order in database
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user?._id,
+          items: cart.map(item => ({
+            productId: item._id || item.id,
+            productName: item.name,
+            productImage: item.image,
+            category: item.category,
+            price: item.price,
+            quantity: item.quantity,
+            size: item.size
+          })),
+          total: total,
+          subtotal: subtotal,
+          deliveryCharge: deliveryCharge,
+          expressDeliveryFee: expressDeliveryFee,
+          loyaltyDiscount: loyaltyDiscount,
+          loyaltyPointsUsed: parseInt(pointsToRedeem) || 0,
+          paymentMethod: 'cod',
+          paymentStatus: 'pending',
+          status: 'pending',
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          deliveryAddress: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          deliveryDate: formData.deliveryDate,
+          deliveryTime: formData.deliveryTime,
+          specialInstructions: formData.specialInstructions
+        })
+      })
+
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create order')
+      }
+
+      const orderData = await orderResponse.json()
+      const orderId = orderData.order?._id || orderData.orderId
+
+      // Call order completion for loyalty points
+      if (user && orderId) {
+        try {
+          await fetch('/api/orders/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              orderId,
+              userId: user._id,
+              loyaltyPointsUsed: parseInt(pointsToRedeem) || 0
+            })
+          })
+        } catch (error) {
+          console.error('Error crediting loyalty points:', error)
+          // Don't fail the order if loyalty points fail
+        }
+      }
+
+      // Clear cart
+      localStorage.removeItem('cart')
+      setCart([])
+
+      toast.success(`Order placed successfully! Order ID: ${orderId}`)
+
+      setTimeout(() => {
+        router.push('/dashboard/orders')
+      }, 2000)
+    } catch (error) {
+      console.error('Error placing COD order:', error)
+      toast.error('Failed to place order. Please try again.')
+    }
   }
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
