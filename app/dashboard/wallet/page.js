@@ -1,437 +1,425 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Wallet, Plus, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, XCircle, CreditCard } from 'lucide-react'
+import { Wallet, Plus, ArrowUpRight, ArrowDownRight, Filter, Download, ChevronLeft, ChevronRight, IndianRupee } from 'lucide-react'
 import { toast } from 'sonner'
-import { useAuth } from '@/contexts/AuthContext'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 export default function WalletPage() {
   const { user } = useAuth()
   const [walletBalance, setWalletBalance] = useState(0)
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showRechargeDialog, setShowRechargeDialog] = useState(false)
+  const [rechargeDialogOpen, setRechargeDialogOpen] = useState(false)
   const [rechargeAmount, setRechargeAmount] = useState('')
-  const [processing, setProcessing] = useState(false)
+  const [recharging, setRecharging] = useState(false)
 
-  const quickAmounts = [100, 500, 1000, 2000, 5000]
+  // Filters
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [pagination, setPagination] = useState({ total: 0, pages: 0 })
 
   useEffect(() => {
     if (user) {
       fetchWalletData()
-      fetchTransactions()
     }
-  }, [user])
+  }, [user, page, typeFilter])
 
   const fetchWalletData = async () => {
     try {
-      // Get wallet balance from user data
-      const response = await fetch('/api/auth/me')
-      const data = await response.json()
-      if (data.success) {
-        setWalletBalance(data.user.walletBalance || 0)
+      setLoading(true)
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '20',
+        type: typeFilter
+      })
+
+      const response = await fetch(`/api/user/wallet?${params}`, {
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setWalletBalance(data.walletBalance)
+        setTransactions(data.transactions)
+        setPagination(data.pagination)
+      } else {
+        toast.error('Failed to fetch wallet data')
       }
     } catch (error) {
       console.error('Error fetching wallet data:', error)
+      toast.error('Something went wrong')
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchTransactions = async () => {
-    try {
-      const response = await fetch('/api/wallet/transactions')
-      const data = await response.json()
-      if (data.success) {
-        setTransactions(data.transactions || [])
-      }
-    } catch (error) {
-      console.error('Error fetching transactions:', error)
-    }
-  }
+  const handleAddMoney = async () => {
+    const amount = parseFloat(rechargeAmount)
 
-  const handleRecharge = async () => {
-    const amount = parseInt(rechargeAmount)
-    
-    if (!amount || amount < 10) {
-      toast.error('Minimum recharge amount is ₹10')
+    if (!amount || amount < 100) {
+      toast.error('Minimum recharge amount is ₹100')
       return
     }
-    
+
     if (amount > 50000) {
       toast.error('Maximum recharge amount is ₹50,000')
       return
     }
-    
-    setProcessing(true)
-    
+
     try {
+      setRecharging(true)
+
       // Create Razorpay order
-      const response = await fetch('/api/wallet/recharge', {
+      const response = await fetch('/api/user/wallet/recharge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ amount })
       })
-      
+
       const data = await response.json()
-      
-      if (!data.success) {
+
+      if (!response.ok) {
         toast.error(data.error || 'Failed to create recharge order')
-        setProcessing(false)
         return
       }
-      
-      // Load Razorpay script
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      script.async = true
-      document.body.appendChild(script)
-      
-      script.onload = () => {
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: data.order.amount,
-          currency: data.order.currency,
-          name: 'Mr. COCO Bakery',
-          description: 'Wallet Recharge',
-          order_id: data.order.id,
-          image: '/logo.png',
-          handler: async function (response) {
-            // Verify payment
-            const verifyResponse = await fetch('/api/wallet/verify', {
+
+      // Initialize Razorpay checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.orderId,
+        name: 'Mr. COCO Bakery',
+        description: 'Wallet Recharge',
+        image: '/images/mrcoco-logo.png',
+        handler: async function (response) {
+          // Verify payment
+          try {
+            const verifyResponse = await fetch('/api/user/wallet/verify-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
+                razorpay_signature: response.razorpay_signature,
+                transactionId: data.transactionId
               })
             })
-            
+
             const verifyData = await verifyResponse.json()
-            
-            if (verifyData.success) {
-              toast.success('Wallet Recharged! ₹' + amount + ' added to your wallet', { duration: 5000 })
-              setWalletBalance(verifyData.walletBalance)
-              setShowRechargeDialog(false)
+
+            if (verifyResponse.ok) {
+              toast.success(`₹${verifyData.amount} added to wallet!`)
+              setRechargeDialogOpen(false)
               setRechargeAmount('')
-              fetchTransactions()
+              fetchWalletData()
             } else {
-              toast.error('Payment verification failed')
+              toast.error(verifyData.error || 'Payment verification failed')
             }
-            setProcessing(false)
-          },
-          modal: {
-            ondismiss: function() {
-              setProcessing(false)
-              toast.info('Payment cancelled')
-            }
-          },
-          prefill: {
-            name: user?.name || '',
-            email: user?.email || '',
-            contact: user?.phone || ''
-          },
-          theme: {
-            color: '#ec4899'
+          } catch (error) {
+            console.error('Error verifying payment:', error)
+            toast.error('Payment verification failed')
           }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone || ''
+        },
+        theme: {
+          color: '#db2777'
         }
-        
-        const rzp = new window.Razorpay(options)
-        rzp.open()
       }
+
+      const rzp = new window.Razorpay(options)
+      rzp.open()
+
+      rzp.on('payment.failed', function (response) {
+        toast.error('Payment failed. Please try again.')
+      })
     } catch (error) {
-      console.error('Recharge error:', error)
-      toast.error('Failed to initiate recharge')
-      setProcessing(false)
+      console.error('Error adding money:', error)
+      toast.error('Something went wrong')
+    } finally {
+      setRecharging(false)
     }
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+  const getTransactionIcon = (type) => {
+    return type === 'credit' ? (
+      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+        <ArrowDownRight className="w-5 h-5 text-green-600" />
+      </div>
+    ) : (
+      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+        <ArrowUpRight className="w-5 h-5 text-red-600" />
+      </div>
+    )
   }
 
   const getStatusBadge = (status) => {
-    const styles = {
-      completed: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      failed: 'bg-red-100 text-red-800'
+    const colors = {
+      completed: 'bg-green-100 text-green-800 border-green-200',
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      failed: 'bg-red-100 text-red-800 border-red-200'
     }
-    return styles[status] || styles.pending
-  }
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle2 className="w-4 h-4" />
-      case 'pending':
-        return <Clock className="w-4 h-4" />
-      case 'failed':
-        return <XCircle className="w-4 h-4" />
-      default:
-        return <Clock className="w-4 h-4" />
-    }
-  }
-
-  if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner size="lg" />
+      <Badge className={`${colors[status] || colors.pending} border`}>
+        {status.toUpperCase()}
+      </Badge>
+    )
+  }
+
+  if (loading && transactions.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <Wallet className="w-12 h-12 text-pink-600 animate-pulse mx-auto mb-4" />
+          <p className="text-gray-600">Loading wallet...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Wallet</h1>
-        <p className="text-gray-500 mt-1">Manage your wallet balance and transactions</p>
+        <h1 className="text-3xl font-bold font-serif text-pink-900 mb-2">My Wallet</h1>
+        <p className="text-gray-600">Manage your wallet balance and transactions</p>
       </div>
 
       {/* Wallet Balance Card */}
       <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white">
         <CardContent className="p-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center">
-                <Wallet className="w-8 h-8 text-white" />
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
+                <Wallet className="w-10 h-10 text-white" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Wallet Balance</p>
-                <p className="text-4xl font-bold text-gray-900">₹{walletBalance.toLocaleString('en-IN')}</p>
+                <p className="text-sm text-gray-600 mb-1">Current Balance</p>
+                <h2 className="text-4xl font-bold text-pink-900">
+                  ₹{walletBalance.toFixed(2)}
+                </h2>
               </div>
             </div>
             <Button
-              onClick={() => setShowRechargeDialog(true)}
-              className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-6 text-lg"
+              onClick={() => setRechargeDialogOpen(true)}
+              className="bg-pink-600 hover:bg-pink-700 text-white"
+              size="lg"
             >
-              <Plus className="w-5 h-5 mr-2" />
+              <Plus className="w-4 h-4 mr-2" />
               Add Money
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <ArrowDownRight className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Recharged</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ₹{transactions
-                    .filter(t => t.type === 'recharge' && t.status === 'completed')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                    .toLocaleString('en-IN')}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <ArrowUpRight className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Spent</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ₹{transactions
-                    .filter(t => t.type === 'debit' && t.status === 'completed')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                    .toLocaleString('en-IN')}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Transactions</p>
-                <p className="text-2xl font-bold text-gray-900">{transactions.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Transaction History */}
-      <Card>
+      <Card className="border-2 border-pink-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Transaction History
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl font-serif text-pink-900">Transaction History</CardTitle>
+              <CardDescription>View all your wallet transactions</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Transactions</SelectItem>
+                  <SelectItem value="credit">Credits</SelectItem>
+                  <SelectItem value="debit">Debits</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Wallet className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>No transactions yet</p>
-              <p className="text-sm mt-1">Start by adding money to your wallet</p>
+            <div className="text-center py-12">
+              <Wallet className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No transactions yet</h3>
+              <p className="text-gray-600 mb-6">Add money to your wallet to get started</p>
+              <Button
+                onClick={() => setRechargeDialogOpen(true)}
+                className="bg-pink-600 hover:bg-pink-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Money
+              </Button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <div
-                  key={transaction._id}
-                  className="flex items-center justify-between p-4 border-2 rounded-lg hover:border-pink-200 transition"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.type === 'recharge' ? 'bg-green-100' : 'bg-red-100'
-                    }`}>
-                      {transaction.type === 'recharge' ? (
-                        <ArrowDownRight className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <ArrowUpRight className="w-5 h-5 text-red-600" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {transaction.type === 'recharge' ? 'Wallet Recharge' : 'Order Payment'}
-                      </p>
-                      <p className="text-sm text-gray-500">{formatDate(transaction.createdAt)}</p>
-                      {transaction.orderId && (
-                        <p className="text-xs text-gray-400 mt-1">Order ID: {transaction.orderId}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={`text-lg font-bold ${
-                      transaction.type === 'recharge' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'recharge' ? '+' : '-'}₹{transaction.amount}
-                    </p>
-                    <Badge className={getStatusBadge(transaction.status)}>
-                      <span className="flex items-center gap-1">
-                        {getStatusIcon(transaction.status)}
-                        {transaction.status}
-                      </span>
-                    </Badge>
-                  </div>
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow key={transaction._id}>
+                        <TableCell>
+                          {getTransactionIcon(transaction.type)}
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium text-gray-900">{transaction.description}</p>
+                            {transaction.orderId && (
+                              <p className="text-xs text-gray-500">Order: {transaction.orderId}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-600">
+                            {new Date(transaction.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                            <br />
+                            <span className="text-xs text-gray-500">
+                              {new Date(transaction.createdAt).toLocaleTimeString('en-IN', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span className={`font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
+                            {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toFixed(2)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(transaction.status)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {pagination.pages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  
+                  <span className="text-sm text-gray-600">
+                    Page {page} of {pagination.pages}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+                    disabled={page === pagination.pages}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Recharge Dialog */}
-      <Dialog open={showRechargeDialog} onOpenChange={setShowRechargeDialog}>
-        <DialogContent className="sm:max-w-md">
+      {/* Add Money Dialog */}
+      <Dialog open={rechargeDialogOpen} onOpenChange={setRechargeDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-serif text-pink-900">Add Money to Wallet</DialogTitle>
+            <DialogTitle>Add Money to Wallet</DialogTitle>
             <DialogDescription>
-              Recharge your wallet to make faster checkouts
+              Enter amount to recharge (Minimum: ₹100, Maximum: ₹50,000)
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* Current Balance */}
-            <div className="bg-pink-50 border-2 border-pink-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Current Balance</p>
-              <p className="text-3xl font-bold text-pink-900">₹{walletBalance}</p>
-            </div>
 
-            {/* Amount Input */}
-            <div>
-              <Label htmlFor="amount" className="text-base font-semibold mb-3">
-                Enter Amount
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                value={rechargeAmount}
-                onChange={(e) => setRechargeAmount(e.target.value)}
-                placeholder="Enter amount (₹10 - ₹50,000)"
-                className="text-lg h-12"
-                min="10"
-                max="50000"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                Minimum: ₹10 • Maximum: ₹50,000
-              </p>
-            </div>
-
-            {/* Quick Amount Buttons */}
-            <div>
-              <Label className="text-sm text-gray-600 mb-2">Quick Select</Label>
-              <div className="grid grid-cols-5 gap-2">
-                {quickAmounts.map((amount) => (
-                  <Button
-                    key={amount}
-                    type="button"
-                    variant="outline"
-                    onClick={() => setRechargeAmount(amount.toString())}
-                    className="border-pink-300 hover:bg-pink-50"
-                  >
-                    ₹{amount}
-                  </Button>
-                ))}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount *</Label>
+              <div className="relative">
+                <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder="Enter amount"
+                  value={rechargeAmount}
+                  onChange={(e) => setRechargeAmount(e.target.value)}
+                  min={100}
+                  max={50000}
+                  className="pl-10"
+                />
               </div>
             </div>
 
-            {/* Info */}
+            {/* Quick Amount Buttons */}
+            <div className="grid grid-cols-4 gap-2">
+              {[100, 500, 1000, 2000].map((amount) => (
+                <Button
+                  key={amount}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setRechargeAmount(amount.toString())}
+                  className="border-pink-300 hover:bg-pink-50"
+                >
+                  ₹{amount}
+                </Button>
+              ))}
+            </div>
+
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-xs text-blue-900">
-                <strong>💳 Secure Payment:</strong> Powered by Razorpay. Your payment information is safe and encrypted.
+              <p className="text-sm text-blue-900">
+                <strong>Note:</strong> Money will be credited instantly to your wallet after successful payment.
               </p>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowRechargeDialog(false)}
-              className="flex-1"
-              disabled={processing}
+              onClick={() => {
+                setRechargeDialogOpen(false)
+                setRechargeAmount('')
+              }}
+              disabled={recharging}
             >
               Cancel
             </Button>
             <Button
-              onClick={handleRecharge}
-              disabled={processing || !rechargeAmount}
-              className="flex-1 bg-pink-600 hover:bg-pink-700"
+              className="bg-pink-600 hover:bg-pink-700 text-white"
+              onClick={handleAddMoney}
+              disabled={recharging || !rechargeAmount}
             >
-              {processing ? (
-                <span className="flex items-center gap-2">
-                  <LoadingSpinner size="sm" />
-                  Processing...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  Proceed to Pay
-                </span>
-              )}
+              {recharging ? 'Processing...' : 'Proceed to Pay'}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
