@@ -10,17 +10,17 @@ export default function DashboardPage() {
   const { user } = useAuth()
 
   const stats = [
-    { icon: ShoppingBag, label: 'Total Orders', value: '0', color: 'pink', href: '/dashboard/orders' },
-    { icon: Wallet, label: 'Wallet Balance', value: `₹${user?.walletBalance || 0}`, color: 'green', href: '/dashboard/wallet' },
-    { icon: Award, label: 'Loyalty Points', value: user?.loyaltyPoints || 0, color: 'yellow', href: '/dashboard/loyalty' },
-    { icon: Heart, label: 'Wishlist Items', value: '0', color: 'red', href: '/dashboard/wishlist' },
+    { icon: ShoppingBag, label: 'Total Orders', value: '0', colorBg: 'bg-pink-100', colorText: 'text-pink-600', href: '/dashboard/orders' },
+    { icon: Wallet, label: 'Wallet Balance', value: `₹${user?.walletBalance || 0}`, colorBg: 'bg-green-100', colorText: 'text-green-600', href: '/dashboard/wallet' },
+    { icon: Award, label: 'Loyalty Points', value: user?.loyaltyPoints || 0, colorBg: 'bg-yellow-100', colorText: 'text-yellow-600', href: '/dashboard/loyalty' },
+    { icon: Heart, label: 'Wishlist Items', value: '0', colorBg: 'bg-red-100', colorText: 'text-red-600', href: '/dashboard/wishlist' },
   ]
 
   const quickActions = [
-    { icon: ShoppingBag, label: 'Browse Products', href: '/products', color: 'pink' },
-    { icon: Package, label: 'Track Order', href: '/dashboard/orders', color: 'blue' },
-    { icon: MapPin, label: 'Manage Addresses', href: '/dashboard/addresses', color: 'green' },
-    { icon: Gift, label: 'Refer & Earn', href: '/dashboard/referrals', color: 'purple' },
+    { icon: ShoppingBag, label: 'Browse Products', href: '/products', colorBg: 'bg-pink-100', colorText: 'text-pink-600' },
+    { icon: Package, label: 'Track Order', href: '/dashboard/orders', colorBg: 'bg-blue-100', colorText: 'text-blue-600' },
+    { icon: MapPin, label: 'Manage Addresses', href: '/dashboard/addresses', colorBg: 'bg-green-100', colorText: 'text-green-600' },
+    { icon: Gift, label: 'Refer & Earn', href: '/dashboard/referrals', colorBg: 'bg-purple-100', colorText: 'text-purple-600' },
   ]
 
   return (
@@ -40,8 +40,8 @@ export default function DashboardPage() {
               <Card className="border-2 border-pink-100 hover:border-pink-400 hover:shadow-lg transition-all cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 bg-${stat.color}-100 rounded-full flex items-center justify-center`}>
-                      <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                    <div className={`w-12 h-12 ${stat.colorBg} rounded-full flex items-center justify-center`}>
+                      <Icon className={`w-6 h-6 ${stat.colorText}`} />
                     </div>
                     <TrendingUp className="w-4 h-4 text-gray-400" />
                   </div>
@@ -67,8 +67,8 @@ export default function DashboardPage() {
                 <Link key={action.label} href={action.href}>
                   <Button variant="outline" className="w-full h-auto p-4 justify-between hover:bg-pink-50 hover:border-pink-400">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 bg-${action.color}-100 rounded-lg flex items-center justify-center`}>
-                        <Icon className={`w-5 h-5 text-${action.color}-600`} />
+                      <div className={`w-10 h-10 ${action.colorBg} rounded-lg flex items-center justify-center`}>
+                        <Icon className={`w-5 h-5 ${action.colorText}`} />
                       </div>
                       <span className="font-medium">{action.label}</span>
                     </div>
