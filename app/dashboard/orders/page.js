@@ -1,135 +1,175 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Package, MapPin, Calendar, Eye, Search, ArrowLeft } from 'lucide-react'
-import { toast } from 'sonner'
+import { Package, Search, Filter, ChevronLeft, ChevronRight, X, Calendar, ShoppingBag, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import Image from 'next/image'
 
 export default function OrdersPage() {
   const { user } = useAuth()
   const [orders, setOrders] = useState([])
-  const [filteredOrders, setFilteredOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
   const [selectedOrder, setSelectedOrder] = useState(null)
-  const [showDetailsDialog, setShowDetailsDialog] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancellationReason, setCancellationReason] = useState('')
+  const [cancelling, setCancelling] = useState(false)
+
+  // Filters
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [pagination, setPagination] = useState({ total: 0, pages: 0 })
 
   useEffect(() => {
-    fetchOrders()
-  }, [])
-
-  useEffect(() => {
-    filterOrders()
-  }, [orders, statusFilter, searchQuery])
+    if (user) {
+      fetchOrders()
+    }
+  }, [user, page, statusFilter, search])
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`/api/orders?userId=${user?._id || ''}`)
-      const data = await response.json()
+      setLoading(true)
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10',
+        status: statusFilter,
+        ...(search && { search })
+      })
+
+      const response = await fetch(`/api/user/orders?${params}`, {
+        credentials: 'include'
+      })
+
       if (response.ok) {
-        setOrders(data.orders || [])
+        const data = await response.json()
+        setOrders(data.orders)
+        setPagination(data.pagination)
       } else {
         toast.error('Failed to fetch orders')
       }
     } catch (error) {
-      console.error('Error:', error)
-      toast.error('Failed to fetch orders')
+      console.error('Error fetching orders:', error)
+      toast.error('Something went wrong')
     } finally {
       setLoading(false)
     }
   }
 
-  const filterOrders = () => {
-    let filtered = [...orders]
-    
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(o => o.status === statusFilter)
+  const handleCancelOrder = async () => {
+    if (!cancellationReason.trim()) {
+      toast.error('Please provide a reason for cancellation')
+      return
     }
-    
-    if (searchQuery) {
-      filtered = filtered.filter(o => 
-        o._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        o.items?.some(item => item.productName.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
+
+    try {
+      setCancelling(true)
+      const response = await fetch(`/api/user/orders/${selectedOrder._id}/cancel`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ reason: cancellationReason })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success(data.message)
+        if (data.refundAmount > 0) {
+          toast.success(`₹${data.refundAmount} has been credited to your wallet`)
+        }
+        setCancelDialogOpen(false)
+        setCancellationReason('')
+        fetchOrders()
+      } else {
+        toast.error(data.error || 'Failed to cancel order')
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error('Something went wrong')
+    } finally {
+      setCancelling(false)
     }
-    
-    setFilteredOrders(filtered)
   }
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { label: 'Pending', className: 'bg-yellow-100 text-yellow-800' },
-      processing: { label: 'Processing', className: 'bg-blue-100 text-blue-800' },
-      shipped: { label: 'Shipped', className: 'bg-purple-100 text-purple-800' },
-      delivered: { label: 'Delivered', className: 'bg-green-100 text-green-800' },
-      cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800' }
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      processing: 'bg-blue-100 text-blue-800 border-blue-200',
+      shipped: 'bg-purple-100 text-purple-800 border-purple-200',
+      delivered: 'bg-green-100 text-green-800 border-green-200',
+      cancelled: 'bg-red-100 text-red-800 border-red-200'
     }
-    const config = statusConfig[status] || statusConfig.pending
-    return <Badge className={config.className}>{config.label}</Badge>
+    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
+  const canCancelOrder = (order) => {
+    if (order.status === 'cancelled' || order.status === 'delivered') {
+      return false
+    }
+
+    const hasCakes = order.items.some(item => 
+      item.category?.toLowerCase() === 'cakes' || 
+      item.category?.toLowerCase() === 'cake'
+    )
+
+    if (hasCakes) {
+      return false
+    }
+
+    const orderCreatedAt = new Date(order.createdAt)
+    const now = new Date()
+    const hoursSinceOrder = (now - orderCreatedAt) / (1000 * 60 * 60)
+
+    return hoursSinceOrder <= 12
   }
 
-  const openOrderDetails = (order) => {
-    setSelectedOrder(order)
-    setShowDetailsDialog(true)
-  }
-
-  if (loading) {
+  if (loading && orders.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading orders...</div>
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <Package className="w-12 h-12 text-pink-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading your orders...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
-        </Link>
-      </div>
-
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold font-serif text-pink-900">My Orders</h1>
-        <p className="text-gray-600 mt-1">Track and manage your orders</p>
+        <h1 className="text-3xl font-bold font-serif text-pink-900 mb-2">My Orders</h1>
+        <p className="text-gray-600">View and manage your order history</p>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Card className="border-2 border-pink-200">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search orders..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by Order ID or Product..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
+
+            {/* Status Filter */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Orders</SelectItem>
@@ -140,136 +180,211 @@ export default function OrdersPage() {
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
+
+            {/* Clear Filters */}
+            {(search || statusFilter !== 'all') && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearch('')
+                  setStatusFilter('all')
+                  setPage(1)
+                }}
+                className="flex items-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                Clear Filters
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Orders List */}
-      <div className="space-y-4">
-        {filteredOrders.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
+      {orders.length === 0 ? (
+        <Card className="border-2 border-pink-200">
+          <CardContent className="p-12">
+            <div className="text-center">
               <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No orders found</h3>
-              <p className="text-gray-500 mb-4">Start shopping to see your orders here</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
+              <p className="text-gray-600 mb-6">
+                {search || statusFilter !== 'all' 
+                  ? 'Try adjusting your filters'
+                  : 'Start shopping to see your orders here'}
+              </p>
               <Link href="/products">
-                <Button className="bg-pink-600 hover:bg-pink-700">Browse Products</Button>
+                <Button className="bg-pink-600 hover:bg-pink-700 text-white">
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  Browse Products
+                </Button>
               </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredOrders.map((order) => (
-            <Card key={order._id} className="border-2 border-pink-100 hover:border-pink-300 transition">
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {orders.map((order) => (
+            <Card key={order._id} className="border-2 border-pink-100 hover:border-pink-300 transition-all">
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                  {/* Order Info */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-sm text-gray-600">#{order._id?.substring(0, 8)}</span>
-                      {getStatusBadge(order.status)}
-                      {order.expressDelivery && (
-                        <Badge variant="secondary" className="bg-pink-100 text-pink-800">Express</Badge>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="font-semibold text-gray-900">Order #{order._id}</h3>
+                      <Badge className={`${getStatusColor(order.status)} border`}>
+                        {order.status.toUpperCase()}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </div>
+                      <div>
+                        <strong className="text-gray-900">₹{order.total}</strong>
+                      </div>
+                      <div className="col-span-2">
+                        {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                      </div>
+                    </div>
+
+                    {/* Product Images */}
+                    <div className="flex gap-2 mt-3">
+                      {order.items.slice(0, 3).map((item, idx) => (
+                        <div key={idx} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-pink-100">
+                          <img
+                            src={item.productImage}
+                            alt={item.productName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                      {order.items.length > 3 && (
+                        <div className="w-16 h-16 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 font-semibold text-sm border-2 border-pink-200">
+                          +{order.items.length - 3}
+                        </div>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">Ordered on {formatDate(order.createdAt)}</p>
-                    <p className="text-sm text-gray-600">{order.items?.length || 0} item(s) • Total: ₹{order.total}</p>
-                    {order.deliveryDate && (
-                      <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-                        <Calendar className="w-3 h-3" />
-                        Delivery: {order.deliveryDate}
-                      </p>
-                    )}
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => openOrderDetails(order)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 lg:w-48">
+                    <Link href={`/track-order?id=${order._id}`}>
+                      <Button variant="outline" className="w-full border-pink-300 hover:bg-pink-50">
+                        Track Order
+                      </Button>
+                    </Link>
+                    
+                    {canCancelOrder(order) && (
+                      <Button
+                        variant="outline"
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                          setSelectedOrder(order)
+                          setCancelDialogOpen(true)
+                        }}
+                      >
+                        Cancel Order
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Order Details Dialog */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          
+          <span className="text-sm text-gray-600">
+            Page {page} of {pagination.pages}
+          </span>
+          
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+            disabled={page === pagination.pages}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Cancel Order Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Cancel Order
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </DialogDescription>
           </DialogHeader>
-          {selectedOrder && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <div className="text-xs text-gray-500">Order ID</div>
-                  <div className="font-mono text-sm">#{selectedOrder._id}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">Status</div>
-                  <div>{getStatusBadge(selectedOrder.status)}</div>
-                </div>
+          
+          <div className="space-y-4">
+            {selectedOrder && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600 mb-2">Order ID: <strong>{selectedOrder._id}</strong></p>
+                <p className="text-sm text-gray-600">Total Amount: <strong>₹{selectedOrder.total}</strong></p>
+                {selectedOrder.paymentStatus === 'paid' && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ Refund will be credited to your wallet
+                  </p>
+                )}
               </div>
+            )}
 
-              <Card>
-                <CardHeader><CardTitle className="text-lg">Items</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  {selectedOrder.items?.map((item, index) => (
-                    <div key={index} className="flex items-center gap-4 p-3 border rounded">
-                      {item.productImage && (
-                        <img src={item.productImage} alt={item.productName} className="w-16 h-16 rounded object-cover" />
-                      )}
-                      <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
-                        <div className="text-sm text-gray-600">Qty: {item.quantity}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium">₹{item.price}</div>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader><CardTitle className="text-lg">Delivery Address</CardTitle></CardHeader>
-                <CardContent>
-                  <p>{selectedOrder.customerName}</p>
-                  <p className="text-sm text-gray-600">{selectedOrder.address}</p>
-                  <p className="text-sm text-gray-600">{selectedOrder.city}, {selectedOrder.state} - {selectedOrder.pincode}</p>
-                  <p className="text-sm text-gray-600 mt-2">Phone: {selectedOrder.customerPhone}</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center justify-between">
-                    <span>Payment Summary</span>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => window.open(`/api/orders/invoice?orderId=${selectedOrder._id}`, '_blank')}
-                      className="ml-auto"
-                    >
-                      Download Invoice
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between"><span>Subtotal:</span><span>₹{selectedOrder.subtotal}</span></div>
-                  <div className="flex justify-between"><span>Delivery Fee:</span><span>₹{selectedOrder.deliveryFee || 0}</span></div>
-                  {selectedOrder.expressDeliveryFee > 0 && (
-                    <div className="flex justify-between text-pink-600"><span>Express Delivery:</span><span>₹{selectedOrder.expressDeliveryFee}</span></div>
-                  )}
-                  <div className="flex justify-between font-bold text-lg pt-2 border-t"><span>Total:</span><span>₹{selectedOrder.total}</span></div>
-                </CardContent>
-              </Card>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Reason for Cancellation *
+              </label>
+              <Textarea
+                placeholder="Please tell us why you're cancelling this order..."
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                rows={4}
+              />
             </div>
-          )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCancelDialogOpen(false)
+                setCancellationReason('')
+              }}
+              disabled={cancelling}
+            >
+              Keep Order
+            </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleCancelOrder}
+              disabled={cancelling || !cancellationReason.trim()}
+            >
+              {cancelling ? 'Cancelling...' : 'Cancel Order'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
