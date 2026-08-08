@@ -62,8 +62,9 @@ export default function Home() {
     try {
       const response = await fetch('/api/admin/decoration-gallery')
       const data = await response.json()
-      if (data.success) {
-        setDecorationGallery(data.gallery || [])
+      // API returns { gallery: [...] }, not { success, gallery }
+      if (data.gallery) {
+        setDecorationGallery(data.gallery)
       }
     } catch (error) {
       console.error('Error fetching decoration gallery:', error)
