@@ -83,8 +83,6 @@ export default function Home() {
           price: product.price,
           originalPrice: product.originalPrice,
           image: product.images?.[0] || product.image,
-          rating: product.rating || 4.8,
-          reviews: product.reviewCount || 0,
           category: product.category,
           size: product.size
         }))
@@ -372,11 +370,6 @@ export default function Home() {
                   <Link href={`/products/${product.id}`}>
                     <h3 className="font-semibold text-pink-900 mb-2 hover:text-pink-600 transition">{product.name}</h3>
                   </Link>
-                  <div className="flex items-center gap-1 mb-2">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{product.rating}</span>
-                    <span className="text-sm text-gray-500">({product.reviews})</span>
-                  </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-xl font-bold text-pink-900">₹{product.price}</span>

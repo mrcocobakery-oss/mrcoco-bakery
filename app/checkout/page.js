@@ -84,10 +84,6 @@ export default function CheckoutPage() {
       setLoyaltyPoints(user.loyaltyPoints || 0)
     }
   }, [user])
-        phone: user.phone || ''
-      }))
-    }
-  }, [user])
   
   const fetchSavedAddresses = async () => {
     try {
