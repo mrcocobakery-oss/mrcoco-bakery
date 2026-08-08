@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, User, Mail, Phone, Lock, ArrowLeft, Gift } from 'lucide-react'
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { signup } = useAuth()
@@ -249,5 +249,17 @@ export default function SignupPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
+      </div>
+    }>
+      <SignupForm />
+    </Suspense>
   )
 }

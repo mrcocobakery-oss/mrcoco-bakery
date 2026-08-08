@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -20,7 +20,7 @@ export async function PUT(request, { params }) {
     const { orderId } = await params
     const { reason } = await request.json()
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
     
     // Get the order
     const order = await db.collection('orders').findOne({

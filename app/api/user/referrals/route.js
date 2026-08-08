@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -17,7 +17,7 @@ export async function GET() {
     const decoded = jwt.verify(token, JWT_SECRET)
     const userId = decoded.userId
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
     
     // Get user's referral info
     const user = await db.collection('users').findOne(

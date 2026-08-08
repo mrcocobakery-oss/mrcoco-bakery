@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 
 export async function POST(request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Get order details
     const order = await db.collection('orders').findOne({ _id: orderId })

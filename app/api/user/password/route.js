@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
@@ -35,7 +35,7 @@ export async function PUT(request) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
     
     // Get user with password
     const user = await db.collection('users').findOne({ _id: userId })

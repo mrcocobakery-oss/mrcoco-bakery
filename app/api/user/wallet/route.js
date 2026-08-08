@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -24,7 +24,7 @@ export async function GET(request) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
     
     // Get user wallet balance
     const user = await db.collection('users').findOne(

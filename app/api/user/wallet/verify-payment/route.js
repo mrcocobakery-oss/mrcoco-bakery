@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
@@ -34,7 +34,7 @@ export async function POST(request) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Get the pending transaction
     const transaction = await db.collection('transactions').findOne({

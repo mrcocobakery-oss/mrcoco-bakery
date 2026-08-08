@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -34,7 +34,7 @@ export async function POST(request) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Get user's loyalty points
     const user = await db.collection('users').findOne(

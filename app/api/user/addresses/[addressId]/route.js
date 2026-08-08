@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -42,7 +42,7 @@ export async function PUT(request, { params }) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // If this is set as default, unset all other defaults first
     if (isDefault) {
@@ -105,7 +105,7 @@ export async function DELETE(request, { params }) {
 
     const { addressId } = await params
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Remove address
     const result = await db.collection('users').updateOne(

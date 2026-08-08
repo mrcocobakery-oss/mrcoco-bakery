@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
+import { connectToDatabase } from '@/lib/mongodb'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 
@@ -17,7 +17,7 @@ export async function GET() {
     const decoded = jwt.verify(token, JWT_SECRET)
     const userId = decoded.userId
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
     
     // Get user's wishlist
     const user = await db.collection('users').findOne(
@@ -71,7 +71,7 @@ export async function POST(request) {
       )
     }
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Check if product exists
     const product = await db.collection('products').findOne({ _id: productId })
@@ -131,7 +131,7 @@ export async function DELETE(request) {
 
     const { productId } = await request.json()
 
-    const { db } = await connectDB()
+    const { db } = await connectToDatabase()
 
     // Remove from wishlist
     await db.collection('users').updateOne(
