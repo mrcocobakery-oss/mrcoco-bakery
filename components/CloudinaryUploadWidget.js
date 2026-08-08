@@ -74,10 +74,14 @@ export function CloudinaryUploadWidget({
         }}
       >
         {({ open }) => (
-          <div>
+          <div className="cloudinary-widget">
             <Button 
               type="button"
-              onClick={() => open()}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                open()
+              }}
               disabled={uploading}
               className="w-full bg-pink-600 hover:bg-pink-700 text-white"
             >

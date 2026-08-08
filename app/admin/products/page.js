@@ -396,7 +396,18 @@ export default function AdminProductsPage() {
 
       {/* Add/Edit Product Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog} modal={false}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => {
+            // Prevent dialog from closing when clicking on Cloudinary widget
+            const target = e.target
+            if (target.closest('.cloudinary-widget') || 
+                target.closest('[id^="cloudinary"]') ||
+                target.closest('iframe')) {
+              e.preventDefault()
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{editMode ? 'Edit Product' : 'Add New Product'}</DialogTitle>
           </DialogHeader>
