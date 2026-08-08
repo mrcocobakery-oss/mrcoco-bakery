@@ -20,6 +20,7 @@ export default function Home() {
   const [sliders, setSliders] = useState([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [decorationGallery, setDecorationGallery] = useState([])
+  const [bestSellers, setBestSellers] = useState([])
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart')
@@ -31,6 +32,8 @@ export default function Home() {
     fetchSliders()
     // Fetch decoration gallery
     fetchDecorationGallery()
+    // Fetch best sellers
+    fetchBestSellers()
   }, [])
 
   // Auto-play slider every 5 seconds
@@ -64,6 +67,30 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error fetching decoration gallery:', error)
+    }
+  }
+
+  const fetchBestSellers = async () => {
+    try {
+      const response = await fetch('/api/products?featured=true&limit=4')
+      const data = await response.json()
+      if (data.success && data.products) {
+        // Map products to match the expected format
+        const formattedProducts = data.products.map(product => ({
+          id: product._id || product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          image: product.images?.[0] || product.image,
+          rating: product.rating || 4.8,
+          reviews: product.reviewCount || 0,
+          category: product.category,
+          size: product.size
+        }))
+        setBestSellers(formattedProducts)
+      }
+    } catch (error) {
+      console.error('Error fetching best sellers:', error)
     }
   }
 
@@ -104,13 +131,6 @@ export default function Home() {
     { name: 'Cookies', icon: Cookie, image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', count: '30+' },
     { name: 'Namkeen', icon: Sparkles, image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=500', count: '25+' },
     { name: 'Gift Packs', icon: Gift, image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHw0fHxwcmVtaXVtJTIwY2FrZXN8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85', count: '20+' }
-  ]
-
-  const bestSellers = [
-    { id: 1, name: 'Chocolate Truffle Cake', price: 899, originalPrice: 1099, image: 'https://images.pexels.com/photos/35583855/pexels-photo-35583855.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.8, reviews: 245, discount: 18 },
-    { id: 2, name: 'Red Velvet Cake', price: 799, originalPrice: 999, image: 'https://images.unsplash.com/photo-1780586377241-41b03171419b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwzfHxwcmVtaXVtJTIwY2FrZXN8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85', rating: 4.9, reviews: 312, discount: 20 },
-    { id: 3, name: 'Premium Butter Cookies', price: 399, originalPrice: 499, image: 'https://images.pexels.com/photos/27304325/pexels-photo-27304325.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940', rating: 4.7, reviews: 189, discount: 20 },
-    { id: 4, name: 'White & Gold Cake', price: 1299, originalPrice: 1599, image: 'https://images.unsplash.com/photo-1633062781822-e32867fe7d4a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHw0fHxwcmVtaXVtJTIwY2FrZXN8ZW58MHx8fHwxNzg0NTQ1OTUyfDA&ixlib=rb-4.1.0&q=85', rating: 5.0, reviews: 156, discount: 19 }
   ]
 
   const reviews = [
