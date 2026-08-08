@@ -24,9 +24,9 @@ export async function POST(request) {
       )
     }
 
-    // Calculate loyalty points to earn (100 points per ₹100 spent)
+    // Calculate loyalty points to earn (10 points per ₹100 spent)
     // Use the amount after loyalty discount
-    const pointsToAdd = Math.floor(order.total / 100) * 100
+    const pointsToAdd = Math.floor(order.total / 100) * 10
 
     // Deduct used points and add earned points
     const pointsUsed = loyaltyPointsUsed || 0

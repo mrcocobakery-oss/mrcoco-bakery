@@ -76,10 +76,10 @@ export default function LoyaltyPage() {
               <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-700">For every ₹100 spent</span>
-                  <span className="font-bold text-green-600 text-lg">+100 Points</span>
+                  <span className="font-bold text-green-600 text-lg">+10 Points</span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Earn 100 loyalty points for every ₹100 spent on orders
+                  Earn 10 loyalty points for every ₹100 spent on orders
                 </p>
               </div>
             </div>
