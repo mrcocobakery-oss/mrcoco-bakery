@@ -508,9 +508,15 @@ function ProductsPageContent() {
                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                             priority={false}
                           />
-                          {product.discount && (
-                            <Badge className="absolute top-3 left-3 bg-red-500 text-white border-0 z-10">{product.discount}% OFF</Badge>
-                          )}
+                          {/* Veg Icon - Pure Veg & Eggless */}
+                          <div className="absolute top-3 left-3 z-10">
+                            <img 
+                              src="/veg-icon.svg" 
+                              alt="Pure Veg" 
+                              className="w-6 h-6"
+                              title="100% Pure Veg & Eggless"
+                            />
+                          </div>
                           {!product.inStock && (
                             <Badge className="absolute top-3 right-3 bg-gray-900 text-white border-0 z-10">Out of Stock</Badge>
                           )}

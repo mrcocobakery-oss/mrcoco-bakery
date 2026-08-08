@@ -182,11 +182,15 @@ export default function ProductDetailPage() {
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
-                {product.discount && (
-                  <Badge className="absolute top-4 left-4 bg-red-500 text-white text-lg px-3 py-1">
-                    {product.discount}% OFF
-                  </Badge>
-                )}
+                {/* Veg Icon - Pure Veg & Eggless */}
+                <div className="absolute top-4 left-4">
+                  <img 
+                    src="/veg-icon.svg" 
+                    alt="Pure Veg" 
+                    className="w-10 h-10 bg-white rounded p-1"
+                    title="100% Pure Veg & Eggless"
+                  />
+                </div>
               </div>
             </Card>
             {productImages.length > 1 && (
@@ -229,11 +233,15 @@ export default function ProductDetailPage() {
                 {product.originalPrice && (
                   <span className="text-xl text-gray-400 line-through">₹{product.originalPrice}</span>
                 )}
-                {product.discount && (
-                  <Badge className="bg-green-100 text-green-700">Save {product.discount}%</Badge>
+              </div>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-sm text-gray-600">Inclusive of all taxes</p>
+                {product.size && (
+                  <Badge variant="outline" className="text-pink-700 border-pink-300">
+                    Weight: {product.size}
+                  </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mt-1">Inclusive of all taxes</p>
             </div>
 
             <Separator className="my-6" />
@@ -370,11 +378,14 @@ export default function ProductDetailPage() {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
-                      {relatedProduct.discount && (
-                        <Badge className="absolute top-2 left-2 bg-red-500 text-white border-0 z-10">
-                          {relatedProduct.discount}% OFF
-                        </Badge>
-                      )}
+                      {/* Veg Icon */}
+                      <div className="absolute top-2 left-2 z-10">
+                        <img 
+                          src="/veg-icon.svg" 
+                          alt="Pure Veg" 
+                          className="w-6 h-6 bg-white rounded p-0.5"
+                        />
+                      </div>
                     </div>
                   </Link>
                   <CardContent className="p-4">

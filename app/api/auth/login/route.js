@@ -19,6 +19,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
+    // Check if user has a password (Google OAuth users don't have passwords)
+    if (!user.password) {
+      return NextResponse.json({ error: 'Please sign in with Google' }, { status: 401 })
+    }
+
     // Check password
     const isValidPassword = await comparePassword(password, user.password)
     if (!isValidPassword) {
