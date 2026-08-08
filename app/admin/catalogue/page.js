@@ -51,11 +51,28 @@ export default function AdminCataloguePage() {
     try {
       setUploading(true)
 
-      // Upload to Cloudinary
+      // First, get signed upload parameters from backend
+      const signResponse = await fetch('/api/admin/catalogue/sign-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name
+        })
+      })
+
+      if (!signResponse.ok) {
+        throw new Error('Failed to get upload signature')
+      }
+
+      const signData = await signResponse.json()
+
+      // Upload to Cloudinary with signature
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', 'ml_default') // Use your Cloudinary upload preset
-      formData.append('folder', 'catalogues')
+      formData.append('api_key', signData.apiKey)
+      formData.append('timestamp', signData.timestamp)
+      formData.append('signature', signData.signature)
+      formData.append('folder', signData.folder)
 
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload`,
@@ -68,6 +85,7 @@ export default function AdminCataloguePage() {
       const cloudinaryData = await cloudinaryResponse.json()
 
       if (!cloudinaryResponse.ok) {
+        console.error('Cloudinary error:', cloudinaryData)
         throw new Error('Failed to upload to Cloudinary')
       }
 
