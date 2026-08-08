@@ -105,26 +105,39 @@ export default function BecomeOurPartnerPage() {
       <Header />
 
       {/* Hero Section with Download Catalogue */}
-      <div className="bg-gradient-to-r from-pink-600 to-pink-800 py-16">
-        <div className="container mx-auto px-4">
+      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-purple-700 py-20 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold font-serif text-white mb-4">
               Become Our Partner
             </h1>
-            <p className="text-pink-100 text-lg mb-6">
-              Join hands with Mr. COCO Bakery and grow your business with us
+            <p className="text-white text-xl mb-8">
+              Grow Your Business with Mr. COCO Bakery
             </p>
             
-            {/* Download Catalogue Button */}
-            {catalogue && (
-              <Button
-                onClick={handleDownloadCatalogue}
-                className="bg-white text-pink-600 hover:bg-pink-50 font-semibold text-lg px-8 py-6 h-auto"
-                size="lg"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Download Catalogue
-              </Button>
+            {/* Download Catalogue Button - Always Visible */}
+            <Button
+              onClick={handleDownloadCatalogue}
+              disabled={!catalogue}
+              className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-lg px-10 py-7 h-auto rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300"
+              size="lg"
+            >
+              <Download className="w-6 h-6 mr-3" />
+              Download Catalogue
+            </Button>
+            
+            {!catalogue && (
+              <p className="text-white/80 text-sm mt-3">
+                Catalogue will be available soon
+              </p>
             )}
           </div>
         </div>
